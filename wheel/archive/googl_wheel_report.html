@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QQQ Wheel Strategy Backtest</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1a1a2e; line-height: 1.6; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+h1 { text-align: center; font-size: 28px; margin: 20px 0 5px; color: #1a1a2e; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px; }
+.card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.card-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.card-value { font-size: 24px; font-weight: 700; }
+.card-value.profit { color: #c0392b; }
+.card-value.loss { color: #27ae60; }
+.card-value.neutral { color: #2c3e50; }
+.card-sub { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+.highlight-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 30px; text-align: center; margin-bottom: 30px; color: white; }
+.highlight-box .label { font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+.highlight-box .value { font-size: 48px; font-weight: 800; margin: 10px 0; }
+.highlight-box .detail { font-size: 14px; opacity: 0.8; }
+
+.config-box { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.config-box h3 { font-size: 16px; margin-bottom: 12px; color: #555; }
+.config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.config-item { display: flex; justify-content: space-between; padding: 6px 12px; background: #f8f9fa; border-radius: 6px; font-size: 13px; }
+.config-item span:first-child { color: #888; }
+.config-item span:last-child { font-weight: 600; }
+
+.chart-container { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.chart-container h3 { font-size: 16px; margin-bottom: 16px; color: #333; }
+.chart-wrapper { position: relative; height: 350px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+thead { background: #2c3e50; color: white; }
+th { padding: 12px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
+td { padding: 8px; text-align: center; border-bottom: 1px solid #eee; white-space: nowrap; }
+tr:hover { background: #f8f9fa; }
+td.put { color: #e74c3c; font-weight: 600; }
+td.call { color: #2980b9; font-weight: 600; }
+td.assigned { color: #e67e22; font-weight: 600; }
+td.expired { color: #27ae60; }
+td.profit { color: #c0392b; font-weight: 600; }
+td.loss { color: #27ae60; font-weight: 600; }
+td.note { text-align: left; color: #666; font-size: 11px; }
+
+.section-title { font-size: 20px; font-weight: 700; margin: 30px 0 15px; color: #2c3e50; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Google (GOOGL) Wheel Strategy Backtest</h1>
+    <p class="subtitle">Sell Put (${cfg.put_otm} OTM) → if assigned, sell Call ($10.0 OTM) → if assigned, back to Put | 10-day DTE</p>
+
+    <div class="highlight-box">
+        <div class="label">Annualized Return</div>
+        <div class="value">-7.14%</div>
+        <div class="detail">
+            Total return: -3.77% over 189 days |
+            Initial: $31,393 → Final: $30,211 |
+            vs Buy&Hold: +25.09% annualized
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <div class="card">
+            <div class="card-label">Total Premium Income</div>
+            <div class="card-value profit">${result.total_premium:,.0f}</div>
+            <div class="card-sub">19 cycles</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Total Return</div>
+            <div class="card-value loss">-3.77%</div>
+            <div class="card-sub">$-1,182 P&L</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Max Drawdown</div>
+            <div class="card-value loss">11.21%</div>
+            <div class="card-sub">Peak to trough</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Buy & Hold Return</div>
+            <div class="card-value neutral">+12.29%</div>
+            <div class="card-sub">Annualized: +25.09%</div>
+        </div>
+        <div class="card">
+            <div class="card-label">B&H Max Drawdown</div>
+            <div class="card-value loss">20.37%</div>
+            <div class="card-sub">vs Wheel: 11.21%</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Put Cycles</div>
+            <div class="card-value neutral">10</div>
+            <div class="card-sub">2 assigned</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Call Cycles</div>
+            <div class="card-value neutral">9</div>
+            <div class="card-sub">1 assigned</div>
+        </div>
+    </div>
+
+    <div class="config-box">
+        <h3>Configuration</h3>
+        <div class="config-grid">
+            <div class="config-item"><span>DTE</span><span>10 days</span></div>
+            <div class="config-item"><span>Put OTM</span><span>${cfg.put_otm}</span></div>
+            <div class="config-item"><span>Call OTM</span><span>${cfg.call_otm}</span></div>
+            <div class="config-item"><span>Start</span><span>2026-01-01</span></div>
+            <div class="config-item"><span>End</span><span>2026-07-14</span></div>
+            <div class="config-item"><span>IV Mode</span><span>fixed</span></div>
+            <div class="config-item"><span>Put IV</span><span>30.1%</span></div>
+            <div class="config-item"><span>Call IV</span><span>21.79%</span></div>
+            <div class="config-item"><span>Risk-free Rate</span><span>5.0%</span></div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3>Portfolio Value: Wheel Strategy vs Buy &amp; Hold</h3>
+        <div class="chart-wrapper">
+            <canvas id="portfolioChart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3>Per-Cycle Premium Income & PnL</h3>
+        <div class="chart-wrapper">
+            <canvas id="premiumChart"></canvas>
+        </div>
+    </div>
+
+    <div class="section-title">Cycle List (19 cycles)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Entry Date</th>
+                <th>Entry Price</th>
+                <th>Strike</th>
+                <th>IV</th>
+                <th>Premium/sh</th>
+                <th>Premium Total</th>
+                <th>Expiry Date</th>
+                <th>Expiry Price</th>
+                <th>Result</th>
+                <th>Cycle PnL</th>
+                <th>Wheel Value</th>
+                <th>B&H Value</th>
+                <th>Shares</th>
+                <th>Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td>1</td>
+                <td class="put">PUT</td>
+                <td>2026-01-06</td>
+                <td>$313.93</td>
+                <td>$299</td>
+                <td>30.10%</td>
+                <td>$1.26</td>
+                <td>$126.00</td>
+                <td>2026-01-16</td>
+                <td>$329.57</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+126.00</td>
+                <td>$31,519.10</td>
+                <td>$32,957.10</td>
+                <td>0</td>
+                <td class="note">Put expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td class="put">PUT</td>
+                <td>2026-01-16</td>
+                <td>$329.57</td>
+                <td>$315</td>
+                <td>30.10%</td>
+                <td>$1.51</td>
+                <td>$151.00</td>
+                <td>2026-01-26</td>
+                <td>$332.83</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+151.00</td>
+                <td>$31,670.10</td>
+                <td>$33,282.70</td>
+                <td>0</td>
+                <td class="note">Put expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td class="put">PUT</td>
+                <td>2026-01-26</td>
+                <td>$332.83</td>
+                <td>$318</td>
+                <td>30.10%</td>
+                <td>$1.50</td>
+                <td>$150.00</td>
+                <td>2026-02-05</td>
+                <td>$330.82</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+150.00</td>
+                <td>$31,820.10</td>
+                <td>$33,081.90</td>
+                <td>0</td>
+                <td class="note">Put expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td class="put">PUT</td>
+                <td>2026-02-05</td>
+                <td>$330.82</td>
+                <td>$316</td>
+                <td>30.10%</td>
+                <td>$1.87</td>
+                <td>$187.00</td>
+                <td>2026-02-17</td>
+                <td>$301.63</td>
+                <td class="assigned">Assigned</td>
+                <td class="loss">$-1,250.30</td>
+                <td>$30,569.80</td>
+                <td>$30,162.70</td>
+                <td>100</td>
+                <td class="note">Put assigned: bought 100 shares @ $316</td>
+            </tr>
+
+            <tr>
+                <td>5</td>
+                <td class="call">CALL</td>
+                <td>2026-02-17</td>
+                <td>$301.63</td>
+                <td>$312</td>
+                <td>21.79%</td>
+                <td>$1.11</td>
+                <td>$111.00</td>
+                <td>2026-02-27</td>
+                <td>$311.36</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+1,083.80</td>
+                <td>$31,653.60</td>
+                <td>$31,135.50</td>
+                <td>100</td>
+                <td class="note">Call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>6</td>
+                <td class="call">CALL</td>
+                <td>2026-02-27</td>
+                <td>$311.36</td>
+                <td>$321</td>
+                <td>21.79%</td>
+                <td>$1.35</td>
+                <td>$135.00</td>
+                <td>2026-03-09</td>
+                <td>$306.18</td>
+                <td class="expired">Expired</td>
+                <td class="loss">$-382.90</td>
+                <td>$31,270.70</td>
+                <td>$30,617.60</td>
+                <td>100</td>
+                <td class="note">Call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>7</td>
+                <td class="call">CALL</td>
+                <td>2026-03-09</td>
+                <td>$306.18</td>
+                <td>$316</td>
+                <td>21.79%</td>
+                <td>$1.26</td>
+                <td>$126.00</td>
+                <td>2026-03-19</td>
+                <td>$306.95</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+203.00</td>
+                <td>$31,473.70</td>
+                <td>$30,694.60</td>
+                <td>100</td>
+                <td class="note">Call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>8</td>
+                <td class="call">CALL</td>
+                <td>2026-03-19</td>
+                <td>$306.95</td>
+                <td>$317</td>
+                <td>21.79%</td>
+                <td>$1.39</td>
+                <td>$139.00</td>
+                <td>2026-03-30</td>
+                <td>$273.34</td>
+                <td class="expired">Expired</td>
+                <td class="loss">$-3,222.00</td>
+                <td>$28,251.70</td>
+                <td>$27,333.60</td>
+                <td>100</td>
+                <td class="note">Call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>9</td>
+                <td class="call">CALL</td>
+                <td>2026-03-30</td>
+                <td>$273.34</td>
+                <td>$283</td>
+                <td>21.79%</td>
+                <td>$0.96</td>
+                <td>$96.00</td>
+                <td>2026-04-09</td>
+                <td>$318.30</td>
+                <td class="assigned">Assigned</td>
+                <td class="profit">$+1,062.40</td>
+                <td>$29,314.10</td>
+                <td>$31,829.90</td>
+                <td>0</td>
+                <td class="note">Call assigned: sold 100 shares @ $283</td>
+            </tr>
+
+            <tr>
+                <td>10</td>
+                <td class="put">PUT</td>
+                <td>2026-04-09</td>
+                <td>$318.30</td>
+                <td>$303</td>
+                <td>30.10%</td>
+                <td>$1.42</td>
+                <td>$142.00</td>
+                <td>2026-04-20</td>
+                <td>$337.22</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+142.00</td>
+                <td>$29,456.10</td>
+                <td>$33,721.80</td>
+                <td>0</td>
+                <td class="note">Put expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>11</td>
+                <td class="put">PUT</td>
+                <td>2026-04-20</td>
+                <td>$337.22</td>
+                <td>$322</td>
+                <td>30.10%</td>
+                <td>$1.49</td>
+                <td>$149.00</td>
+                <td>2026-04-30</td>
+                <td>$384.57</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+149.00</td>
+                <td>$29,605.10</td>
+                <td>$38,456.90</td>
+                <td>0</td>
+                <td class="note">Put expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>12</td>
+                <td class="put">PUT</td>
+                <td>2026-04-30</td>
+                <td>$384.57</td>
+                <td>$370</td>
+                <td>30.10%</td>
+                <td>$2.50</td>
+                <td>$250.00</td>
+                <td>2026-05-11</td>
+                <td>$388.41</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+250.00</td>
+                <td>$29,855.10</td>
+                <td>$38,840.70</td>
+                <td>0</td>
+                <td class="note">Put expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>13</td>
+                <td class="put">PUT</td>
+                <td>2026-05-11</td>
+                <td>$388.41</td>
+                <td>$373</td>
+                <td>30.10%</td>
+                <td>$2.12</td>
+                <td>$212.00</td>
+                <td>2026-05-21</td>
+                <td>$387.43</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+212.00</td>
+                <td>$30,067.10</td>
+                <td>$38,742.70</td>
+                <td>0</td>
+                <td class="note">Put expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>14</td>
+                <td class="put">PUT</td>
+                <td>2026-05-21</td>
+                <td>$387.43</td>
+                <td>$372</td>
+                <td>30.10%</td>
+                <td>$2.35</td>
+                <td>$235.00</td>
+                <td>2026-06-01</td>
+                <td>$376.14</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+235.00</td>
+                <td>$30,302.10</td>
+                <td>$37,614.40</td>
+                <td>0</td>
+                <td class="note">Put expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>15</td>
+                <td class="put">PUT</td>
+                <td>2026-06-01</td>
+                <td>$376.14</td>
+                <td>$361</td>
+                <td>30.10%</td>
+                <td>$2.01</td>
+                <td>$201.00</td>
+                <td>2026-06-11</td>
+                <td>$357.77</td>
+                <td class="assigned">Assigned</td>
+                <td class="loss">$-122.00</td>
+                <td>$30,180.10</td>
+                <td>$35,777.00</td>
+                <td>100</td>
+                <td class="note">Put assigned: bought 100 shares @ $361</td>
+            </tr>
+
+            <tr>
+                <td>16</td>
+                <td class="call">CALL</td>
+                <td>2026-06-11</td>
+                <td>$357.77</td>
+                <td>$368</td>
+                <td>21.79%</td>
+                <td>$1.94</td>
+                <td>$194.00</td>
+                <td>2026-06-22</td>
+                <td>$349.68</td>
+                <td class="expired">Expired</td>
+                <td class="loss">$-615.00</td>
+                <td>$29,565.10</td>
+                <td>$34,968.00</td>
+                <td>100</td>
+                <td class="note">Call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>17</td>
+                <td class="call">CALL</td>
+                <td>2026-06-22</td>
+                <td>$349.68</td>
+                <td>$360</td>
+                <td>21.79%</td>
+                <td>$1.62</td>
+                <td>$162.00</td>
+                <td>2026-07-02</td>
+                <td>$359.91</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+1,185.00</td>
+                <td>$30,750.10</td>
+                <td>$35,991.00</td>
+                <td>100</td>
+                <td class="note">Call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>18</td>
+                <td class="call">CALL</td>
+                <td>2026-07-02</td>
+                <td>$359.91</td>
+                <td>$370</td>
+                <td>21.79%</td>
+                <td>$2.00</td>
+                <td>$200.00</td>
+                <td>2026-07-13</td>
+                <td>$352.51</td>
+                <td class="expired">Expired</td>
+                <td class="loss">$-540.00</td>
+                <td>$30,210.10</td>
+                <td>$35,251.00</td>
+                <td>100</td>
+                <td class="note">Call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>19</td>
+                <td class="call">CALL</td>
+                <td>2026-07-13</td>
+                <td>$352.51</td>
+                <td>$363</td>
+                <td>21.79%</td>
+                <td>$0.01</td>
+                <td>$1.00</td>
+                <td>2026-07-14</td>
+                <td>$352.51</td>
+                <td class="expired">Expired</td>
+                <td class="profit">$+1.00</td>
+                <td>$30,211.10</td>
+                <td>$35,251.00</td>
+                <td>100</td>
+                <td class="note">Call expired worthless</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+const labels = ["2026-01-06", "2026-01-16", "2026-01-26", "2026-02-05", "2026-02-17", "2026-02-27", "2026-03-09", "2026-03-19", "2026-03-30", "2026-04-09", "2026-04-20", "2026-04-30", "2026-05-11", "2026-05-21", "2026-06-01", "2026-06-11", "2026-06-22", "2026-07-02", "2026-07-13"];
+const portfolioValues = [31519.1, 31670.1, 31820.1, 30569.8, 31653.6, 31270.7, 31473.7, 28251.7, 29314.1, 29456.1, 29605.1, 29855.1, 30067.1, 30302.1, 30180.1, 29565.1, 30750.1, 30210.1, 30211.1];
+const buyHoldValues = [32957.1, 33282.7, 33081.9, 30162.7, 31135.5, 30617.6, 30694.6, 27333.6, 31829.9, 33721.8, 38456.9, 38840.7, 38742.7, 37614.4, 35777.0, 34968.0, 35991.0, 35251.0, 35251.0];
+const premiums = [126.0, 151.0, 150.0, 187.0, 111.0, 135.0, 126.0, 139.0, 96.0, 142.0, 149.0, 250.0, 212.0, 235.0, 201.0, 194.0, 162.0, 200.0, 1.0];
+const pnls = [126.0, 151.0, 150.0, -1250.3, 1083.8, -382.9, 203.0, -3222.0, 1062.4, 142.0, 149.0, 250.0, 212.0, 235.0, -122.0, -615.0, 1185.0, -540.0, 1.0];
+
+// Portfolio value chart - Wheel vs Buy & Hold
+new Chart(document.getElementById('portfolioChart'), {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Wheel Strategy',
+                data: portfolioValues,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                fill: true,
+                tension: 0.1,
+                pointRadius: 3,
+                pointBackgroundColor: portfolioValues.map((v, i) => {
+                    return i > 0 && v < portfolioValues[i-1] ? '#e74c3c' : '#27ae60';
+                }),
+                borderWidth: 2
+            },
+            {
+                label: 'Buy & Hold',
+                data: buyHoldValues,
+                borderColor: '#f39c12',
+                backgroundColor: 'rgba(243, 156, 18, 0.05)',
+                fill: false,
+                tension: 0.1,
+                pointRadius: 3,
+                pointBackgroundColor: '#f39c12',
+                borderDash: [6, 3],
+                borderWidth: 2
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) { return ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}); }
+                }
+            }
+        },
+        scales: {
+            y: { ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } }
+        }
+    }
+});
+
+// Premium & PnL chart
+new Chart(document.getElementById('premiumChart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Premium',
+                data: premiums,
+                backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                borderColor: '#667eea',
+                borderWidth: 1,
+                yAxisID: 'y'
+            },
+            {
+                label: 'Cycle PnL',
+                data: pnls,
+                backgroundColor: pnls.map(p => p >= 0 ? 'rgba(192, 57, 43, 0.6)' : 'rgba(39, 174, 96, 0.6)'),
+                borderColor: pnls.map(p => p >= 0 ? '#c0392b' : '#27ae60'),
+                borderWidth: 1,
+                yAxisID: 'y1'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: { type: 'linear', position: 'left', title: { display: true, text: 'Premium ($)' } },
+            y1: { type: 'linear', position: 'right', title: { display: true, text: 'PnL ($)' } }
+        }
+    }
+});
+</script>
+</body>
+</html>
