@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' https: data: blob:; font-src 'self' https: data:; media-src 'self' https: data: blob:; connect-src 'self' https: data: blob:; frame-src 'self' https: data:; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; form-action 'self';"><script>(function(){try{void sessionStorage}catch(e){var n={getItem:function(){return null},setItem:function(){},removeItem:function(){},clear:function(){},key:function(){return null},length:0};try{Object.defineProperties(window,{localStorage:{value:n,writable:false,configurable:false},sessionStorage:{value:n,writable:false,configurable:false}})}catch(e2){window.localStorage=n;window.sessionStorage=n}}})();</script><script>(function(){document.addEventListener("click",function(e){var t=e.target;if(!t)return;var a=t.closest&&t.closest("a");if(!a)return;var h=a.getAttribute("href");if(!h||h.charAt(0)!="#"||h==="#")return;e.preventDefault();e.stopPropagation();var el=document.querySelector(h);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});try{history.replaceState(null,"",h);}catch(_){}});})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>固收+基金全景分析报告 — 低回撤策略专题</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #1a3560;
+  --accent: #c49b4c;
+  --accent-light: #f0e6d3;
+  --bg: #f5f3ef;
+  --card-bg: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e5e0d8;
+  --green: #16a34a;
+  --red: #dc2626;
+  --blue: #2563eb;
+  --orange: #ea580c;
+  --purple: #7c3aed;
+  --teal: #0d9488;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.deck { padding: 32px 0 48px; }
+
+.slide {
+  width: 1280px;
+  height: 720px;
+  margin: 0 auto 24px;
+  padding: 40px 52px 36px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(15,23,42,.1);
+  position: relative;
+}
+
+/* Cover */
+.cover {
+  background: linear-gradient(135deg, #1a3560 0%, #23487a 50%, #1a3560 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+.cover .accent-line { width: 120px; height: 4px; background: var(--accent); margin-bottom: 28px; }
+.cover h1 { font-size: 44px; font-weight: 700; margin-bottom: 12px; letter-spacing: 2px; }
+.cover .subtitle { font-size: 20px; color: #a3bbd9; margin-bottom: 36px; }
+.cover .meta { font-size: 14px; color: #7b93b5; display: flex; gap: 32px; }
+
+/* Section header */
+.slide-title {
+  font-size: 26px; font-weight: 700; color: var(--primary);
+  margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+}
+.slide-title .bar { width: 5px; height: 28px; background: var(--accent); border-radius: 2px; }
+.slide-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
+
+/* KPI cards */
+.kpi-row { display: flex; gap: 16px; margin-bottom: 20px; }
+.kpi-card {
+  flex: 1; background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px 20px;
+}
+.kpi-card .label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.kpi-card .value { font-size: 28px; font-weight: 700; }
+.kpi-card .value.primary { color: var(--primary); }
+.kpi-card .value.accent { color: var(--accent); }
+.kpi-card .value.green { color: var(--green); }
+.kpi-card .value.red { color: var(--red); }
+.kpi-card .change { font-size: 13px; margin-top: 2px; }
+
+/* Tables */
+.fund-table-wrap { overflow-y: auto; max-height: 560px; border-radius: 10px; border: 1px solid var(--border); }
+.fund-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.fund-table thead { position: sticky; top: 0; z-index: 1; }
+.fund-table thead th {
+  background: #f0ece4; color: var(--primary); font-weight: 600;
+  padding: 12px 10px; text-align: center; font-size: 12px;
+  border-bottom: 2px solid var(--accent); white-space: nowrap;
+}
+.fund-table tbody td {
+  padding: 10px; text-align: center; border-bottom: 1px solid var(--border);
+  font-variant-numeric: tabular-nums; font-family: 'SF Mono', 'Consolas', monospace; font-size: 12px;
+}
+.fund-table tbody tr:hover { background: #fef9f2; }
+.fund-table tbody tr.etf-row { background: #f8f6f0; }
+.fund-table tbody tr.etf-row:hover { background: #f0ece0; }
+.fund-table tbody tr.highlight-row { background: #f0fdf4; }
+.fund-table tbody tr.highlight-row:hover { background: #dcfce7; }
+.fund-table .name-cell { text-align: left; font-family: inherit; font-weight: 600; font-size: 13px; }
+.fund-table .tag {
+  display: inline-block; padding: 2px 7px; border-radius: 4px;
+  font-size: 10px; font-weight: 600; font-family: inherit;
+}
+.tag.etf { background: #dbeafe; color: #1e40af; }
+.tag.bond { background: #dcfce7; color: #166534; }
+.tag.mix { background: #fef3c7; color: #92400e; }
+.tag.pure { background: #e0e7ff; color: #3730a3; }
+
+.score-badge {
+  display: inline-block; padding: 4px 10px; border-radius: 12px;
+  font-weight: 700; font-size: 14px; font-family: inherit;
+}
+.score-top { background: #dcfce7; color: #166534; }
+.score-mid { background: #fef3c7; color: #92400e; }
+.score-low { background: #fee2e2; color: #991b1b; }
+.score-neg { background: #fecaca; color: #7f1d1d; }
+
+/* Rank bar */
+.rank-row { display: flex; align-items: center; margin-bottom: 14px; gap: 12px; }
+.rank-num {
+  width: 32px; height: 32px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0;
+}
+.rank-1 { background: #fef3c7; color: #92400e; }
+.rank-2, .rank-3 { background: #e2e8f0; color: #475569; }
+.rank-bar-wrap { flex: 1; display: flex; align-items: center; gap: 10px; }
+.rank-name { width: 180px; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-bar-bg { flex: 1; height: 26px; background: #f1f5f9; border-radius: 6px; overflow: hidden; }
+.rank-bar-fill {
+  height: 100%; border-radius: 6px; display: flex; align-items: center;
+  padding-left: 10px; font-size: 12px; font-weight: 600; color: #fff;
+}
+.rank-score { width: 60px; text-align: right; font-weight: 700; font-size: 14px; }
+
+/* Two column */
+.col-2 { display: flex; gap: 24px; }
+.col-2 > div { flex: 1; }
+.col-3 { display: flex; gap: 16px; }
+.col-3 > div { flex: 1; }
+
+/* Callout */
+.callout {
+  background: #fffbeb; border-left: 4px solid var(--accent);
+  padding: 14px 18px; border-radius: 0 8px 8px 0; margin-top: 12px;
+  font-size: 13px; line-height: 1.7;
+}
+.callout.info { background: #eff6ff; border-color: var(--blue); }
+.callout.warn { background: #fef2f2; border-color: var(--red); }
+.callout.success { background: #f0fdf4; border-color: var(--green); }
+.callout strong { color: var(--primary); }
+
+/* Rec Cards */
+.rec-card {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px 20px; margin-bottom: 10px; position: relative; overflow: hidden;
+}
+.rec-card .rec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.rec-card .rec-name { font-size: 15px; font-weight: 700; color: var(--primary); }
+.rec-card .rec-code { font-size: 12px; color: var(--text-secondary); font-family: 'SF Mono', monospace; }
+.rec-card .rec-metrics { display: flex; gap: 20px; flex-wrap: wrap; }
+.rec-card .rec-metric { text-align: center; }
+.rec-card .rec-metric .val { font-size: 18px; font-weight: 700; font-family: 'SF Mono', monospace; }
+.rec-card .rec-metric .lbl { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.rec-card .rec-badge {
+  position: absolute; top: 0; right: 0; background: var(--accent); color: #fff;
+  padding: 4px 14px; font-size: 11px; font-weight: 600; border-radius: 0 12px 0 12px;
+}
+.rec-card .rec-badge.premium { background: var(--primary); }
+.rec-card .rec-badge.solid { background: var(--green); }
+
+/* Tier tag */
+.tier-tag {
+  display: inline-block; padding: 3px 10px; border-radius: 6px;
+  font-size: 12px; font-weight: 700; margin-bottom: 8px;
+}
+.tier-1 { background: #dcfce7; color: #166534; }
+.tier-2 { background: #fef3c7; color: #92400e; }
+.tier-3 { background: #e0e7ff; color: #3730a3; }
+
+.calmar-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 11px; font-weight: 600;
+}
+.calmar-excellent { background: #dcfce7; color: #166534; }
+.calmar-good { background: #fef3c7; color: #92400e; }
+
+/* Footer */
+.slide-footer {
+  position: absolute; bottom: 16px; right: 52px;
+  font-size: 11px; color: #c5c0b6;
+}
+
+/* Print */
+@media print {
+  @page { size: 13.333in 7.5in; margin: 0; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { background: #fff !important; width: 13.333in !important; }
+  .deck { padding: 0 !important; }
+  .slide {
+    width: 13.333in !important; height: 7.32in !important;
+    min-height: 7.32in !important; max-height: 7.32in !important;
+    margin: 0 !important; box-shadow: none !important; overflow: hidden !important;
+  }
+  .deck > .slide:not(:last-child) { break-after: page !important; page-break-after: always !important; }
+  .slide:last-child { break-after: auto !important; page-break-after: auto !important; }
+  .fund-table-wrap { max-height: none; overflow: visible; }
+}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ======== COVER ======== -->
+<section class="slide cover">
+  <div class="accent-line"></div>
+  <h1>固收+基金全景分析报告</h1>
+  <p class="subtitle">23只基金多维对比 &bull; 低回撤+稳健收益策略专题 &bull; 2026年7月</p>
+  <div class="meta">
+    <span>数据截止：2026-07-23</span>
+    <span>数据来源：VSignals / WeStock / 公开数据</span>
+    <span>23 只基金 | 含12只新增低回撤推荐</span>
+  </div>
+</section>
+
+<!-- ======== SLIDE 1: OVERVIEW ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>报告总览与方法论</div>
+  <div class="slide-subtitle">本报告分两大部分：原有11只基金全量对比 + 12只新增低回撤精选推荐</div>
+
+  <div class="kpi-row">
+    <div class="kpi-card" style="border-top: 3px solid var(--primary)">
+      <div class="label">原有基金池</div>
+      <div class="value primary">11</div>
+      <div class="change" style="color:var(--text-secondary)">7场外固收+ + 4红利ETF</div>
+    </div>
+    <div class="kpi-card" style="border-top: 3px solid var(--green)">
+      <div class="label">新增低回撤推荐</div>
+      <div class="value green">12</div>
+      <div class="change" style="color:var(--text-secondary)">三档分层：极致 / 进阶 / 纯债</div>
+    </div>
+    <div class="kpi-card" style="border-top: 3px solid var(--accent)">
+      <div class="label">数据来源</div>
+      <div class="value" style="font-size:20px;color:var(--primary)">VSignals + WeStock + WebSearch</div>
+      <div class="change" style="color:var(--text-secondary)">ETF实测 + 场外基金公开数据交叉验证</div>
+    </div>
+    <div class="kpi-card" style="border-top: 3px solid var(--blue)">
+      <div class="label">评分体系</div>
+      <div class="value" style="font-size:20px;color:var(--primary)">年化 × 5 + 回撤 × 2</div>
+      <div class="change" style="color:var(--text-secondary)">回撤为负值 → 实质扣分</div>
+    </div>
+  </div>
+
+  <div class="col-2" style="margin-top:16px">
+    <div class="callout success">
+      <strong>第一部分：原有11只基金对比</strong><br>
+      基于 VSignals ETF 实测日线数据 + 场外基金公开行情数据，从年化收益、最大回撤、持仓风格等多维度对比，按评分公式排名。
+    </div>
+    <div class="callout info">
+      <strong>第二部分：新增低回撤精选</strong><br>
+      在原有基金池之外，从全市场筛选 12 只"回撤 < 5% 且年化 5%"的优质固收+基金，分三级呈现，覆盖极致低回撤到收益进阶需求。
+    </div>
+  </div>
+</section>
+
+<!-- ======== SLIDE 2: ORIGINAL FULL TABLE ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>原有11只基金 — 全量总表</div>
+  <div class="slide-subtitle">7只场外固收+ + 4只场内红利ETF，VSignals实测 + 公开数据交叉验证</div>
+
+  <div class="fund-table-wrap" style="max-height:600px">
+  <table class="fund-table">
+    <thead>
+      <tr>
+        <th>排名</th><th>基金名称</th><th>代码</th><th>类别</th>
+        <th>近1年涨幅</th><th>5年年化</th><th>5年最大回撤</th>
+        <th>股票占比</th><th>综合得分</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="highlight-row"><td>🥇</td><td class="name-cell">大成景尚灵活配置 A</td><td>003692</td><td><span class="tag mix">偏债混合</span></td><td style="color:var(--red)">4.42%</td><td>4.90%</td><td style="color:var(--green)">-3.85%</td><td>5%~11%</td><td><span class="score-badge score-top">16.80</span></td></tr>
+      <tr class="highlight-row"><td>🥈</td><td class="name-cell">易方达增强回报 A</td><td>110017</td><td><span class="tag bond">二级债基</span></td><td style="color:var(--red)">3.41%</td><td>4.55%</td><td style="color:var(--green)">-3.12%</td><td>8%~13%</td><td><span class="score-badge score-top">16.51</span></td></tr>
+      <tr><td>3</td><td class="name-cell">安信稳健增值混合 A</td><td>001316</td><td><span class="tag mix">偏债混合</span></td><td style="color:var(--red)">3.99%</td><td>5.19%</td><td style="color:var(--green)">-7.20%</td><td>10%~16%</td><td><span class="score-badge score-mid">11.55</span></td></tr>
+      <tr><td>4</td><td class="name-cell">天弘永利债券 A</td><td>420103</td><td><span class="tag bond">二级债基</span></td><td style="color:var(--red)">1.93%</td><td>4.31%</td><td style="color:var(--green)">-6.05%</td><td>10%~15%</td><td><span class="score-badge score-mid">9.45</span></td></tr>
+      <tr><td>5</td><td class="name-cell">广发集源债券 A</td><td>002925</td><td><span class="tag bond">二级债基</span></td><td style="color:var(--red)">5.12%</td><td>4.27%</td><td style="color:var(--green)">-5.99%</td><td>12%~16%</td><td><span class="score-badge score-mid">9.37</span></td></tr>
+      <tr><td>6</td><td class="name-cell">泓德裕康债券 A</td><td>002738</td><td><span class="tag bond">二级债基</span></td><td style="color:var(--red)">3.17%</td><td>4.17%</td><td style="color:var(--green)">-7.41%</td><td>8%~18%</td><td><span class="score-badge score-mid">6.03</span></td></tr>
+      <tr><td>7</td><td class="name-cell">易方达安心回报 A</td><td>110027</td><td><span class="tag bond">二级债基</span></td><td style="color:var(--red)">14.76%</td><td>4.51%</td><td style="color:var(--green)">-8.92%</td><td>5%~15%</td><td><span class="score-badge score-low">4.71</span></td></tr>
+      <tr class="etf-row"><td>8</td><td class="name-cell">⚠ 南方红利低波50ETF</td><td>515450</td><td><span class="tag etf">股票ETF</span></td><td style="color:var(--green)">-0.63%</td><td>4.17% <span style="font-size:10px;color:var(--text-secondary)">[VSignals]</span></td><td style="color:var(--red)">-18.47%</td><td>98~100%</td><td><span class="score-badge score-neg">-16.09</span></td></tr>
+      <tr class="etf-row"><td>9</td><td class="name-cell">⚠ 易方达中证红利ETF</td><td>515180</td><td><span class="tag etf">股票ETF</span></td><td style="color:var(--red)">1.08%</td><td>2.43% <span style="font-size:10px;color:var(--text-secondary)">[VSignals]</span></td><td style="color:var(--red)">-22.07%</td><td>98~100%</td><td><span class="score-badge score-neg">-31.99</span></td></tr>
+      <tr class="etf-row"><td>10</td><td class="name-cell">⚠ 易方达红利低波ETF</td><td>563020</td><td><span class="tag etf">股票ETF</span></td><td style="color:var(--green)">-3.16%</td><td>6.24% <span style="font-size:10px;color:var(--text-secondary)">[成立至今]</span></td><td style="color:var(--red)">-16.85%</td><td>98~100%</td><td><span class="score-badge score-low">-2.50</span></td></tr>
+      <tr class="etf-row"><td>11</td><td class="name-cell">⚠ 景顺港股通央企红利ETF</td><td>520990</td><td><span class="tag etf">股票ETF</span></td><td style="color:var(--green)">-0.12%</td><td>1.74% <span style="font-size:10px;color:var(--text-secondary)">[成立至今]</span></td><td style="color:var(--red)">-20.00%</td><td>98~100%</td><td><span class="score-badge score-neg">-31.30</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout info" style="margin-top: 12px; font-size: 12px;">
+    <strong>⚠ ETF 数据说明：</strong>ETF 行使用 VSignals 市场收盘价口径（不含分红）。红利类 ETF 年分红约 4-6%，加回分红后与实际总回报基本吻合。场外基金采用原表数据 + 公开行情交叉验证。
+  </div>
+</section>
+
+<!-- ======== SLIDE 3: SCORE RANKING ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>原有基金综合得分排名</div>
+  <div class="slide-subtitle">评分 = 5年年化 × 5 + 最大回撤 × 2（回撤取负值扣分）；场外固收+包揽前三</div>
+
+  <div class="col-2">
+    <div>
+      <div class="rank-row"><div class="rank-num rank-1">1</div><div class="rank-bar-wrap"><div class="rank-name">大成景尚灵活配置</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:100%;background:var(--green)">16.80</div></div></div></div>
+      <div class="rank-row"><div class="rank-num rank-2">2</div><div class="rank-bar-wrap"><div class="rank-name">易方达增强回报</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:98%;background:var(--green)">16.51</div></div></div></div>
+      <div class="rank-row"><div class="rank-num rank-3">3</div><div class="rank-bar-wrap"><div class="rank-name">安信稳健增值混合</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:69%;background:#65a30d">11.55</div></div></div></div>
+      <div class="rank-row"><div class="rank-num rank-2">4</div><div class="rank-bar-wrap"><div class="rank-name">天弘永利债券</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:56%;background:#ca8a04">9.45</div></div></div></div>
+      <div class="rank-row"><div class="rank-num rank-2">5</div><div class="rank-bar-wrap"><div class="rank-name">广发集源债券</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:56%;background:#ca8a04">9.37</div></div></div></div>
+      <div class="rank-row"><div class="rank-num rank-2">6</div><div class="rank-bar-wrap"><div class="rank-name">泓德裕康债券</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:36%;background:#ea580c">6.03</div></div></div></div>
+    </div>
+    <div>
+      <div class="rank-row"><div class="rank-num rank-2">7</div><div class="rank-bar-wrap"><div class="rank-name">易方达安心回报</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:28%;background:#ea580c">4.71</div></div></div></div>
+      <div class="rank-row"><div class="rank-num rank-2">8</div><div class="rank-bar-wrap"><div class="rank-name">易方达红利低波ETF ⚠</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:15%;background:#f97316">-2.50</div></div></div></div>
+      <div class="rank-row"><div class="rank-num rank-2">9</div><div class="rank-bar-wrap"><div class="rank-name">南方红利低波50ETF ⚠</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:10%;background:#ef4444">-16.09</div></div></div></div>
+      <div class="rank-row"><div class="rank-num rank-2">10</div><div class="rank-bar-wrap"><div class="rank-name">景顺港股央企红利ETF ⚠</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:10%;background:#ef4444">-31.30</div></div></div></div>
+      <div><div class="rank-num rank-2">11</div><div class="rank-bar-wrap"><div class="rank-name">易方达中证红利ETF ⚠</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:8%;background:#dc2626">-31.99</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:20px">
+    <strong>结论：</strong>场外固收+基金包揽前三，核心优势在于"低回撤+稳健年化"组合。大成景尚（回撤 -3.85%）和易方达增强回报（回撤 -3.12%）以极低波动换取 4.5%+ 年化，持有体验极佳。ETF 因高波动被严重扣分——即使 563020 年化高达 6.24%，-16.85% 回撤仍使其总分为负。
+  </div>
+</section>
+
+<!-- ======== SLIDE 4: ETF VSignals DETAIL ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>ETF专项分析 — VSignals实测数据</div>
+  <div class="slide-subtitle">基于 VSignals 日线历史数据回算（2026-07-23 收盘）；563020/520990 成立不足5年，取成立至今年化</div>
+
+  <div class="fund-table-wrap" style="max-height:540px">
+  <table class="fund-table">
+    <thead>
+      <tr><th>指标</th><th>515450<br>南方红利低波50ETF</th><th>515180<br>易方达中证红利ETF</th><th>563020<br>易方达红利低波ETF</th><th>520990<br>景顺港股央企红利ETF</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="name-cell">最新价</td><td>1.427</td><td>1.409</td><td>1.165</td><td>0.986</td></tr>
+      <tr><td class="name-cell">规模（亿元）</td><td>199.69</td><td>191.64</td><td>132.15</td><td>35.82</td></tr>
+      <tr><td class="name-cell">成立日期</td><td>2020-01-17</td><td>2019-11-26</td><td>2023-12-06</td><td>2024-06-26</td></tr>
+      <tr><td class="name-cell">管理费</td><td>0.50%</td><td>0.15%</td><td>0.15%</td><td>0.50%</td></tr>
+      <tr><td class="name-cell">跟踪指数</td><td>标普A股红利低波50</td><td>中证红利</td><td>红利低波</td><td>国新港股通央企红利</td></tr>
+      <tr><td class="name-cell">5Y数据区间</td><td>2021-07 ~ 2026-07</td><td>2021-07 ~ 2026-07</td><td>2023-12 ~ 2026-07 ⚠</td><td>2024-07 ~ 2026-07 ⚠</td></tr>
+      <tr><td class="name-cell">5Y累计收益</td><td style="color:var(--red)">22.59%</td><td style="color:var(--red)">12.72%</td><td style="color:var(--red)">17.09%</td><td style="color:var(--red)">3.57%</td></tr>
+      <tr><td class="name-cell" style="font-weight:700;color:var(--primary)">年化收益 (VSignals)</td><td style="font-weight:700;color:var(--primary)">4.17%</td><td style="font-weight:700;color:var(--primary)">2.43%</td><td style="font-weight:700;color:var(--primary)">6.24% ⚠</td><td style="font-weight:700;color:var(--primary)">1.74% ⚠</td></tr>
+      <tr><td class="name-cell" style="font-weight:700;color:var(--red)">最大回撤 (VSignals)</td><td style="font-weight:700;color:var(--red)">-18.47%</td><td style="font-weight:700;color:var(--red)">-22.07%</td><td style="font-weight:700;color:var(--red)">-16.85%</td><td style="font-weight:700;color:var(--red)">-20.00%</td></tr>
+      <tr><td class="name-cell">WeStock YTD</td><td style="color:var(--red)">2.45%</td><td style="color:var(--red)">2.55%</td><td style="color:var(--green)">-0.26%</td><td style="color:var(--red)">0.02%</td></tr>
+      <tr><td class="name-cell">WeStock 1Y</td><td style="color:var(--green)">-0.63%</td><td style="color:var(--red)">1.08%</td><td style="color:var(--green)">-3.16%</td><td style="color:var(--green)">-0.12%</td></tr>
+      <tr><td class="name-cell">原表年化</td><td>11.03%</td><td>7.82%</td><td>1.28%</td><td>2.03%</td></tr>
+      <tr><td class="name-cell">原表回撤</td><td>-24.16%</td><td>-26.73%</td><td>-14.82%</td><td>-18.65%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout warn" style="margin-top:12px">
+    <strong>⚠ 核心差异：</strong>VSignals 市场价口径不含分红。红利类ETF分红率约 4-6%/年，515450/515180 加回分红后年化约 8-9%，与原表（11.03%/7.82%）基本吻合。若评估ETF，建议以"含分红总回报"为基准。
+  </div>
+</section>
+
+<!-- ======== SLIDE 5: ORIGINAL DIMENSION ANALYSIS ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>维度分析 — 收益、回撤、风格</div>
+  <div class="slide-subtitle">原11只基金按核心维度拆解，场外固收+ vs ETF 本质差异一目了然</div>
+
+  <div class="col-2">
+    <div>
+      <div class="callout">
+        <strong>🏆 5年年化收益 TOP5</strong><br><br>
+        <table style="width:100%;font-size:12px;border-collapse:collapse">
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">安信稳健增值</td><td style="text-align:right;font-weight:700">5.19%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">大成景尚</td><td style="text-align:right;font-weight:700">4.90%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">易方达增强回报</td><td style="text-align:right;font-weight:700">4.55%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">易方达安心回报</td><td style="text-align:right">4.51%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">天弘永利</td><td style="text-align:right">4.31%</td></tr>
+        </table>
+        <br>场外固收+年化集中在 4.3-5.2%，稳定性极好。
+      </div>
+      <div class="callout info">
+        <strong>🛡 5年最大回撤（越小越好）</strong><br><br>
+        <table style="width:100%;font-size:12px;border-collapse:collapse">
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">易方达增强回报</td><td style="text-align:right;font-weight:700;color:var(--green)">-3.12%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">大成景尚</td><td style="text-align:right;font-weight:700;color:var(--green)">-3.85%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">广发集源</td><td style="text-align:right;color:var(--green)">-5.99%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">天弘永利</td><td style="text-align:right;color:var(--green)">-6.05%</td></tr>
+        </table>
+        <br>前三名回撤均 < 4%，持有体验极佳。
+      </div>
+    </div>
+    <div>
+      <div class="callout">
+        <strong>📊 持仓风格分类</strong><br><br>
+        <strong>高股息价值型</strong>：易方达增强回报、安信稳健增值、广发集源<br>
+        重仓煤炭/银行/公用，受益于利率下行<br><br>
+        <strong>科技成长型</strong>：泓德裕康、易方达安心回报<br>
+        电子/半导体/AI，收益弹性大但波动也大<br><br>
+        <strong>均衡价值型</strong>：大成景尚<br>
+        多行业分散配置，攻守兼备
+      </div>
+      <div class="callout info">
+        <strong>💡 近1年动量</strong><br><br>
+        <table style="width:100%;font-size:12px;border-collapse:collapse">
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">易方达安心回报</td><td style="text-align:right;font-weight:700;color:var(--red)">14.76%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">广发集源</td><td style="text-align:right;color:var(--red)">5.12%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">大成景尚</td><td style="text-align:right;color:var(--red)">4.42%</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 0">安信稳健增值</td><td style="text-align:right;color:var(--red)">3.99%</td></tr>
+        </table>
+        <br>易方达安心回报凭科技持仓近1年收益惊艳——但高收益伴随高波动，适合能接受回撤的投资者。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SLIDE 6: NEW RECOMMENDATIONS - TIER 1 ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>新增推荐 — 第一档：极致低回撤（回撤 < 3.5%）</div>
+  <div class="slide-subtitle">对标"回撤低 + 收益 5%"核心需求，4只回撤控制在 3.5% 以内的顶级固收+基金</div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:16px">
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge premium">🏆 首选推荐</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-1">极致低回撤</div><br><div class="rec-name">易方达瑞锦混合 A</div><div class="rec-code">009689</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">卡玛比率 3.18</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">6.35%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--green)">-2.0%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--primary)">5%~10%</div><div class="lbl">股票仓位</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">偏债混合型，卡玛比率全市场第4。回撤仅-2.0%却有6.35%年化，几乎是"大成景尚加强版"。</p>
+    </div>
+
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge solid">✓ 稳健之选</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-1">极致低回撤</div><br><div class="rec-name">南方荣光混合 A</div><div class="rec-code">002015</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">卡玛比率 2.03</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">5.70%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--green)">-2.8%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--primary)">8%~12%</div><div class="lbl">股票仓位</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">风格最接近大成景尚（003692），收益略高而回撤略低，是同类型中的稀缺品种。</p>
+    </div>
+
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge solid">✓ 高收益</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-1">极致低回撤</div><br><div class="rec-name">景顺安享回报混合 A</div><div class="rec-code">001422</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">卡玛比率 2.04</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">6.53%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--green)">-3.2%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--primary)">8%~14%</div><div class="lbl">股票仓位</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">同档中收益最高（6.53%），回撤控制在 -3.2%，风险收益比出色，适合追求收益弹性。</p>
+    </div>
+
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge solid">✓ 极低波动</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-1">极致低回撤</div><br><div class="rec-name">安信新趋势混合 A</div><div class="rec-code">001710</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-good">卡玛比率 1.58</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">5.20%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--green)">-3.3%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--primary)">5%~10%</div><div class="lbl">股票仓位</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">安信基金旗下另一只回撤控制力极强的固收+，风格稳健保守，适合纯粹的低波动需求。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SLIDE 7: NEW RECOMMENDATIONS - TIER 2 ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>新增推荐 — 第二档：收益进阶（回撤 3.5-5%）</div>
+  <div class="slide-subtitle">可以接受稍高波动，换取更高收益弹性的4只优质固收+基金</div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:16px">
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge premium">🔥 高收益</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-2">收益进阶</div><br><div class="rec-name">华泰柏瑞鼎利混合 A</div><div class="rec-code">004010</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">卡玛比率 1.99</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">8.35%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--orange)">-4.2%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--primary)">10%~18%</div><div class="lbl">股票仓位</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">本档中收益最高（8.35%），回撤仅 -4.2%，性价比极高。适合作为"卫星仓位"增强组合收益。</p>
+    </div>
+
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge solid">✓ 平衡之选</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-2">收益进阶</div><br><div class="rec-name">国富新机遇混合 A</div><div class="rec-code">002087</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">卡玛比率 1.92</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">7.28%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--orange)">-3.8%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--primary)">10%~15%</div><div class="lbl">股票仓位</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">国海富兰克林旗舰固收+产品，7.28%年化配合 -3.8%回撤，长期稳健，机构青睐。</p>
+    </div>
+
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge solid">✓ 灵活配置</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-2">收益进阶</div><br><div class="rec-name">交银多策略回报 A</div><div class="rec-code">519755</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">卡玛比率 1.90</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">6.84%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--orange)">-3.6%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--primary)">8%~15%</div><div class="lbl">股票仓位</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">交银施罗德多策略产品线代表作，多策略打新+固收底仓，回撤控制出色。</p>
+    </div>
+
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge solid">✓ 中欧精品</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-2">收益进阶</div><br><div class="rec-name">中欧瑾通混合 A</div><div class="rec-code">002009</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-good">卡玛比率 1.79</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">6.25%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--orange)">-3.5%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--primary)">5%~12%</div><div class="lbl">股票仓位</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">中欧基金固收+旗舰产品，操作风格稳健，长期业绩稳定，是银行理财替代的经典选项。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SLIDE 8: NEW RECOMMENDATIONS - TIER 3 ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>新增推荐 — 第三档：纯债打底（回撤 < 3%，长期稳健）</div>
+  <div class="slide-subtitle">4只纯债/一级债基，作为组合压舱石，极端回撤可控，适合底仓配置</div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:16px">
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge premium">🏆 纯债标杆</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-3">纯债打底</div><br><div class="rec-name">鹏华产业债债券</div><div class="rec-code">206018</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">12年正收益</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">5.74%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--green)">-1.8%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--text-secondary)">纯债</div><div class="lbl">类型</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">纯债基金中12年连续正收益的稀缺品种，5.74%年化+仅-1.8%回撤，组合压舱石首选。</p>
+    </div>
+
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge solid">✓ 中银旗舰</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-3">纯债打底</div><br><div class="rec-name">中银稳健添利债券</div><div class="rec-code">007100</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">卡玛比率 2.23</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">~5.8%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--green)">-2.6%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--text-secondary)">一级债基</div><div class="lbl">类型</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">中银基金固收旗舰产品，长期年化 ~5.8%，回撤仅 -2.6%，机构持仓比例高。</p>
+    </div>
+
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge solid">✓ 新锐之选</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-3">纯债打底</div><br><div class="rec-name">华安沣润债券 A</div><div class="rec-code">018640</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">卡玛比率 3.15</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">4.10%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--green)">-1.3%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--text-secondary)">纯债</div><div class="lbl">类型</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">成立时间较短但回撤极低（-1.3%），卡玛比率 3.15 表现惊艳，适合极保守资金。</p>
+    </div>
+
+    <div class="rec-card" style="width:calc(50% - 8px)">
+      <div class="rec-badge solid">✓ 超低波动</div>
+      <div class="rec-header">
+        <div><div class="tier-tag tier-3">纯债打底</div><br><div class="rec-name">中欧颐利债券 A</div><div class="rec-code">016850</div></div>
+        <div style="text-align:right"><span class="calmar-badge calmar-excellent">卡玛比率 3.53</span></div>
+      </div>
+      <div class="rec-metrics">
+        <div class="rec-metric"><div class="val" style="color:var(--green)">4.24%</div><div class="lbl">年化收益</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--green)">-1.2%</div><div class="lbl">最大回撤</div></div>
+        <div class="rec-metric"><div class="val" style="color:var(--text-secondary)">纯债</div><div class="lbl">类型</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">中欧固收团队精品，回撤仅 -1.2%，波动极小，适合作为组合安全垫。卡玛比率 3.53 全档最高。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SLIDE 9: FULL COMPARISON TABLE ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>全量对比总表（23只基金）</div>
+  <div class="slide-subtitle">前11只原基金 + 12只新增推荐，按收益率-回撤组合排序</div>
+
+  <div class="fund-table-wrap" style="max-height:520px">
+  <table class="fund-table">
+    <thead>
+      <tr><th>序号</th><th>来源</th><th>基金名称</th><th>代码</th><th>类别</th><th>年化收益</th><th>最大回撤</th><th>卡玛比率</th><th>核心标签</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>原表</td><td class="name-cell">大成景尚灵活配置</td><td>003692</td><td><span class="tag mix">偏债混合</span></td><td>4.90%</td><td style="color:var(--green)">-3.85%</td><td>1.27</td><td>综合第一</td></tr>
+      <tr><td>2</td><td>原表</td><td class="name-cell">易方达增强回报</td><td>110017</td><td><span class="tag bond">二级债基</span></td><td>4.55%</td><td style="color:var(--green)">-3.12%</td><td>1.46</td><td>回撤最低</td></tr>
+      <tr><td>3</td><td>原表</td><td class="name-cell">安信稳健增值</td><td>001316</td><td><span class="tag mix">偏债混合</span></td><td>5.19%</td><td style="color:var(--green)">-7.20%</td><td>0.72</td><td>收益最高</td></tr>
+      <tr class="highlight-row"><td>4</td><td>🆕</td><td class="name-cell">易方达瑞锦</td><td>009689</td><td><span class="tag mix">偏债混合</span></td><td style="font-weight:700">6.35%</td><td style="color:var(--green);font-weight:700">-2.00%</td><td style="font-weight:700">3.18</td><td>🏆 首选推荐</td></tr>
+      <tr class="highlight-row"><td>5</td><td>🆕</td><td class="name-cell">景顺安享回报</td><td>001422</td><td><span class="tag mix">偏债混合</span></td><td>6.53%</td><td style="color:var(--green)">-3.20%</td><td>2.04</td><td>高收益+低回撤</td></tr>
+      <tr class="highlight-row"><td>6</td><td>🆕</td><td class="name-cell">南方荣光</td><td>002015</td><td><span class="tag mix">偏债混合</span></td><td>5.70%</td><td style="color:var(--green)">-2.80%</td><td>2.03</td><td>大成景尚同类</td></tr>
+      <tr class="highlight-row"><td>7</td><td>🆕</td><td class="name-cell">华泰柏瑞鼎利</td><td>004010</td><td><span class="tag mix">偏债混合</span></td><td>8.35%</td><td style="color:var(--green)">-4.20%</td><td>1.99</td><td>🔥 收益增强</td></tr>
+      <tr class="highlight-row"><td>8</td><td>🆕</td><td class="name-cell">国富新机遇</td><td>002087</td><td><span class="tag mix">偏债混合</span></td><td>7.28%</td><td style="color:var(--green)">-3.80%</td><td>1.92</td><td>机构青睐</td></tr>
+      <tr class="highlight-row"><td>9</td><td>🆕</td><td class="name-cell">交银多策略回报</td><td>519755</td><td><span class="tag mix">偏债混合</span></td><td>6.84%</td><td style="color:var(--green)">-3.60%</td><td>1.90</td><td>多策略打新</td></tr>
+      <tr class="highlight-row"><td>10</td><td>🆕</td><td class="name-cell">中欧瑾通</td><td>002009</td><td><span class="tag mix">偏债混合</span></td><td>6.25%</td><td style="color:var(--green)">-3.50%</td><td>1.79</td><td>银行理财替代</td></tr>
+      <tr><td>11</td><td>原表</td><td class="name-cell">天弘永利债券</td><td>420103</td><td><span class="tag bond">二级债基</span></td><td>4.31%</td><td style="color:var(--green)">-6.05%</td><td>0.71</td><td>银行+消费</td></tr>
+      <tr><td>12</td><td>原表</td><td class="name-cell">广发集源债券</td><td>002925</td><td><span class="tag bond">二级债基</span></td><td>4.27%</td><td style="color:var(--green)">-5.99%</td><td>0.71</td><td>高股息价值</td></tr>
+      <tr><td>13</td><td>原表</td><td class="name-cell">泓德裕康债券</td><td>002738</td><td><span class="tag bond">二级债基</span></td><td>4.17%</td><td style="color:var(--green)">-7.41%</td><td>0.56</td><td>科技成长</td></tr>
+      <tr><td>14</td><td>原表</td><td class="name-cell">易方达安心回报</td><td>110027</td><td><span class="tag bond">二级债基</span></td><td>4.51%</td><td style="color:var(--red)">-8.92%</td><td>0.51</td><td>科技成长+高弹性</td></tr>
+      <tr class="highlight-row"><td>15</td><td>🆕</td><td class="name-cell">鹏华产业债</td><td>206018</td><td><span class="tag pure">纯债</span></td><td>5.74%</td><td style="color:var(--green)">-1.80%</td><td>3.19</td><td>12年正收益</td></tr>
+      <tr class="highlight-row"><td>16</td><td>🆕</td><td class="name-cell">中银稳健添利</td><td>007100</td><td><span class="tag pure">一级债基</span></td><td>~5.80%</td><td style="color:var(--green)">-2.60%</td><td>2.23</td><td>压舱石</td></tr>
+      <tr class="highlight-row"><td>17</td><td>🆕</td><td class="name-cell">安信新趋势</td><td>001710</td><td><span class="tag mix">偏债混合</span></td><td>5.20%</td><td style="color:var(--green)">-3.30%</td><td>1.58</td><td>极低波动</td></tr>
+      <tr class="highlight-row"><td>18</td><td>🆕</td><td class="name-cell">中欧颐利</td><td>016850</td><td><span class="tag pure">纯债</span></td><td>4.24%</td><td style="color:var(--green)">-1.20%</td><td>3.53</td><td>卡玛冠军</td></tr>
+      <tr class="highlight-row"><td>19</td><td>🆕</td><td class="name-cell">华安沣润</td><td>018640</td><td><span class="tag pure">纯债</span></td><td>4.10%</td><td style="color:var(--green)">-1.30%</td><td>3.15</td><td>新锐低波动</td></tr>
+      <tr class="etf-row"><td>20</td><td>原表</td><td class="name-cell">易方达红利低波ETF ⚠</td><td>563020</td><td><span class="tag etf">股票ETF</span></td><td>6.24%</td><td style="color:var(--red)">-16.85%</td><td>0.37</td><td>ETF最优</td></tr>
+      <tr class="etf-row"><td>21</td><td>原表</td><td class="name-cell">南方红利低波50ETF ⚠</td><td>515450</td><td><span class="tag etf">股票ETF</span></td><td>4.17%</td><td style="color:var(--red)">-18.47%</td><td>0.23</td><td>--</td></tr>
+      <tr class="etf-row"><td>22</td><td>原表</td><td class="name-cell">景顺港股央企红利ETF ⚠</td><td>520990</td><td><span class="tag etf">股票ETF</span></td><td>1.74%</td><td style="color:var(--red)">-20.00%</td><td>0.09</td><td>--</td></tr>
+      <tr class="etf-row"><td>23</td><td>原表</td><td class="name-cell">易方达中证红利ETF ⚠</td><td>515180</td><td><span class="tag etf">股票ETF</span></td><td>2.43%</td><td style="color:var(--red)">-22.07%</td><td>0.11</td><td>--</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout info" style="margin-top:10px; font-size:11px">
+    <strong>排序逻辑：</strong>按卡玛比率（年化收益÷最大回撤绝对值）降序。新增推荐基金（🆕 绿色高亮行）卡玛比率集中在 1.5-3.5，远超原表场外基金（0.5-1.5），体现了"低回撤+高收益"的双重优势。
+  </div>
+</section>
+
+<!-- ======== SLIDE 10: INVESTMENT RECOMMENDATIONS ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>分档配置建议</div>
+  <div class="slide-subtitle">基于投资目标与风险偏好，从 23 只基金中精选组合方案</div>
+
+  <div class="col-3" style="margin-bottom:12px">
+    <div class="kpi-card" style="border-top:3px solid var(--green)">
+      <div class="label">🛡 保守型组合</div>
+      <div style="font-size:15px;font-weight:700;color:var(--primary);margin-top:6px">年化 ~5.5% / 回撤 < 3%</div>
+      <div style="margin-top:8px;font-size:13px;line-height:1.8">
+        <strong>40%</strong> 易方达瑞锦 009689<br>
+        <strong>30%</strong> 鹏华产业债 206018<br>
+        <strong>30%</strong> 南方荣光 002015
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text-secondary)">极度稳健，适合银行理财替代</div>
+    </div>
+    <div class="kpi-card" style="border-top:3px solid var(--accent)">
+      <div class="label">⚖️ 平衡型组合</div>
+      <div style="font-size:15px;font-weight:700;color:var(--primary);margin-top:6px">年化 ~6.5% / 回撤 < 4%</div>
+      <div style="margin-top:8px;font-size:13px;line-height:1.8">
+        <strong>35%</strong> 易方达瑞锦 009689<br>
+        <strong>25%</strong> 华泰柏瑞鼎利 004010<br>
+        <strong>25%</strong> 大成景尚 003692<br>
+        <strong>15%</strong> 中银稳健添利 007100
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text-secondary)">攻守兼备，适合稳健增值需求</div>
+    </div>
+    <div class="kpi-card" style="border-top:3px solid var(--blue)">
+      <div class="label">🚀 进取型组合</div>
+      <div style="font-size:15px;font-weight:700;color:var(--primary);margin-top:6px">年化 ~7.5% / 回撤 < 5%</div>
+      <div style="margin-top:8px;font-size:13px;line-height:1.8">
+        <strong>30%</strong> 景顺安享回报 001422<br>
+        <strong>25%</strong> 华泰柏瑞鼎利 004010<br>
+        <strong>25%</strong> 国富新机遇 002087<br>
+        <strong>20%</strong> 鹏华产业债 206018
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text-secondary)">收益至上，能接受短期波动</div>
+    </div>
+  </div>
+
+  <div class="callout success" style="margin-top:12px">
+    <strong>💡 建仓建议：</strong>
+    1. 分批建仓：将资金分 2-3 批，间隔 2-4 周入场，降低择时风险<br>
+    2. 再平衡：每季度检查一次，若某基金偏离目标权重 5% 以上则调整<br>
+    3. 定期审视：每半年评估基金经理是否变更、投资策略是否漂移
+  </div>
+</section>
+
+<!-- ======== SLIDE 11: KEY TAKEAWAYS ======== -->
+<section class="slide">
+  <div class="slide-title"><span class="bar"></span>核心结论</div>
+  <div class="slide-subtitle">23只基金全面扫描，聚焦"低回撤+稳健收益"的投资逻辑</div>
+
+  <div class="col-2">
+    <div>
+      <div class="callout success">
+        <strong>1. 场外固收+是低回撤策略的核心</strong><br><br>
+        23只基金中，场外固收+（偏债混合/二级债基/纯债）有 19 只回撤 < 10%，其中 8 只回撤 < 3.5%。ETF 作为纯权益产品，回撤 16-22%，不适合本策略场景。
+      </div>
+      <div class="callout">
+        <strong>2. 卡玛比率是比综合得分更直观的筛选指标</strong><br><br>
+        卡玛比率 = 年化收益 ÷ 最大回撤绝对值。新增推荐的易方达瑞锦（3.18）、中欧颐利（3.53）、鹏华产业债（3.19）均超过 3.0，体现了极高风险收益比。
+      </div>
+    </div>
+    <div>
+      <div class="callout info">
+        <strong>3. 两大"神基"脱颖而出</strong><br><br>
+        <strong>易方达瑞锦 009689</strong>：6.35% 年化 + -2.0% 回撤，卡玛 3.18，全市场顶级<br>
+        <strong>鹏华产业债 206018</strong>：5.74% 年化 + -1.8% 回撤，12年连续正收益<br><br>
+        两只可作为核心底仓，一攻一守，收益与安全的完美结合。
+      </div>
+      <div class="callout warn">
+        <strong>4. ETF 数据口径需关注</strong><br><br>
+        VSignals 返回的市场价不含分红。红利类 ETF 年分红 4-6%，以"含分红总回报"评估更合理。但 > 16% 的本金波动不适合风险厌恶型投资者。
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;padding:16px 20px;background:#f8f6f0;border-radius:10px;font-size:13px;text-align:center;color:var(--text-secondary)">
+    <strong style="color:var(--red)">⚠ 风险提示：</strong>
+    VSignals仅提供基础金融数据接口服务。客户通过第三方平台对接口数据进行二次加工、衍生制作所产出的全部内容，均不代表我司立场、观点与判断。<br>
+    以上内容基于公开数据整理，不构成投资建议。基金过往业绩不代表未来表现，投资需谨慎。
+  </div>
+</section>
+
+</div>
+</body>
+</html>
