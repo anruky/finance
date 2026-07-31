@@ -14,8 +14,11 @@ Usage:
 import os
 import sys
 import json
+import math
+import re
 import sqlite3
 import subprocess
+import requests
 from datetime import datetime
 
 from flask import Flask, request, jsonify, Response
@@ -43,6 +46,288 @@ STATE_INFO = {
     'D': {'name': 'Gain Then Back', 'desc': 'Both expired (Act1)', 'color': '#f39c12'},
     'E': {'name': 'Big Drop', 'desc': 'Put assigned', 'color': '#e67e22'},
 }
+
+
+# ============================================================
+# Black-Scholes helpers (for Action / live trade signal)
+# ============================================================
+
+def _N(x):
+    return 0.5 * (1 + math.erf(x / math.sqrt(2)))
+
+
+def _bs_call(S, K, T, r, sigma):
+    if T <= 0:
+        return max(S - K, 0)
+    d1 = (math.log(S / K) + (r + sigma ** 2 / 2) * T) / (sigma * math.sqrt(T))
+    d2 = d1 - sigma * math.sqrt(T)
+    return S * _N(d1) - K * math.exp(-r * T) * _N(d2)
+
+
+def _bs_put(S, K, T, r, sigma):
+    if T <= 0:
+        return max(K - S, 0)
+    d1 = (math.log(S / K) + (r + sigma ** 2 / 2) * T) / (sigma * math.sqrt(T))
+    d2 = d1 - sigma * math.sqrt(T)
+    return K * math.exp(-r * T) * _N(-d2) - S * _N(-d1)
+
+
+def _find_put_strike(S, T, r, sigma, annualized_target, dte):
+    target_ratio = annualized_target * dte / 365.0
+    lo, hi = 0.01, S
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        target = mid * target_ratio
+        premium = _bs_put(S, mid, T, r, sigma)
+        if premium < target:
+            lo = mid
+        else:
+            hi = mid
+    K = round(mid, 2)
+    return K, _bs_put(S, K, T, r, sigma)
+
+
+def _find_call_strike(S, T, r, sigma, annualized_target, dte):
+    target_premium = S * annualized_target * dte / 365.0
+    lo, hi = S, S * 3.0
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        premium = _bs_call(S, mid, T, r, sigma)
+        if premium > target_premium:
+            lo = mid
+        else:
+            hi = mid
+    K = round(mid, 2)
+    return K, _bs_call(S, K, T, r, sigma)
+
+
+# ============================================================
+# Market data fetcher (Nasdaq API + stockanalysis.com)
+# ============================================================
+
+_NASDAQ_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'application/json',
+}
+
+_SA_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+}
+
+_sa_session = None
+_nasdaq_session = None
+
+
+def _get_sa_session():
+    global _sa_session
+    if _sa_session is None:
+        _sa_session = requests.Session()
+        _sa_session.headers.update(_SA_HEADERS)
+    return _sa_session
+
+
+def _get_nasdaq_session():
+    global _nasdaq_session
+    if _nasdaq_session is None:
+        _nasdaq_session = requests.Session()
+        _nasdaq_session.headers.update(_NASDAQ_HEADERS)
+    return _nasdaq_session
+
+
+def _parse_num(val):
+    """Parse a number from API response, handling '--' and None."""
+    if val is None or val == '--' or val == '':
+        return None
+    try:
+        return float(str(val).replace(',', ''))
+    except (ValueError, TypeError):
+        return None
+
+
+# -- Map dataset ticker to Nasdaq-friendly symbol + asset class --
+_TICKER_MAP = {
+    'GOOGL': {'symbol': 'GOOGL', 'assetclass': 'stocks'},
+    'QQQ': {'symbol': 'QQQ', 'assetclass': 'etf'},
+    'Tencent (0700.HK)': {'symbol': 'TCEHY', 'assetclass': 'stocks'},  # ADR ticker
+}
+
+
+def _get_stock_price(ticker):
+    """Return (price, long_name, currency). Tries Nasdaq API first, then stockanalysis.com."""
+    ticker_info = _TICKER_MAP.get(ticker, {'symbol': ticker, 'assetclass': 'stocks'})
+    nasdaq_ticker = ticker_info['symbol']
+    assetclass = ticker_info['assetclass']
+
+    # Method 1: Nasdaq API (from option-chain page lastTrade field)
+    try:
+        s = _get_nasdaq_session()
+        url = f'https://api.nasdaq.com/api/quote/{nasdaq_ticker}/option-chain?assetclass={assetclass}&limit=10&fromdate=all&todate=all'
+        r = s.get(url, timeout=12)
+        if r.status_code == 200:
+            data = r.json().get('data', {})
+            last_trade = data.get('lastTrade', '')
+            m = re.search(r'\$([\d,.]+)', last_trade)
+            if m:
+                price = float(m.group(1).replace(',', ''))
+                return price, None, 'USD'
+    except Exception:
+        pass
+
+    # Method 2: stockanalysis.com (scrape price from HTML)
+    try:
+        sa_ticker = ticker.lower().replace(' (0700.hk)', '')
+        s = _get_sa_session()
+        r = s.get(f'https://stockanalysis.com/stocks/{sa_ticker}/', timeout=10)
+        if r.status_code == 200:
+            m = re.search(r'class="text-4xl[^"]*"[^>]*>\$?([\d,.]+)', r.text)
+            if m:
+                price = float(m.group(1).replace(',', ''))
+                return price, None, 'USD'
+    except Exception:
+        pass
+
+    return None, None, None
+
+
+def _get_options_chain(ticker, target_dte):
+    """Return (chain_dict, exp_date_str, actual_dte) from Nasdaq API."""
+    ticker_info = _TICKER_MAP.get(ticker, {'symbol': ticker, 'assetclass': 'stocks'})
+    nasdaq_ticker = ticker_info['symbol']
+    assetclass = ticker_info['assetclass']
+    try:
+        s = _get_nasdaq_session()
+
+        # Step 1: Get available expiration date ranges
+        url = f'https://api.nasdaq.com/api/quote/{nasdaq_ticker}/option-chain?assetclass={assetclass}&limit=10&fromdate=all&todate=all'
+        r = s.get(url, timeout=12)
+        if r.status_code != 200:
+            return None, None, None
+
+        data = r.json().get('data', {})
+        fromdate_filter = data.get('filterlist', {}).get('fromdate', {}).get('filter', [])
+        if not fromdate_filter:
+            return None, None, None
+
+        # Find the expiration range closest to target_dte
+        now = datetime.now()
+        best_filter = None
+        best_diff = float('inf')
+        for f in fromdate_filter:
+            if f['value'] == 'all':
+                continue
+            parts = f['value'].split('|')
+            try:
+                start_date = datetime.strptime(parts[0], '%Y-%m-%d')
+            except ValueError:
+                continue
+            dte = (start_date - now).days
+            diff = abs(dte - target_dte)
+            if diff < best_diff:
+                best_diff = diff
+                best_filter = f
+
+        if not best_filter:
+            return None, None, None
+
+        parts = best_filter['value'].split('|')
+        fromdate, todate = parts[0], parts[1]
+
+        # Step 2: Fetch the options chain for this date range
+        url = (f'https://api.nasdaq.com/api/quote/{nasdaq_ticker}/option-chain'
+               f'?assetclass={assetclass}&fromdate={fromdate}&todate={todate}'
+               f'&callput=callput&money=all&type=all&limit=200')
+        r = s.get(url, timeout=15)
+        if r.status_code != 200:
+            return None, None, None
+
+        data = r.json().get('data', {})
+        rows = data.get('table', {}).get('rows', [])
+
+        # First pass: collect all unique expiry dates and compute their DTE
+        exp_dates = {}  # {exp_str: dte}
+        for row in rows:
+            ed = row.get('expiryDate')
+            if ed and ed not in exp_dates:
+                try:
+                    exp_dt = datetime.strptime(ed + ' 2026', '%b %d %Y')
+                    dte = max(1, (exp_dt - now).days)
+                    exp_dates[ed] = dte
+                except ValueError:
+                    pass
+
+        # Pick the expiry date closest to target_dte
+        if exp_dates:
+            best_exp = min(exp_dates, key=lambda e: abs(exp_dates[e] - target_dte))
+            actual_dte = exp_dates[best_exp]
+            exp_date_str = f'{best_exp}, 2026'
+        else:
+            best_exp = None
+            actual_dte = target_dte
+            exp_date_str = f'{fromdate} ~ {todate}'
+
+        # Second pass: parse rows, filtering to the selected expiry
+        calls = []
+        puts = []
+        for row in rows:
+            strike = _parse_num(row.get('strike'))
+            if strike is None:
+                continue
+            # Skip rows that don't match the selected expiry
+            if best_exp and row.get('expiryDate') != best_exp:
+                continue
+
+            # Call data
+            c_bid = _parse_num(row.get('c_Bid'))
+            c_ask = _parse_num(row.get('c_Ask'))
+            if c_bid is not None or c_ask is not None:
+                calls.append({
+                    'strike': strike,
+                    'bid': c_bid or 0.0,
+                    'ask': c_ask or 0.0,
+                    'lastPrice': _parse_num(row.get('c_Last')) or 0.0,
+                    'volume': int(_parse_num(row.get('c_Volume')) or 0),
+                    'openInterest': int(_parse_num(row.get('c_Openinterest')) or 0),
+                })
+
+            # Put data
+            p_bid = _parse_num(row.get('p_Bid'))
+            p_ask = _parse_num(row.get('p_Ask'))
+            if p_bid is not None or p_ask is not None:
+                puts.append({
+                    'strike': strike,
+                    'bid': p_bid or 0.0,
+                    'ask': p_ask or 0.0,
+                    'lastPrice': _parse_num(row.get('p_Last')) or 0.0,
+                    'volume': int(_parse_num(row.get('p_Volume')) or 0),
+                    'openInterest': int(_parse_num(row.get('p_Openinterest')) or 0),
+                })
+
+        if not calls and not puts:
+            return None, None, None
+
+        return {'calls': calls, 'puts': puts}, exp_date_str, actual_dte
+
+    except Exception:
+        return None, None, None
+
+
+def _find_best_option(options, target_strike):
+    """Find the real option contract whose strike is closest to target_strike."""
+    if not options:
+        return None
+    best = min(options, key=lambda o: abs(o['strike'] - target_strike))
+    bid = best.get('bid', 0)
+    ask = best.get('ask', 0)
+    mid = (bid + ask) / 2 if bid > 0 and ask > 0 else best.get('lastPrice', 0)
+    return {
+        'strike': best['strike'],
+        'bid': round(bid, 2),
+        'ask': round(ask, 2),
+        'mid': round(mid, 2),
+        'iv': None,  # Nasdaq API doesn't provide IV
+        'volume': best.get('volume', 0),
+        'open_interest': best.get('openInterest', 0),
+    }
 
 
 # ============================================================
@@ -304,6 +589,134 @@ def api_delete(run_id):
     return jsonify({'status': 'deleted'})
 
 
+@app.route('/api/action', methods=['POST'])
+def api_action():
+    """Live trade signal: fetch real options data, compute put/call strikes."""
+    data = request.json
+    dataset_key = data.get('dataset', 'GOOGL')
+    state = data.get('state', 'A')
+    targets = data.get('targets', {})
+    dte = int(data.get('dte', 18))
+    put_iv = float(data.get('put_iv', 30)) / 100.0
+    call_iv = float(data.get('call_iv', 22)) / 100.0
+
+    if dataset_key not in DATASETS:
+        return jsonify({'error': f'Unknown dataset: {dataset_key}'}), 400
+
+    ds = DATASETS[dataset_key]
+    ticker = ds['ticker']
+
+    # State targets
+    st = targets.get(state, {'put': 40, 'call': 3})
+    put_target = float(st.get('put', 40)) / 100.0
+    call_target = float(st.get('call', 3)) / 100.0
+
+    # Fetch live stock price
+    stock_price, stock_name, currency = _get_stock_price(ticker)
+    data_source = 'live'
+
+    if stock_price is None:
+        # Fallback: use last close from local data file
+        data_file = os.path.join(BASE_DIR, ds['file'])
+        if os.path.exists(data_file):
+            with open(data_file) as f:
+                stock_data = json.load(f)
+            if stock_data and isinstance(stock_data, list):
+                last = stock_data[-1]
+                # Data format: [date, open, high, low, close]
+                if isinstance(last, list) and len(last) >= 5:
+                    stock_price = last[4]
+                elif isinstance(last, dict):
+                    stock_price = last.get('close', last.get('price', 100))
+                stock_name = ds['label']
+                currency = 'USD'
+                data_source = 'historical'
+
+    if stock_price is None or stock_price <= 0:
+        return jsonify({'error': 'Cannot fetch stock price and no local data'}), 500
+
+    # Fetch options chain
+    chain, exp_date, actual_dte = _get_options_chain(ticker, dte)
+    if actual_dte is None:
+        actual_dte = dte
+        exp_date = f'~{dte} days'
+
+    # Compute theoretical strikes
+    T = actual_dte / 365.0
+    r = 0.04
+
+    put_theory_k, put_theory_p = _find_put_strike(stock_price, T, r, put_iv, put_target, actual_dte)
+    call_theory_k, call_theory_p = _find_call_strike(stock_price, T, r, call_iv, call_target, actual_dte)
+
+    # Match against real options chain
+    put_real = _find_best_option(chain['puts'], put_theory_k) if chain else None
+    call_real = _find_best_option(chain['calls'], call_theory_k) if chain else None
+
+    # Build put result
+    put_strike = put_real['strike'] if put_real else round(put_theory_k, 2)
+    put_bid = put_real['bid'] if put_real else round(put_theory_p, 2)
+    put_ann = (put_bid / put_strike * 365 / actual_dte * 100) if put_strike > 0 else 0
+    put_otm = (stock_price - put_strike) / stock_price * 100
+
+    # Build call result
+    call_strike = call_real['strike'] if call_real else round(call_theory_k, 2)
+    call_bid = call_real['bid'] if call_real else round(call_theory_p, 2)
+    call_ann = (call_bid / stock_price * 365 / actual_dte * 100) if stock_price > 0 else 0
+    call_otm = (call_strike - stock_price) / stock_price * 100
+
+    put_prem_contract = round(put_bid * 100)
+    call_prem_contract = round(call_bid * 100)
+
+    result = {
+        'ticker': ticker,
+        'stock_name': stock_name or ds['label'],
+        'stock_price': round(stock_price, 2),
+        'currency': currency or 'USD',
+        'data_source': data_source,
+        'expiry_date': exp_date,
+        'dte': actual_dte,
+        'state': state,
+        'state_name': STATE_INFO.get(state, {}).get('name', ''),
+        'has_real_data': chain is not None,
+        'put': {
+            'target_pct': st.get('put', 40),
+            'theoretical_strike': round(put_theory_k, 2),
+            'theoretical_premium': round(put_theory_p, 2),
+            'real_strike': put_real['strike'] if put_real else None,
+            'bid': put_real['bid'] if put_real else None,
+            'ask': put_real['ask'] if put_real else None,
+            'mid': put_real['mid'] if put_real else None,
+            'iv': put_real['iv'] if put_real else None,
+            'volume': put_real['volume'] if put_real else None,
+            'open_interest': put_real['open_interest'] if put_real else None,
+            'premium_per_contract': put_prem_contract,
+            'actual_annualized': round(put_ann, 1),
+            'otm_pct': round(put_otm, 1),
+        },
+        'call': {
+            'target_pct': st.get('call', 3),
+            'theoretical_strike': round(call_theory_k, 2),
+            'theoretical_premium': round(call_theory_p, 2),
+            'real_strike': call_real['strike'] if call_real else None,
+            'bid': call_real['bid'] if call_real else None,
+            'ask': call_real['ask'] if call_real else None,
+            'mid': call_real['mid'] if call_real else None,
+            'iv': call_real['iv'] if call_real else None,
+            'volume': call_real['volume'] if call_real else None,
+            'open_interest': call_real['open_interest'] if call_real else None,
+            'premium_per_contract': call_prem_contract,
+            'actual_annualized': round(call_ann, 1),
+            'otm_pct': round(call_otm, 1),
+        },
+        'total_premium': put_prem_contract + call_prem_contract,
+        'breakeven_put': round(put_strike - put_bid, 2),
+        'profit_zone_low': round(put_strike, 2),
+        'profit_zone_high': round(call_strike, 2),
+        'profit_zone_pct': round((call_strike - put_strike) / stock_price * 100, 1),
+    }
+    return jsonify(result)
+
+
 # ============================================================
 # Frontend HTML
 # ============================================================
@@ -410,6 +823,45 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 /* Params tooltip */
 .params-detail { display: none; font-size: 10px; color: #888; margin-top: 4px; }
 .params-detail.show { display: block; }
+
+/* Action module */
+.action-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #00b894, #00cec9); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 4px; }
+.action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,184,148,0.4); }
+.action-btn:active { transform: translateY(0); }
+.action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.state-selector { display: flex; gap: 6px; margin-top: 8px; }
+.state-sel-btn { flex: 1; padding: 10px 4px; border: none; border-radius: 8px; color: white; font-weight: 800; font-size: 14px; cursor: pointer; opacity: 0.35; transition: all 0.15s; text-align: center; }
+.state-sel-btn:hover { opacity: 0.7; }
+.state-sel-btn.active { opacity: 1; transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.state-preview { margin-top: 8px; padding: 6px 10px; background: #f0f4ff; border-radius: 6px; font-size: 11px; color: #555; }
+.state-preview b { color: #333; }
+
+/* Signal results */
+.signal-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.signal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.signal-header h2 { font-size: 16px; font-weight: 700; }
+.signal-header .sig-price { font-size: 20px; font-weight: 800; }
+.signal-header .sig-meta { font-size: 12px; color: #888; }
+.signal-header .sig-close { color: #999; cursor: pointer; font-size: 18px; padding: 4px 8px; }
+.signal-header .sig-close:hover { color: #333; }
+.trade-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.trade-card { border-radius: 10px; padding: 16px; }
+.trade-card.put { background: #fff5f5; border: 1px solid #ffd5d5; }
+.trade-card.call { background: #f0fff4; border: 1px solid #c3e6cb; }
+.trade-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.trade-card .tc-strike { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+.trade-card .tc-action { font-size: 12px; color: #666; margin-bottom: 12px; }
+.trade-card .tc-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; }
+.trade-card .tc-row b { font-weight: 600; }
+.trade-card .tc-highlight { background: rgba(255,255,255,0.6); border-radius: 6px; padding: 6px 8px; margin: 8px 0; font-size: 13px; font-weight: 700; text-align: center; }
+.signal-summary { background: #f8f9fa; border-radius: 10px; padding: 16px; }
+.signal-summary h3 { font-size: 13px; color: #666; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.sig-sum-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+.sig-sum-row b { font-weight: 600; }
+.sig-data-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+.sig-data-badge.live { background: #d4edda; color: #155724; }
+.sig-data-badge.historical { background: #fff3cd; color: #856404; }
+.sig-theory { font-size: 10px; color: #aaa; font-style: italic; }
 </style>
 </head>
 <body>
@@ -462,10 +914,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
     <!-- Run -->
     <button class="run-btn" id="runBtn" onclick="runBacktest()">Run Backtest</button>
+
+    <!-- Action Module -->
+    <div class="card" style="border: 2px solid #00b894;">
+      <h2 style="color: #00b894;">4. Action (Live Trade Signal)</h2>
+      <label style="font-size:12px;color:#666;">Select Current State</label>
+      <div class="state-selector" id="stateSelector"></div>
+      <div class="state-preview" id="statePreview"></div>
+      <button class="action-btn" id="actionBtn" onclick="runAction()">Get Trade Signal</button>
+    </div>
   </div>
 
   <!-- Right Panel: Results -->
   <div class="right-panel">
+    <!-- Trade Signal -->
+    <div id="signalSection" style="display:none;"></div>
+
     <!-- Summary Metrics -->
     <div id="summarySection" style="display:none;">
       <div class="summary-grid" id="summaryGrid"></div>
@@ -544,6 +1008,7 @@ const PRESETS = {
 };
 let selectedDataset = 'GOOGL';
 let historyCache = [];
+let selectedActionState = 'A';
 
 function initDatasets() {
   const grid = document.getElementById('datasetGrid');
@@ -577,12 +1042,12 @@ function initStateParams() {
       <div class="param-group">
         <div class="param-input">
           <label>P</label>
-          <input type="number" id="put_${state}" value="${defaults[state].put}" min="0" max="100" step="1">
+          <input type="number" id="put_${state}" value="${defaults[state].put}" min="0" max="100" step="1" oninput="updateStatePreview()">
           <span>%</span>
         </div>
         <div class="param-input">
           <label>C</label>
-          <input type="number" id="call_${state}" value="${defaults[state].call}" min="0" max="100" step="1">
+          <input type="number" id="call_${state}" value="${defaults[state].call}" min="0" max="100" step="1" oninput="updateStatePreview()">
           <span>%</span>
         </div>
       </div>
@@ -597,6 +1062,176 @@ function applyPreset(name) {
     document.getElementById('put_'+s).value = p[s].put;
     document.getElementById('call_'+s).value = p[s].call;
   });
+  updateStatePreview();
+}
+
+function initStateSelector() {
+  const container = document.getElementById('stateSelector');
+  container.innerHTML = '';
+  Object.entries(STATE_INFO).forEach(([state, info]) => {
+    const btn = document.createElement('button');
+    btn.className = 'state-sel-btn' + (state === selectedActionState ? ' active' : '');
+    btn.style.background = info.color;
+    btn.textContent = state;
+    btn.title = `${state}: ${info.name} (${info.desc})`;
+    btn.onclick = () => {
+      selectedActionState = state;
+      document.querySelectorAll('.state-sel-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateStatePreview();
+    };
+    container.appendChild(btn);
+  });
+  updateStatePreview();
+}
+
+function updateStatePreview() {
+  const putVal = document.getElementById('put_'+selectedActionState)?.value || '?';
+  const callVal = document.getElementById('call_'+selectedActionState)?.value || '?';
+  const info = STATE_INFO[selectedActionState];
+  document.getElementById('statePreview').innerHTML =
+    `<b>State ${selectedActionState}</b> (${info.name}) &mdash; Put Target: <b>${putVal}%</b> | Call Target: <b>${callVal}%</b>`;
+}
+
+async function runAction() {
+  const btn = document.getElementById('actionBtn');
+  btn.disabled = true;
+  btn.textContent = 'Fetching...';
+  document.getElementById('loadingOverlay').classList.add('show');
+  document.querySelector('.loading-text').textContent = 'Fetching live options data...';
+
+  const targets = {};
+  ['A','B','C','D','E'].forEach(s => {
+    targets[s] = {
+      put: parseInt(document.getElementById('put_'+s).value) || 0,
+      call: parseInt(document.getElementById('call_'+s).value) || 0
+    };
+  });
+
+  const payload = {
+    dataset: selectedDataset,
+    state: selectedActionState,
+    targets,
+    dte: parseInt(document.getElementById('dte').value) || 18,
+    put_iv: parseInt(document.getElementById('putIv').value) || 30,
+    call_iv: parseInt(document.getElementById('callIv').value) || 22
+  };
+
+  try {
+    const resp = await fetch('/api/action', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if (data.error) {
+      alert('Error: ' + data.error);
+      return;
+    }
+    renderSignal(data);
+  } catch(e) {
+    alert('Request failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Get Trade Signal';
+    document.getElementById('loadingOverlay').classList.remove('show');
+    document.querySelector('.loading-text').textContent = 'Running backtest...';
+  }
+}
+
+function renderSignal(d) {
+  const cur = d.currency === 'USD' ? '$' : (d.currency === 'HKD' ? 'HK$' : d.currency + ' ');
+  const dataBadge = d.data_source === 'live'
+    ? '<span class="sig-data-badge live">LIVE</span>'
+    : '<span class="sig-data-badge historical">HISTORICAL</span>';
+  const realBadge = d.has_real_data
+    ? '<span class="sig-data-badge live">Real Options Chain</span>'
+    : '<span class="sig-data-badge historical">Theoretical Only</span>';
+
+  // Put card
+  const p = d.put;
+  const putStrike = p.real_strike !== null ? p.real_strike : p.theoretical_strike;
+  const putBid = p.bid !== null ? p.bid : p.theoretical_premium;
+  const putRealRows = p.bid !== null ? `
+    <div class="tc-row"><span>Bid / Ask</span><b>${cur}${p.bid} / ${cur}${p.ask}</b></div>
+    <div class="tc-row"><span>Mid</span><b>${cur}${p.mid}</b></div>
+    <div class="tc-row"><span>Implied Vol</span><b>${p.iv !== null ? p.iv + '%' : 'N/A'}</b></div>
+    <div class="tc-row"><span>Volume / OI</span><b>${(p.volume||0).toLocaleString()} / ${(p.open_interest||0).toLocaleString()}</b></div>
+  ` : `<div class="sig-theory">Theoretical strike: ${cur}${p.theoretical_strike} (premium ${cur}${p.theoretical_premium})</div>`;
+
+  // Call card
+  const c = d.call;
+  const callStrike = c.real_strike !== null ? c.real_strike : c.theoretical_strike;
+  const callBid = c.bid !== null ? c.bid : c.theoretical_premium;
+  const callRealRows = c.bid !== null ? `
+    <div class="tc-row"><span>Bid / Ask</span><b>${cur}${c.bid} / ${cur}${c.ask}</b></div>
+    <div class="tc-row"><span>Mid</span><b>${cur}${c.mid}</b></div>
+    <div class="tc-row"><span>Implied Vol</span><b>${c.iv !== null ? c.iv + '%' : 'N/A'}</b></div>
+    <div class="tc-row"><span>Volume / OI</span><b>${(c.volume||0).toLocaleString()} / ${(c.open_interest||0).toLocaleString()}</b></div>
+  ` : `<div class="sig-theory">Theoretical strike: ${cur}${c.theoretical_strike} (premium ${cur}${c.theoretical_premium})</div>`;
+
+  const html = `
+    <div class="signal-card">
+      <div class="signal-header">
+        <div>
+          <h2>${d.stock_name} (${d.ticker})</h2>
+          <div class="sig-meta">
+            ${dataBadge} ${realBadge}
+            &nbsp;|&nbsp; Expiry: <b>${d.expiry_date}</b> (${d.dte} DTE)
+            &nbsp;|&nbsp; State: <b style="color:${STATE_INFO[d.state].color}">${d.state} - ${d.state_name}</b>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="sig-price">${cur}${d.stock_price}</div>
+          <div class="sig-meta">Current Price</div>
+        </div>
+        <span class="sig-close" onclick="closeSignal()">&times;</span>
+      </div>
+
+      <div class="trade-cards">
+        <div class="trade-card put">
+          <h3 style="color:#c0392b;">SELL PUT</h3>
+          <div class="tc-strike" style="color:#c0392b;">${cur}${putStrike}</div>
+          <div class="tc-action">Sell 1x ${d.ticker} ${d.expiry_date} ${cur}${putStrike} Put &rarr; collect ${cur}${putBid}</div>
+          <div class="tc-highlight" style="color:#c0392b;">
+            Premium: ${cur}${p.premium_per_contract}/contract &nbsp;|&nbsp; ${p.actual_annualized}% annualized
+          </div>
+          <div class="tc-row"><span>Target (annualized)</span><b>${p.target_pct}%</b></div>
+          <div class="tc-row"><span>OTM Distance</span><b>${p.otm_pct}%</b></div>
+          ${putRealRows}
+        </div>
+
+        <div class="trade-card call">
+          <h3 style="color:#27ae60;">SELL CALL</h3>
+          <div class="tc-strike" style="color:#27ae60;">${cur}${callStrike}</div>
+          <div class="tc-action">Sell 1x ${d.ticker} ${d.expiry_date} ${cur}${callStrike} Call &rarr; collect ${cur}${callBid}</div>
+          <div class="tc-highlight" style="color:#27ae60;">
+            Premium: ${cur}${c.premium_per_contract}/contract &nbsp;|&nbsp; ${c.actual_annualized}% annualized
+          </div>
+          <div class="tc-row"><span>Target (annualized)</span><b>${c.target_pct}%</b></div>
+          <div class="tc-row"><span>OTM Distance</span><b>${c.otm_pct}%</b></div>
+          ${callRealRows}
+        </div>
+      </div>
+
+      <div class="signal-summary">
+        <h3>Trade Summary</h3>
+        <div class="sig-sum-row"><span>Total Premium Collected</span><b style="color:#27ae60;">${cur}${d.total_premium}</b></div>
+        <div class="sig-sum-row"><span>Put Breakeven</span><b>${cur}${d.breakeven_put} (${(((d.breakeven_put - d.stock_price)/d.stock_price)*100).toFixed(1)}% below current)</b></div>
+        <div class="sig-sum-row"><span>Profit Zone (both expire worthless)</span><b>${cur}${d.profit_zone_low} ~ ${cur}${d.profit_zone_high} (${d.profit_zone_pct}% range)</b></div>
+        <div class="sig-sum-row"><span>Put Assignment Risk</span><b style="color:#c0392b;">Stock drops below ${cur}${d.profit_zone_low} (-${Math.abs(p.otm_pct).toFixed(1)}%)</b></div>
+        <div class="sig-sum-row"><span>Call Assignment Risk</span><b style="color:#27ae60;">Stock rises above ${cur}${d.profit_zone_high} (+${c.otm_pct.toFixed(1)}%)</b></div>
+      </div>
+    </div>
+  `;
+  document.getElementById('signalSection').innerHTML = html;
+  document.getElementById('signalSection').style.display = 'block';
+  document.getElementById('signalSection').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function closeSignal() {
+  document.getElementById('signalSection').style.display = 'none';
+  document.getElementById('signalSection').innerHTML = '';
 }
 
 async function runBacktest() {
@@ -851,6 +1486,7 @@ function applyParams(id) {
   });
   // Scroll to top
   document.querySelector('.left-panel').scrollIntoView({behavior:'smooth', block:'start'});
+  updateStatePreview();
 }
 
 async function deleteRun(id) {
@@ -862,6 +1498,7 @@ async function deleteRun(id) {
 // Init
 initDatasets();
 initStateParams();
+initStateSelector();
 loadHistory();
 </script>
 </body>
