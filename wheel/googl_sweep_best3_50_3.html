@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOOGL Wheel Strategy - Gav Version</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1a1a2e; line-height: 1.6; }
+.container { max-width: 1500px; margin: 0 auto; padding: 20px; }
+h1 { text-align: center; font-size: 28px; margin: 20px 0 5px; color: #1a1a2e; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px; }
+.card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.card-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.card-value { font-size: 24px; font-weight: 700; }
+.card-value.profit { color: #27ae60; }
+.card-value.loss { color: #c0392b; }
+.card-value.neutral { color: #2c3e50; }
+.card-sub { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+.highlight-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 30px; text-align: center; margin-bottom: 30px; color: white; }
+.highlight-box .label { font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+.highlight-box .value { font-size: 48px; font-weight: 800; margin: 10px 0; }
+.highlight-box .detail { font-size: 14px; opacity: 0.8; }
+
+.config-box { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.config-box h3 { font-size: 16px; margin-bottom: 12px; color: #555; }
+.config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.config-item { display: flex; justify-content: space-between; padding: 6px 12px; background: #f8f9fa; border-radius: 6px; font-size: 13px; }
+.config-item span:first-child { color: #888; }
+.config-item span:last-child { font-weight: 600; }
+
+.chart-container { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.chart-container h3 { font-size: 16px; margin-bottom: 16px; color: #333; }
+.chart-wrapper { position: relative; height: 400px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+thead { background: #2c3e50; color: white; }
+th { padding: 12px 6px; text-align: center; font-weight: 600; white-space: nowrap; }
+td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #eee; white-space: nowrap; }
+tr:hover { background: #f8f9fa; }
+td.state-a { color: #667eea; font-weight: 700; }
+td.state-b { color: #27ae60; font-weight: 700; }
+td.state-c { color: #e74c3c; font-weight: 700; }
+td.state-d { color: #f39c12; font-weight: 700; }
+td.state-e { color: #e67e22; font-weight: 700; }
+td.profit { color: #27ae60; font-weight: 600; }
+td.loss { color: #c0392b; font-weight: 600; }
+td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
+.prem-detail { font-size: 10px; color: #999; }
+.badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.badge-action { background: #e74c3c; color: white; }
+.badge-state { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; color: white; }
+.badge-state.a { background: #667eea; }
+.badge-state.b { background: #27ae60; }
+.badge-state.c { background: #e74c3c; }
+.badge-state.d { background: #f39c12; }
+.badge-state.e { background: #e67e22; }
+
+.state-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.state-legend-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #666; }
+.state-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+.chart-wrapper-dual { position: relative; height: 480px; }
+
+.section-title { font-size: 20px; font-weight: 700; margin: 30px 0 15px; color: #2c3e50; }
+
+.strategy-box { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.strategy-box h3 { font-size: 16px; margin-bottom: 12px; color: #555; }
+.strategy-box ul { margin-left: 20px; font-size: 13px; color: #444; }
+.strategy-box li { margin-bottom: 6px; }
+
+.income-cost-section { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.income-cost-section h3 { font-size: 16px; margin-bottom: 16px; color: #333; }
+.income-cost-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.ic-column { border-radius: 8px; padding: 16px; }
+.ic-column.income { background: #eafaf1; }
+.ic-column.cost { background: #fdedec; }
+.ic-column.net { background: #f4f6f9; }
+.ic-header { font-size: 14px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #555; }
+.ic-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.ic-row:last-child { border-bottom: none; }
+.ic-row.ic-total { font-weight: 700; border-top: 2px solid rgba(0,0,0,0.1); padding-top: 10px; margin-top: 4px; }
+.ic-value { font-weight: 600; }
+.ic-value.profit { color: #27ae60; }
+.ic-value.loss { color: #c0392b; }
+
+.state-targets-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+.state-targets-table th { padding: 6px 10px; text-align: center; background: #f8f9fa; color: #555; font-weight: 600; }
+.state-targets-table td { padding: 6px 10px; text-align: center; border-bottom: 1px solid #eee; }
+.state-targets-table td.state-label { font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>GOOGL Wheel Strategy - Gav Version</h1>
+    <p class="subtitle">1 lot stock + cash | State-specific Put/Call targets | Margin 11% | All states normalize to A | 10-day DTE</p>
+
+    <div class="highlight-box">
+        <div class="label">Annualized Return</div>
+        <div class="value">+35.84%</div>
+        <div class="detail">
+            Total: +17.19% over 189 days |
+            $64,312 -> $75,367 |
+            vs B&H: +31.76% annualized
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <div class="card">
+            <div class="card-label">Total Return</div>
+            <div class="card-value profit">+17.19%</div>
+            <div class="card-sub">$+11,055 P&L</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Max Drawdown</div>
+            <div class="card-value loss">6.89%</div>
+            <div class="card-sub">B&H: 20.37%</div>
+        </div>
+        <div class="card">
+            <div class="card-label">B&H Return</div>
+            <div class="card-value neutral">+15.35%</div>
+            <div class="card-sub">Ann: +31.76%</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Action 1 / States</div>
+            <div class="card-value neutral">2</div>
+            <div class="card-sub">A:13 / B:2 / E:3</div>
+        </div>
+    </div>
+
+    <div class="income-cost-section">
+        <h3>Income &amp; Cost Summary</h3>
+        <div class="income-cost-grid">
+            <div class="ic-column income">
+                <div class="ic-header">Income</div>
+                <div class="ic-row"><span>Premium income</span><span class="ic-value profit">$8,056</span></div>
+                <div class="ic-row"><span>Stock gains</span><span class="ic-value profit">$15,315</span></div>
+                <div class="ic-row ic-total"><span>Total income</span><span class="ic-value profit">$23,371</span></div>
+            </div>
+            <div class="ic-column cost">
+                <div class="ic-header">Cost</div>
+                <div class="ic-row"><span>Stock losses</span><span class="ic-value loss">$12,272</span></div>
+                <div class="ic-row"><span>Financing cost</span><span class="ic-value loss">$45</span></div>
+                <div class="ic-row ic-total"><span>Total cost</span><span class="ic-value loss">$12,317</span></div>
+            </div>
+            <div class="ic-column net">
+                <div class="ic-header">Net P&amp;L</div>
+                <div class="ic-row ic-total"><span>Net</span><span class="ic-value profit">$+11,055</span></div>
+                <div class="ic-row"><span>Return</span><span class="ic-value profit">+17.19%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="strategy-box">
+        <h3>Strategy Logic (Gav Version)</h3>
+        <ul>
+            <li><b>Initial</b>: 100 shares + cash (State A), 2 lots total capital</li>
+            <li><b>Daily Monitor</b>: If price hits call strike -> buy 100 shares on margin (11% ann.). Put stays open.</li>
+            <li><b>State B</b> (call exercised after Act1): pay off loan -> A. Next: Put 50% / Call 3%</li>
+            <li><b>State C</b> (put exercised after Act1): sell 200, pay off loan -> A. Next: Put 10% / Call 10%</li>
+            <li><b>State D</b> (neither after Act1): sell 100, pay off loan -> A. Next: Put 50% / Call 3%</li>
+            <li><b>State E</b> (put exercised, no Act1): sell 100 -> A. Next: Put 10% / Call 10%</li>
+            <li><b>State A</b> (neither exercised): stays A. Next: Put 50% / Call 3%</li>
+            <li><b>Cycle</b>: 10 days to expiry, all states normalize to A position</li>
+        </ul>
+    </div>
+
+    <div class="config-box">
+        <h3>State-Specific Targets (Annualized)</h3>
+        <table class="state-targets-table">
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Description</th>
+                    <th>Put Target</th>
+                    <th>Call Target</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="state-label state-a">A</td><td>Low volatility</td><td>50%</td><td>3%</td></tr>
+                <tr><td class="state-label state-b">B</td><td>Big gain (call assigned)</td><td>50%</td><td>3%</td></tr>
+                <tr><td class="state-label state-c">C</td><td>Volatile, ended down</td><td>10%</td><td>10%</td></tr>
+                <tr><td class="state-label state-d">D</td><td>Gain then pullback</td><td>50%</td><td>3%</td></tr>
+                <tr><td class="state-label state-e">E</td><td>Big drop</td><td>10%</td><td>10%</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="config-box">
+        <h3>Configuration</h3>
+        <div class="config-grid">
+            <div class="config-item"><span>DTE</span><span>10 days</span></div>
+            <div class="config-item"><span>Margin Rate</span><span>11%</span></div>
+            <div class="config-item"><span>Start</span><span>2026-01-01</span></div>
+            <div class="config-item"><span>End</span><span>2026-07-15</span></div>
+            <div class="config-item"><span>Put IV</span><span>40.0%</span></div>
+            <div class="config-item"><span>Call IV</span><span>30.0%</span></div>
+            <div class="config-item"><span>Risk-free Rate</span><span>5.0%</span></div>
+            <div class="config-item"><span>Cycles</span><span>18</span></div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3>Portfolio Value: Strategy vs Buy &amp; Hold vs Stock Price</h3>
+        <div class="state-legend">
+            <div class="state-legend-item"><div class="state-legend-dot" style="background:#667eea"></div>A - Neither exercised</div>
+            <div class="state-legend-item"><div class="state-legend-dot" style="background:#27ae60"></div>B - Call assigned (Act1)</div>
+            <div class="state-legend-item"><div class="state-legend-dot" style="background:#e74c3c"></div>C - Put assigned (Act1)</div>
+            <div class="state-legend-item"><div class="state-legend-dot" style="background:#f39c12"></div>D - Both expired (Act1)</div>
+            <div class="state-legend-item"><div class="state-legend-dot" style="background:#e67e22"></div>E - Put assigned (no Act1)</div>
+        </div>
+        <div class="chart-wrapper-dual">
+            <canvas id="portfolioChart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3>Per-Cycle Premium, PnL & Financing Cost</h3>
+        <div class="chart-wrapper">
+            <canvas id="premiumChart"></canvas>
+        </div>
+    </div>
+
+    <div class="section-title">Cycle List (18 cycles)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Entry Date</th>
+                <th>Entry Price</th>
+                <th>Put Strike</th>
+                <th>Call Strike</th>
+                <th>Premium</th>
+                <th>Act1</th>
+                <th>Financing</th>
+                <th>Expiry Date</th>
+                <th>Expiry Price</th>
+                <th>From</th>
+                <th>End State</th>
+                <th>Cycle PnL</th>
+                <th>Strategy Value</th>
+                <th>B&H Value</th>
+                <th>Shares</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td>1</td>
+                <td>2026-01-07</td>
+                <td>$321.56</td>
+                <td>$312.72<br><span class="prem-detail">50% tgt</span></td>
+                <td>$354.82<br><span class="prem-detail">3% tgt</span></td>
+                <td>$591<br><span class="prem-detail">P:5.57 / C:0.34</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-01-20</td>
+                <td>$321.58</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+593</td>
+                <td>$64,905</td>
+                <td>$64,316</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>2026-01-20</td>
+                <td>$321.58</td>
+                <td>$311.94<br><span class="prem-detail">50% tgt</span></td>
+                <td>$351.4<br><span class="prem-detail">3% tgt</span></td>
+                <td>$454<br><span class="prem-detail">P:4.27 / C:0.26</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-01-30</td>
+                <td>$337.56</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+2,052</td>
+                <td>$66,957</td>
+                <td>$67,512</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>2026-01-30</td>
+                <td>$337.56</td>
+                <td>$327.45<br><span class="prem-detail">50% tgt</span></td>
+                <td>$368.86<br><span class="prem-detail">3% tgt</span></td>
+                <td>$476<br><span class="prem-detail">P:4.49 / C:0.28</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-02-09</td>
+                <td>$323.90</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-e"><span class="badge-state e" title="Put assigned (no Act1)">E</span><br><span class="prem-detail">Put assigned (no Act1)</span></td>
+                <td class="loss">$-1,245</td>
+                <td>$65,712</td>
+                <td>$64,780</td>
+                <td>100</td>
+                <td class="note">Put assigned: bought 100 @ $327.45; Call expired. Normalized: sold 100</td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td>2026-02-09</td>
+                <td>$323.90</td>
+                <td>$296.32<br><span class="prem-detail">10% tgt</span></td>
+                <td>$344.65<br><span class="prem-detail">10% tgt</span></td>
+                <td>$170<br><span class="prem-detail">P:0.81 / C:0.89</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-02-19</td>
+                <td>$302.46</td>
+                <td class="state-e"><span class="badge-state e" title="Targets: P:10% / C:10%">E</span><br><span class="prem-detail">P:10% / C:10%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="loss">$-1,974</td>
+                <td>$63,738</td>
+                <td>$60,491</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>5</td>
+                <td>2026-02-19</td>
+                <td>$302.46</td>
+                <td>$293.62<br><span class="prem-detail">50% tgt</span></td>
+                <td>$331.64<br><span class="prem-detail">3% tgt</span></td>
+                <td>$470<br><span class="prem-detail">P:4.43 / C:0.27</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-03-02</td>
+                <td>$306.12</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+837</td>
+                <td>$64,574</td>
+                <td>$61,224</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>6</td>
+                <td>2026-03-02</td>
+                <td>$306.12</td>
+                <td>$296.95<br><span class="prem-detail">50% tgt</span></td>
+                <td>$334.51<br><span class="prem-detail">3% tgt</span></td>
+                <td>$432<br><span class="prem-detail">P:4.07 / C:0.25</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-03-12</td>
+                <td>$303.37</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+157</td>
+                <td>$64,731</td>
+                <td>$60,674</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>7</td>
+                <td>2026-03-12</td>
+                <td>$303.37</td>
+                <td>$294.5<br><span class="prem-detail">50% tgt</span></td>
+                <td>$332.64<br><span class="prem-detail">3% tgt</span></td>
+                <td>$471<br><span class="prem-detail">P:4.44 / C:0.27</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-03-23</td>
+                <td>$301.88</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+322</td>
+                <td>$65,053</td>
+                <td>$60,376</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>8</td>
+                <td>2026-03-23</td>
+                <td>$301.88</td>
+                <td>$292.83<br><span class="prem-detail">50% tgt</span></td>
+                <td>$329.87<br><span class="prem-detail">3% tgt</span></td>
+                <td>$426<br><span class="prem-detail">P:4.01 / C:0.25</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-04-02</td>
+                <td>$295.59</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="loss">$-203</td>
+                <td>$64,850</td>
+                <td>$59,119</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>9</td>
+                <td>2026-04-02</td>
+                <td>$295.59</td>
+                <td>$286.95<br><span class="prem-detail">50% tgt</span></td>
+                <td>$324.11<br><span class="prem-detail">3% tgt</span></td>
+                <td>$459<br><span class="prem-detail">P:4.32 / C:0.27</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-04-13</td>
+                <td>$321.12</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+3,011</td>
+                <td>$67,862</td>
+                <td>$64,223</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>10</td>
+                <td>2026-04-13</td>
+                <td>$321.12</td>
+                <td>$311.49<br><span class="prem-detail">50% tgt</span></td>
+                <td>$350.89<br><span class="prem-detail">3% tgt</span></td>
+                <td>$453<br><span class="prem-detail">P:4.27 / C:0.26</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-04-23</td>
+                <td>$338.69</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+2,210</td>
+                <td>$70,072</td>
+                <td>$67,737</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>11</td>
+                <td>2026-04-23</td>
+                <td>$338.69</td>
+                <td>$328.79<br><span class="prem-detail">50% tgt</span></td>
+                <td>$371.36<br><span class="prem-detail">3% tgt</span></td>
+                <td>$526<br><span class="prem-detail">P:4.96 / C:0.31</span></td>
+                <td><span class="badge badge-action">ACT1</span></td>
+                <td>$45<br><span class="prem-detail">loan: $37,136</span></td>
+                <td>2026-05-04</td>
+                <td>$383.02</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-b"><span class="badge-state b" title="Call assigned (Act1)">B</span><br><span class="prem-detail">Call assigned (Act1)</span></td>
+                <td class="profit">$+4,915</td>
+                <td>$74,986</td>
+                <td>$76,604</td>
+                <td>100</td>
+                <td class="note">Action1 on 2026-04-30 @ $371.36; Call assigned: sold 100 @ $371.36; Put expired. Normalized: paid off loan</td>
+            </tr>
+
+            <tr>
+                <td>12</td>
+                <td>2026-05-04</td>
+                <td>$383.02</td>
+                <td>$371.54<br><span class="prem-detail">50% tgt</span></td>
+                <td>$418.54<br><span class="prem-detail">3% tgt</span></td>
+                <td>$540<br><span class="prem-detail">P:5.09 / C:0.31</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-05-14</td>
+                <td>$400.83</td>
+                <td class="state-b"><span class="badge-state b" title="Targets: P:50% / C:3%">B</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+2,321</td>
+                <td>$77,307</td>
+                <td>$80,166</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>13</td>
+                <td>2026-05-14</td>
+                <td>$400.83</td>
+                <td>$389.45<br><span class="prem-detail">50% tgt</span></td>
+                <td>$440.93<br><span class="prem-detail">3% tgt</span></td>
+                <td>$680<br><span class="prem-detail">P:6.40 / C:0.40</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-05-26</td>
+                <td>$388.65</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-e"><span class="badge-state e" title="Put assigned (no Act1)">E</span><br><span class="prem-detail">Put assigned (no Act1)</span></td>
+                <td class="loss">$-619</td>
+                <td>$76,689</td>
+                <td>$77,729</td>
+                <td>100</td>
+                <td class="note">Put assigned: bought 100 @ $389.45; Call expired. Normalized: sold 100</td>
+            </tr>
+
+            <tr>
+                <td>14</td>
+                <td>2026-05-26</td>
+                <td>$388.65</td>
+                <td>$355.56<br><span class="prem-detail">10% tgt</span></td>
+                <td>$413.54<br><span class="prem-detail">10% tgt</span></td>
+                <td>$204<br><span class="prem-detail">P:0.97 / C:1.06</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-06-05</td>
+                <td>$368.31</td>
+                <td class="state-e"><span class="badge-state e" title="Targets: P:10% / C:10%">E</span><br><span class="prem-detail">P:10% / C:10%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="loss">$-1,830</td>
+                <td>$74,859</td>
+                <td>$73,662</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>15</td>
+                <td>2026-06-05</td>
+                <td>$368.31</td>
+                <td>$357.27<br><span class="prem-detail">50% tgt</span></td>
+                <td>$402.46<br><span class="prem-detail">3% tgt</span></td>
+                <td>$520<br><span class="prem-detail">P:4.89 / C:0.30</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-06-15</td>
+                <td>$369.35</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+624</td>
+                <td>$75,483</td>
+                <td>$73,870</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+
+            <tr>
+                <td>16</td>
+                <td>2026-06-15</td>
+                <td>$369.35</td>
+                <td>$358.28<br><span class="prem-detail">50% tgt</span></td>
+                <td>$403.6<br><span class="prem-detail">3% tgt</span></td>
+                <td>$521<br><span class="prem-detail">P:4.91 / C:0.30</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-06-25</td>
+                <td>$343.71</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:50% / C:3%">A</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-e"><span class="badge-state e" title="Put assigned (no Act1)">E</span><br><span class="prem-detail">Put assigned (no Act1)</span></td>
+                <td class="loss">$-3,500</td>
+                <td>$71,983</td>
+                <td>$68,742</td>
+                <td>100</td>
+                <td class="note">Put assigned: bought 100 @ $358.28; Call expired. Normalized: sold 100</td>
+            </tr>
+
+            <tr>
+                <td>17</td>
+                <td>2026-06-25</td>
+                <td>$343.71</td>
+                <td>$313.57<br><span class="prem-detail">10% tgt</span></td>
+                <td>$366.43<br><span class="prem-detail">10% tgt</span></td>
+                <td>$198<br><span class="prem-detail">P:0.94 / C:1.04</span></td>
+                <td><span class="badge badge-action">ACT1</span></td>
+                <td>-</td>
+                <td>2026-07-06</td>
+                <td>$366.46</td>
+                <td class="state-e"><span class="badge-state e" title="Targets: P:10% / C:10%">E</span><br><span class="prem-detail">P:10% / C:10%</span></td>
+                <td class="state-b"><span class="badge-state b" title="Call assigned (Act1)">B</span><br><span class="prem-detail">Call assigned (Act1)</span></td>
+                <td class="profit">$+2,473</td>
+                <td>$74,456</td>
+                <td>$73,292</td>
+                <td>100</td>
+                <td class="note">Action1 on 2026-07-06 @ $366.43; Call assigned: sold 100 @ $366.43; Put expired. Normalized: paid off loan</td>
+            </tr>
+
+            <tr>
+                <td>18</td>
+                <td>2026-07-06</td>
+                <td>$366.46</td>
+                <td>$355.25<br><span class="prem-detail">50% tgt</span></td>
+                <td>$398.98<br><span class="prem-detail">3% tgt</span></td>
+                <td>$465<br><span class="prem-detail">P:4.38 / C:0.27</span></td>
+                <td></td>
+                <td>-</td>
+                <td>2026-07-15</td>
+                <td>$370.92</td>
+                <td class="state-b"><span class="badge-state b" title="Targets: P:50% / C:3%">B</span><br><span class="prem-detail">P:50% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+911</td>
+                <td>$75,367</td>
+                <td>$74,184</td>
+                <td>100</td>
+                <td class="note">Both put and call expired worthless</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+const labels = ["2026-01-20", "2026-01-30", "2026-02-09", "2026-02-19", "2026-03-02", "2026-03-12", "2026-03-23", "2026-04-02", "2026-04-13", "2026-04-23", "2026-05-04", "2026-05-14", "2026-05-26", "2026-06-05", "2026-06-15", "2026-06-25", "2026-07-06", "2026-07-15"];
+const portfolioValues = [64905.37, 66956.97, 65711.91, 63737.56, 64574.07, 64730.64, 65052.89, 64850.15, 67861.56, 70071.52, 74986.19, 77307.43, 76688.76, 74858.88, 75482.58, 71982.65, 74455.68, 75366.79];
+const buyHoldValues = [64316.2, 67512.2, 64779.6, 60491.2, 61224.4, 60673.6, 60375.8, 59118.6, 64223.4, 67737.4, 76604.0, 80165.8, 77729.4, 73661.8, 73870.0, 68742.0, 73292.0, 74184.0];
+const stockPrices = [321.58, 337.56, 323.9, 302.46, 306.12, 303.37, 301.88, 295.59, 321.12, 338.69, 383.02, 400.83, 388.65, 368.31, 369.35, 343.71, 366.46, 370.92];
+const premiums = [591.17, 453.6, 476.44, 169.85, 469.91, 431.97, 471.15, 425.86, 459.01, 452.96, 526.14, 540.34, 679.83, 203.92, 519.6, 521.07, 198.03, 465.11];
+const pnls = [593.17, 2051.6, -1245.06, -1974.35, 836.51, 156.57, 322.25, -202.74, 3011.41, 2209.96, 4914.67, 2321.24, -618.67, -1829.88, 623.7, -3499.93, 2473.03, 911.11];
+const marginInterests = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 44.77, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+const resultStates = ["A", "A", "E", "A", "A", "A", "A", "A", "A", "A", "B", "A", "E", "A", "A", "E", "B", "A"];
+const pointColors = ["#667eea", "#667eea", "#e67e22", "#667eea", "#667eea", "#667eea", "#667eea", "#667eea", "#667eea", "#667eea", "#27ae60", "#667eea", "#e67e22", "#667eea", "#667eea", "#e67e22", "#27ae60", "#667eea"];
+
+// Portfolio chart with stock price trend and state labels
+new Chart(document.getElementById('portfolioChart'), {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Strategy',
+                data: portfolioValues,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                fill: true,
+                tension: 0.1,
+                pointRadius: 6,
+                pointBackgroundColor: pointColors,
+                pointBorderColor: pointColors,
+                borderWidth: 2,
+                yAxisID: 'y',
+                datalabels: {
+                    align: 'top',
+                    offset: 8,
+                    color: function(ctx) {
+                        return pointColors[ctx.dataIndex];
+                    },
+                    font: { size: 11, weight: 'bold' },
+                    formatter: function(value, ctx) {
+                        return resultStates[ctx.dataIndex];
+                    }
+                }
+            },
+            {
+                label: 'Buy & Hold',
+                data: buyHoldValues,
+                borderColor: '#f39c12',
+                backgroundColor: 'rgba(243, 156, 18, 0.05)',
+                fill: false,
+                tension: 0.1,
+                pointRadius: 3,
+                pointBackgroundColor: '#f39c12',
+                borderDash: [6, 3],
+                borderWidth: 2,
+                yAxisID: 'y',
+                datalabels: { display: false }
+            },
+            {
+                label: 'Stock Price',
+                data: stockPrices,
+                borderColor: '#2ecc71',
+                backgroundColor: 'rgba(46, 204, 113, 0.05)',
+                fill: false,
+                tension: 0.1,
+                pointRadius: 3,
+                pointBackgroundColor: '#2ecc71',
+                borderWidth: 1.5,
+                yAxisID: 'y2',
+                datalabels: { display: false }
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            datalabels: {},
+            tooltip: {
+                callbacks: {
+                    afterLabel: function(ctx) {
+                        if (ctx.datasetIndex === 0) {
+                            const stateDescs = {'A':'Neither exercised','B':'Call assigned (after Act1)','C':'Put assigned (after Act1)','D':'Both expired (after Act1)','E':'Put assigned (no Act1)'};
+                            return 'State: ' + resultStates[ctx.dataIndex] + ' - ' + stateDescs[resultStates[ctx.dataIndex]];
+                        }
+                        return '';
+                    },
+                    label: function(ctx) {
+                        return ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    }
+                }
+            },
+            legend: { position: 'top' }
+        },
+        scales: {
+            y: {
+                type: 'linear',
+                position: 'left',
+                title: { display: true, text: 'Portfolio Value ($)' },
+                ticks: { callback: function(v) { return '$' + v.toLocaleString(); } }
+            },
+            y2: {
+                type: 'linear',
+                position: 'right',
+                title: { display: true, text: 'Stock Price ($)' },
+                grid: { drawOnChartArea: false },
+                ticks: { callback: function(v) { return '$' + v.toFixed(0); } }
+            }
+        }
+    }
+});
+
+new Chart(document.getElementById('premiumChart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Premium',
+                data: premiums,
+                backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                borderColor: '#667eea',
+                borderWidth: 1,
+                yAxisID: 'y',
+                datalabels: { display: false }
+            },
+            {
+                label: 'Cycle PnL',
+                data: pnls,
+                backgroundColor: pnls.map(p => p >= 0 ? 'rgba(39, 174, 96, 0.6)' : 'rgba(192, 57, 43, 0.6)'),
+                borderColor: pnls.map(p => p >= 0 ? '#27ae60' : '#c0392b'),
+                borderWidth: 1,
+                yAxisID: 'y1',
+                datalabels: { display: false }
+            },
+            {
+                label: 'Financing Cost',
+                data: marginInterests,
+                backgroundColor: 'rgba(231, 76, 60, 0.4)',
+                borderColor: '#c0392b',
+                borderWidth: 1,
+                yAxisID: 'y1',
+                datalabels: { display: false }
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            datalabels: { display: false },
+            legend: { position: 'top' }
+        },
+        scales: {
+            y: { type: 'linear', position: 'left', title: { display: true, text: 'Premium ($)' } },
+            y1: { type: 'linear', position: 'right', title: { display: true, text: 'PnL / Financing ($)' } }
+        }
+    }
+});
+</script>
+</body>
+</html>

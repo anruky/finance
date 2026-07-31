@@ -102,10 +102,10 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
 
     <div class="highlight-box">
         <div class="label">Annualized Return</div>
-        <div class="value">+20.59%</div>
+        <div class="value">+36.56%</div>
         <div class="detail">
-            Total: +10.18% over 189 days |
-            $64,312 -> $70,861 |
+            Total: +17.51% over 189 days |
+            $64,312 -> $75,571 |
             vs B&H: +31.76% annualized
         </div>
     </div>
@@ -113,12 +113,12 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
     <div class="summary-grid">
         <div class="card">
             <div class="card-label">Total Return</div>
-            <div class="card-value profit">+10.18%</div>
-            <div class="card-sub">$+6,548 P&L</div>
+            <div class="card-value profit">+17.51%</div>
+            <div class="card-sub">$+11,259 P&L</div>
         </div>
         <div class="card">
             <div class="card-label">Max Drawdown</div>
-            <div class="card-value loss">8.42%</div>
+            <div class="card-value loss">7.01%</div>
             <div class="card-sub">B&H: 20.37%</div>
         </div>
         <div class="card">
@@ -128,8 +128,8 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
         </div>
         <div class="card">
             <div class="card-label">Action 1 / States</div>
-            <div class="card-value neutral">3</div>
-            <div class="card-sub">A:6 / B:3 / E:2</div>
+            <div class="card-value neutral">2</div>
+            <div class="card-sub">A:7 / B:2 / E:2</div>
         </div>
     </div>
 
@@ -138,20 +138,20 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
         <div class="income-cost-grid">
             <div class="ic-column income">
                 <div class="ic-header">Income</div>
-                <div class="ic-row"><span>Premium income</span><span class="ic-value profit">$6,592</span></div>
+                <div class="ic-row"><span>Premium income</span><span class="ic-value profit">$10,659</span></div>
                 <div class="ic-row"><span>Stock gains</span><span class="ic-value profit">$13,088</span></div>
-                <div class="ic-row ic-total"><span>Total income</span><span class="ic-value profit">$19,680</span></div>
+                <div class="ic-row ic-total"><span>Total income</span><span class="ic-value profit">$23,747</span></div>
             </div>
             <div class="ic-column cost">
                 <div class="ic-header">Cost</div>
-                <div class="ic-row"><span>Stock losses</span><span class="ic-value loss">$12,813</span></div>
-                <div class="ic-row"><span>Financing cost</span><span class="ic-value loss">$319</span></div>
-                <div class="ic-row ic-total"><span>Total cost</span><span class="ic-value loss">$13,131</span></div>
+                <div class="ic-row"><span>Stock losses</span><span class="ic-value loss">$12,346</span></div>
+                <div class="ic-row"><span>Financing cost</span><span class="ic-value loss">$142</span></div>
+                <div class="ic-row ic-total"><span>Total cost</span><span class="ic-value loss">$12,488</span></div>
             </div>
             <div class="ic-column net">
                 <div class="ic-header">Net P&amp;L</div>
-                <div class="ic-row ic-total"><span>Net</span><span class="ic-value profit">$+6,548</span></div>
-                <div class="ic-row"><span>Return</span><span class="ic-value profit">+10.18%</span></div>
+                <div class="ic-row ic-total"><span>Net</span><span class="ic-value profit">$+11,259</span></div>
+                <div class="ic-row"><span>Return</span><span class="ic-value profit">+17.51%</span></div>
             </div>
         </div>
     </div>
@@ -161,11 +161,11 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
         <ul>
             <li><b>Initial</b>: 100 shares + cash (State A), 2 lots total capital</li>
             <li><b>Daily Monitor</b>: If price hits call strike -> buy 100 shares on margin (11% ann.). Put stays open.</li>
-            <li><b>State B</b> (call exercised after Act1): pay off loan -> A. Next: Put 40% / Call 3%</li>
+            <li><b>State B</b> (call exercised after Act1): pay off loan -> A. Next: Put 70% / Call 3%</li>
             <li><b>State C</b> (put exercised after Act1): sell 200, pay off loan -> A. Next: Put 10% / Call 10%</li>
-            <li><b>State D</b> (neither after Act1): sell 100, pay off loan -> A. Next: Put 40% / Call 3%</li>
+            <li><b>State D</b> (neither after Act1): sell 100, pay off loan -> A. Next: Put 70% / Call 3%</li>
             <li><b>State E</b> (put exercised, no Act1): sell 100 -> A. Next: Put 10% / Call 10%</li>
-            <li><b>State A</b> (neither exercised): stays A. Next: Put 40% / Call 3%</li>
+            <li><b>State A</b> (neither exercised): stays A. Next: Put 70% / Call 3%</li>
             <li><b>Cycle</b>: 18 days to expiry, all states normalize to A position</li>
         </ul>
     </div>
@@ -182,10 +182,10 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
                 </tr>
             </thead>
             <tbody>
-                <tr><td class="state-label state-a">A</td><td>Low volatility</td><td>40%</td><td>3%</td></tr>
-                <tr><td class="state-label state-b">B</td><td>Big gain (call assigned)</td><td>40%</td><td>3%</td></tr>
+                <tr><td class="state-label state-a">A</td><td>Low volatility</td><td>70%</td><td>3%</td></tr>
+                <tr><td class="state-label state-b">B</td><td>Big gain (call assigned)</td><td>70%</td><td>3%</td></tr>
                 <tr><td class="state-label state-c">C</td><td>Volatile, ended down</td><td>10%</td><td>10%</td></tr>
-                <tr><td class="state-label state-d">D</td><td>Gain then pullback</td><td>40%</td><td>3%</td></tr>
+                <tr><td class="state-label state-d">D</td><td>Gain then pullback</td><td>70%</td><td>3%</td></tr>
                 <tr><td class="state-label state-e">E</td><td>Big drop</td><td>10%</td><td>10%</td></tr>
             </tbody>
         </table>
@@ -198,8 +198,8 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
             <div class="config-item"><span>Margin Rate</span><span>11%</span></div>
             <div class="config-item"><span>Start</span><span>2026-01-01</span></div>
             <div class="config-item"><span>End</span><span>2026-07-15</span></div>
-            <div class="config-item"><span>Put IV</span><span>30.0%</span></div>
-            <div class="config-item"><span>Call IV</span><span>22.0%</span></div>
+            <div class="config-item"><span>Put IV</span><span>50.0%</span></div>
+            <div class="config-item"><span>Call IV</span><span>30.0%</span></div>
             <div class="config-item"><span>Risk-free Rate</span><span>5.0%</span></div>
             <div class="config-item"><span>Cycles</span><span>11</span></div>
         </div>
@@ -255,17 +255,17 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
                 <td>1</td>
                 <td>2026-01-07</td>
                 <td>$321.56</td>
-                <td>$317.81<br><span class="prem-detail">40% tgt</span></td>
-                <td>$347.44<br><span class="prem-detail">3% tgt</span></td>
-                <td>$712<br><span class="prem-detail">P:6.62 / C:0.50</span></td>
+                <td>$316.0<br><span class="prem-detail">70% tgt</span></td>
+                <td>$360.48<br><span class="prem-detail">3% tgt</span></td>
+                <td>$1,202<br><span class="prem-detail">P:11.51 / C:0.50</span></td>
                 <td></td>
                 <td>-</td>
                 <td>2026-01-26</td>
                 <td>$332.83</td>
-                <td class="state-a"><span class="badge-state a" title="Targets: P:40% / C:3%">A</span><br><span class="prem-detail">P:40% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:70% / C:3%">A</span><br><span class="prem-detail">P:70% / C:3%</span></td>
                 <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
-                <td class="profit">$+1,839</td>
-                <td>$66,151</td>
+                <td class="profit">$+2,328</td>
+                <td>$66,640</td>
                 <td>$66,565</td>
                 <td>100</td>
                 <td class="note">Both put and call expired worthless</td>
@@ -275,37 +275,37 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
                 <td>2</td>
                 <td>2026-01-26</td>
                 <td>$332.83</td>
-                <td>$328.59<br><span class="prem-detail">40% tgt</span></td>
-                <td>$359.05<br><span class="prem-detail">3% tgt</span></td>
-                <td>$698<br><span class="prem-detail">P:6.48 / C:0.49</span></td>
+                <td>$326.46<br><span class="prem-detail">70% tgt</span></td>
+                <td>$372.22<br><span class="prem-detail">3% tgt</span></td>
+                <td>$1,176<br><span class="prem-detail">P:11.27 / C:0.49</span></td>
                 <td></td>
                 <td>-</td>
                 <td>2026-02-13</td>
                 <td>$305.32</td>
-                <td class="state-a"><span class="badge-state a" title="Targets: P:40% / C:3%">A</span><br><span class="prem-detail">P:40% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:70% / C:3%">A</span><br><span class="prem-detail">P:70% / C:3%</span></td>
                 <td class="state-e"><span class="badge-state e" title="Put assigned (no Act1)">E</span><br><span class="prem-detail">Put assigned (no Act1)</span></td>
-                <td class="loss">$-4,380</td>
-                <td>$61,771</td>
+                <td class="loss">$-3,688</td>
+                <td>$62,953</td>
                 <td>$61,065</td>
                 <td>100</td>
-                <td class="note">Put assigned: bought 100 @ $328.59; Call expired. Normalized: sold 100</td>
+                <td class="note">Put assigned: bought 100 @ $326.46; Call expired. Normalized: sold 100</td>
             </tr>
 
             <tr>
                 <td>3</td>
                 <td>2026-02-13</td>
                 <td>$305.32</td>
-                <td>$284.86<br><span class="prem-detail">10% tgt</span></td>
-                <td>$319.98<br><span class="prem-detail">10% tgt</span></td>
-                <td>$291<br><span class="prem-detail">P:1.40 / C:1.51</span></td>
+                <td>$263.62<br><span class="prem-detail">10% tgt</span></td>
+                <td>$328.9<br><span class="prem-detail">10% tgt</span></td>
+                <td>$281<br><span class="prem-detail">P:1.30 / C:1.51</span></td>
                 <td></td>
                 <td>-</td>
                 <td>2026-03-03</td>
                 <td>$303.19</td>
                 <td class="state-e"><span class="badge-state e" title="Targets: P:10% / C:10%">E</span><br><span class="prem-detail">P:10% / C:10%</span></td>
                 <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
-                <td class="profit">$+77</td>
-                <td>$61,849</td>
+                <td class="profit">$+67</td>
+                <td>$63,019</td>
                 <td>$60,637</td>
                 <td>100</td>
                 <td class="note">Both put and call expired worthless</td>
@@ -315,17 +315,17 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
                 <td>4</td>
                 <td>2026-03-03</td>
                 <td>$303.19</td>
-                <td>$299.98<br><span class="prem-detail">40% tgt</span></td>
-                <td>$328.08<br><span class="prem-detail">3% tgt</span></td>
-                <td>$707<br><span class="prem-detail">P:6.58 / C:0.50</span></td>
+                <td>$298.52<br><span class="prem-detail">70% tgt</span></td>
+                <td>$340.67<br><span class="prem-detail">3% tgt</span></td>
+                <td>$1,195<br><span class="prem-detail">P:11.45 / C:0.50</span></td>
                 <td></td>
                 <td>-</td>
                 <td>2026-03-23</td>
                 <td>$301.88</td>
-                <td class="state-a"><span class="badge-state a" title="Targets: P:40% / C:3%">A</span><br><span class="prem-detail">P:40% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:70% / C:3%">A</span><br><span class="prem-detail">P:70% / C:3%</span></td>
                 <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
-                <td class="profit">$+577</td>
-                <td>$62,425</td>
+                <td class="profit">$+1,064</td>
+                <td>$64,083</td>
                 <td>$60,376</td>
                 <td>100</td>
                 <td class="note">Both put and call expired worthless</td>
@@ -335,17 +335,17 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
                 <td>5</td>
                 <td>2026-03-23</td>
                 <td>$301.88</td>
-                <td>$298.03<br><span class="prem-detail">40% tgt</span></td>
-                <td>$325.66<br><span class="prem-detail">3% tgt</span></td>
-                <td>$632<br><span class="prem-detail">P:5.88 / C:0.45</span></td>
+                <td>$296.1<br><span class="prem-detail">70% tgt</span></td>
+                <td>$337.61<br><span class="prem-detail">3% tgt</span></td>
+                <td>$1,067<br><span class="prem-detail">P:10.22 / C:0.45</span></td>
                 <td></td>
                 <td>-</td>
                 <td>2026-04-10</td>
                 <td>$317.05</td>
-                <td class="state-a"><span class="badge-state a" title="Targets: P:40% / C:3%">A</span><br><span class="prem-detail">P:40% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:70% / C:3%">A</span><br><span class="prem-detail">P:70% / C:3%</span></td>
                 <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
-                <td class="profit">$+2,150</td>
-                <td>$64,575</td>
+                <td class="profit">$+2,584</td>
+                <td>$66,667</td>
                 <td>$63,410</td>
                 <td>100</td>
                 <td class="note">Both put and call expired worthless</td>
@@ -355,77 +355,77 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
                 <td>6</td>
                 <td>2026-04-10</td>
                 <td>$317.05</td>
-                <td>$313.01<br><span class="prem-detail">40% tgt</span></td>
-                <td>$342.03<br><span class="prem-detail">3% tgt</span></td>
-                <td>$664<br><span class="prem-detail">P:6.17 / C:0.47</span></td>
-                <td><span class="badge badge-action">ACT1</span></td>
-                <td>$113<br><span class="prem-detail">loan: $34,203</span></td>
+                <td>$310.98<br><span class="prem-detail">70% tgt</span></td>
+                <td>$354.58<br><span class="prem-detail">3% tgt</span></td>
+                <td>$1,120<br><span class="prem-detail">P:10.73 / C:0.47</span></td>
+                <td></td>
+                <td>-</td>
                 <td>2026-04-28</td>
                 <td>$349.57</td>
-                <td class="state-a"><span class="badge-state a" title="Targets: P:40% / C:3%">A</span><br><span class="prem-detail">P:40% / C:3%</span></td>
-                <td class="state-b"><span class="badge-state b" title="Call assigned (Act1)">B</span><br><span class="prem-detail">Call assigned (Act1)</span></td>
-                <td class="profit">$+3,803</td>
-                <td>$68,378</td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:70% / C:3%">A</span><br><span class="prem-detail">P:70% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
+                <td class="profit">$+4,372</td>
+                <td>$71,040</td>
                 <td>$69,914</td>
                 <td>100</td>
-                <td class="note">Action1 on 2026-04-17 @ $342.03; Call assigned: sold 100 @ $342.03; Put expired. Normalized: paid off loan</td>
+                <td class="note">Both put and call expired worthless</td>
             </tr>
 
             <tr>
                 <td>7</td>
                 <td>2026-04-28</td>
                 <td>$349.57</td>
-                <td>$345.87<br><span class="prem-detail">40% tgt</span></td>
-                <td>$378.27<br><span class="prem-detail">3% tgt</span></td>
-                <td>$815<br><span class="prem-detail">P:7.58 / C:0.57</span></td>
+                <td>$344.19<br><span class="prem-detail">70% tgt</span></td>
+                <td>$392.79<br><span class="prem-detail">3% tgt</span></td>
+                <td>$1,378<br><span class="prem-detail">P:13.20 / C:0.57</span></td>
                 <td><span class="badge badge-action">ACT1</span></td>
-                <td>$205<br><span class="prem-detail">loan: $37,827</span></td>
+                <td>$142<br><span class="prem-detail">loan: $39,279</span></td>
                 <td>2026-05-18</td>
                 <td>$396.70</td>
-                <td class="state-b"><span class="badge-state b" title="Targets: P:40% / C:3%">B</span><br><span class="prem-detail">P:40% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:70% / C:3%">A</span><br><span class="prem-detail">P:70% / C:3%</span></td>
                 <td class="state-b"><span class="badge-state b" title="Call assigned (Act1)">B</span><br><span class="prem-detail">Call assigned (Act1)</span></td>
-                <td class="profit">$+5,323</td>
-                <td>$73,701</td>
+                <td class="profit">$+5,949</td>
+                <td>$76,988</td>
                 <td>$79,340</td>
                 <td>100</td>
-                <td class="note">Action1 on 2026-04-30 @ $378.27; Call assigned: sold 100 @ $378.27; Put expired. Normalized: paid off loan</td>
+                <td class="note">Action1 on 2026-05-06 @ $392.79; Call assigned: sold 100 @ $392.79; Put expired. Normalized: paid off loan</td>
             </tr>
 
             <tr>
                 <td>8</td>
                 <td>2026-05-18</td>
                 <td>$396.70</td>
-                <td>$391.65<br><span class="prem-detail">40% tgt</span></td>
-                <td>$427.95<br><span class="prem-detail">3% tgt</span></td>
-                <td>$831<br><span class="prem-detail">P:7.73 / C:0.59</span></td>
+                <td>$389.11<br><span class="prem-detail">70% tgt</span></td>
+                <td>$443.65<br><span class="prem-detail">3% tgt</span></td>
+                <td>$1,402<br><span class="prem-detail">P:13.43 / C:0.59</span></td>
                 <td></td>
                 <td>-</td>
                 <td>2026-06-05</td>
                 <td>$368.31</td>
-                <td class="state-b"><span class="badge-state b" title="Targets: P:40% / C:3%">B</span><br><span class="prem-detail">P:40% / C:3%</span></td>
+                <td class="state-b"><span class="badge-state b" title="Targets: P:70% / C:3%">B</span><br><span class="prem-detail">P:70% / C:3%</span></td>
                 <td class="state-e"><span class="badge-state e" title="Put assigned (no Act1)">E</span><br><span class="prem-detail">Put assigned (no Act1)</span></td>
-                <td class="loss">$-4,342</td>
-                <td>$69,359</td>
+                <td class="loss">$-3,517</td>
+                <td>$73,471</td>
                 <td>$73,662</td>
                 <td>100</td>
-                <td class="note">Put assigned: bought 100 @ $391.65; Call expired. Normalized: sold 100</td>
+                <td class="note">Put assigned: bought 100 @ $389.11; Call expired. Normalized: sold 100</td>
             </tr>
 
             <tr>
                 <td>9</td>
                 <td>2026-06-05</td>
                 <td>$368.31</td>
-                <td>$343.62<br><span class="prem-detail">10% tgt</span></td>
-                <td>$385.99<br><span class="prem-detail">10% tgt</span></td>
-                <td>$351<br><span class="prem-detail">P:1.69 / C:1.82</span></td>
+                <td>$318.01<br><span class="prem-detail">10% tgt</span></td>
+                <td>$396.75<br><span class="prem-detail">10% tgt</span></td>
+                <td>$339<br><span class="prem-detail">P:1.57 / C:1.82</span></td>
                 <td></td>
                 <td>-</td>
                 <td>2026-06-23</td>
                 <td>$346.13</td>
                 <td class="state-e"><span class="badge-state e" title="Targets: P:10% / C:10%">E</span><br><span class="prem-detail">P:10% / C:10%</span></td>
                 <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
-                <td class="loss">$-1,867</td>
-                <td>$67,492</td>
+                <td class="loss">$-1,879</td>
+                <td>$71,591</td>
                 <td>$69,226</td>
                 <td>100</td>
                 <td class="note">Both put and call expired worthless</td>
@@ -435,17 +435,17 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
                 <td>10</td>
                 <td>2026-06-23</td>
                 <td>$346.13</td>
-                <td>$342.47<br><span class="prem-detail">40% tgt</span></td>
-                <td>$374.55<br><span class="prem-detail">3% tgt</span></td>
-                <td>$808<br><span class="prem-detail">P:7.51 / C:0.57</span></td>
+                <td>$340.81<br><span class="prem-detail">70% tgt</span></td>
+                <td>$388.92<br><span class="prem-detail">3% tgt</span></td>
+                <td>$1,364<br><span class="prem-detail">P:13.07 / C:0.57</span></td>
                 <td></td>
                 <td>-</td>
                 <td>2026-07-13</td>
                 <td>$352.51</td>
-                <td class="state-a"><span class="badge-state a" title="Targets: P:40% / C:3%">A</span><br><span class="prem-detail">P:40% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:70% / C:3%">A</span><br><span class="prem-detail">P:70% / C:3%</span></td>
                 <td class="state-a"><span class="badge-state a" title="Neither exercised">A</span><br><span class="prem-detail">Neither exercised</span></td>
-                <td class="profit">$+1,446</td>
-                <td>$68,938</td>
+                <td class="profit">$+2,002</td>
+                <td>$73,594</td>
                 <td>$70,502</td>
                 <td>100</td>
                 <td class="note">Both put and call expired worthless</td>
@@ -455,20 +455,20 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
                 <td>11</td>
                 <td>2026-07-13</td>
                 <td>$352.51</td>
-                <td>$345.52<br><span class="prem-detail">40% tgt</span></td>
-                <td>$363.93<br><span class="prem-detail">3% tgt</span></td>
-                <td>$82<br><span class="prem-detail">P:0.76 / C:0.06</span></td>
+                <td>$341.16<br><span class="prem-detail">70% tgt</span></td>
+                <td>$369.1<br><span class="prem-detail">3% tgt</span></td>
+                <td>$137<br><span class="prem-detail">P:1.31 / C:0.06</span></td>
                 <td><span class="badge badge-action">ACT1</span></td>
                 <td>-</td>
                 <td>2026-07-15</td>
                 <td>$370.92</td>
-                <td class="state-a"><span class="badge-state a" title="Targets: P:40% / C:3%">A</span><br><span class="prem-detail">P:40% / C:3%</span></td>
+                <td class="state-a"><span class="badge-state a" title="Targets: P:70% / C:3%">A</span><br><span class="prem-detail">P:70% / C:3%</span></td>
                 <td class="state-b"><span class="badge-state b" title="Call assigned (Act1)">B</span><br><span class="prem-detail">Call assigned (Act1)</span></td>
-                <td class="profit">$+1,923</td>
-                <td>$70,861</td>
+                <td class="profit">$+1,978</td>
+                <td>$75,571</td>
                 <td>$74,184</td>
                 <td>100</td>
-                <td class="note">Action1 on 2026-07-15 @ $363.93; Call assigned: sold 100 @ $363.93; Put expired. Normalized: paid off loan</td>
+                <td class="note">Action1 on 2026-07-15 @ $369.10; Call assigned: sold 100 @ $369.1; Put expired. Normalized: paid off loan</td>
             </tr>
         </tbody>
     </table>
@@ -478,14 +478,14 @@ td.note { text-align: left; color: #666; font-size: 11px; max-width: 350px; }
 Chart.register(ChartDataLabels);
 
 const labels = ["2026-01-26", "2026-02-13", "2026-03-03", "2026-03-23", "2026-04-10", "2026-04-28", "2026-05-18", "2026-06-05", "2026-06-23", "2026-07-13", "2026-07-15"];
-const portfolioValues = [66150.83, 61771.33, 61848.57, 62425.32, 64574.91, 68377.88, 73701.27, 69359.31, 67492.42, 68937.92, 70860.52];
+const portfolioValues = [66640.31, 62952.51, 63019.27, 64083.45, 66667.28, 71039.58, 76988.24, 73470.77, 71591.38, 73593.68, 75571.34];
 const buyHoldValues = [66565.4, 61064.6, 60637.0, 60375.8, 63410.0, 69914.0, 79340.4, 73661.8, 69226.0, 70502.0, 74184.0];
 const stockPrices = [332.83, 305.32, 303.19, 301.88, 317.05, 349.57, 396.7, 368.31, 346.13, 352.51, 370.92];
-const premiums = [712.03, 697.6, 291.04, 707.35, 632.49, 664.36, 815.38, 831.44, 351.01, 807.5, 81.6];
-const pnls = [1838.63, -4379.5, 77.24, 576.75, 2149.59, 3802.97, 5323.38, -4341.96, -1866.89, 1445.5, 1922.6];
-const marginInterests = [0.0, 0.0, 0.0, 0.0, 0.0, 113.39, 205.2, 0.0, 0.0, 0.0, 0.0];
-const resultStates = ["A", "E", "A", "A", "A", "B", "B", "E", "A", "A", "B"];
-const pointColors = ["#667eea", "#e67e22", "#667eea", "#667eea", "#667eea", "#27ae60", "#27ae60", "#e67e22", "#667eea", "#667eea", "#27ae60"];
+const premiums = [1201.51, 1176.3, 280.56, 1194.78, 1066.73, 1120.3, 1377.51, 1401.93, 338.51, 1364.3, 136.66];
+const pnls = [2328.11, -3687.8, 66.76, 1064.18, 2583.83, 4372.3, 5948.66, -3517.47, -1879.39, 2002.3, 1977.66];
+const marginInterests = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 142.05, 0.0, 0.0, 0.0, 0.0];
+const resultStates = ["A", "E", "A", "A", "A", "A", "B", "E", "A", "A", "B"];
+const pointColors = ["#667eea", "#e67e22", "#667eea", "#667eea", "#667eea", "#667eea", "#27ae60", "#e67e22", "#667eea", "#667eea", "#27ae60"];
 
 // Portfolio chart with stock price trend and state labels
 new Chart(document.getElementById('portfolioChart'), {

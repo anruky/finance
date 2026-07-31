@@ -161,12 +161,39 @@ Alphabet 的商业模式以**广告收入为现金流核心**，以**云计算�
 
 ### 3.2 Google Cloud：第二增长曲线
 
+#### 3.2.1 美国三巨头对比
+
 | 指标 | Google Cloud | AWS | Microsoft Cloud | 备注 |
 |------|--------------|-----|-----------------|------|
 | **2026 Q1 收入** | $20.0B (+63%) | 未披露（ARR >$150B） | 未披露（ARR $139B） | AWS、Azure 为估算 |
 | **年化收入 (ARR)** | ~$80B | >$150B | ~$139B | [CRN](https://www.crn.com/news/cloud/2026/aws-vs-google-cloud-vs-microsoft-azure-q1-earnings-face-off) |
 | **运营利润率** | 32.9% | ~37% | ~45%（估算） | Google Cloud 利润率快速改善 |
 | **积压订单** | >$460B | 未披露 | 未披露 | [Alphabet Q1 Release](https://www.publicnow.com/view/17A919ACC7338D2A53818AEC06A458C02B57152C) |
+| **全球份额** | 14% | 28% | 21% | Synergy Research Q1 2026 |
+
+#### 3.2.2 中国云厂商对比
+
+| 指标 | Google Cloud | 阿里云 | 腾讯云 | 备注 |
+|------|--------------|--------|--------|------|
+| **季度收入** | $20.0B | $6.0B（RMB 416亿） | ~$3-4B（估算） | Google 是阿里 3.3x |
+| **增速** | +63% | +38-40% | +40% | Google 增速最快 |
+| **运营利润率** | 32.9% | 持续改善（EBITA +57%） | 35%+（已规模盈利） | 腾讯利润率反超 |
+| **AI 收入占比** | 未精确披露 | **30%**（首个披露） | 25-30% | 中国厂商更透明 |
+| **全球份额** | 14% | 4% | 2% | [Synergy Q1 2026](https://www.crn.com/news/cloud/2026/cloud-market-share-q1-2026-aws-microsoft-google-battling-in-ai-era) |
+| **中国份额** | — | 22-36%（#1） | 9-18%（#3） | 中国市场独立战场 |
+| **自研芯片** | TPU v8i/v8t | 平头哥真武 PPU（10万+） | 无（依赖外采+长鑫 DRAM） | Google、阿里均自研 |
+| **旗舰模型** | Gemini 3.5 | Qwen 3.6-Plus | 混元 Hy3 (295B MoE) | 均第一梯队 |
+| **2026E Capex** | $195-205B | ~$22-25B（RMB 154B） | ~$13-15B（RMB 90-100B） | Google 是阿里 8x |
+| **FCF** | -$5.9B（转负） | -$6.7B（转负） | +$79B（集团整体） | 阿里与 Google 同步转负 |
+
+**中国云市场关键数据**：
+- 中国公有云市场 2026 年规模 **RMB 5,820 亿**（~$820B），同比 +18-21%
+- 三大头部（阿里+华为+腾讯）合计份额 57-64%，集中度低于美国（Big Three 63%）
+- 阿里云 AI 收入连续 **11 个季度三位数增长**，年化 AI 收入突破 RMB 358 亿（$52B）
+- 腾讯云 2025 年实现**规模盈利**，走"高质量增长"路线，拒绝 Token 价格战
+- 运营商云（天翼+移动+联通）份额合计超 1/3，正在蚕食互联网云厂商份额
+
+> **核心洞察**：中国云市场是 Google Cloud 全球扩张的最大阻力区。阿里云凭借全栈自研（飞天 OS + 平头哥芯片 + 通义千问）和平头哥 10 万+ PPU 部署，已在 AI 云领域建立了与中国市场深度绑定的壁垒。Google Cloud 在中国市场基本缺位（受限于牌照和数据合规），这意味着全球云市场的"下半场"——AI 推理和企业 Agent——将呈现"美国 Big Three + 中国阿里/腾讯"的区域割据格局。
 
 **关键变化**：
 - Google Cloud 是 Q1 最大亮点，收入同比 +63%，运营利润从 $2.18B 增至 $6.60B。
@@ -174,7 +201,7 @@ Alphabet 的商业模式以**广告收入为现金流核心**，以**云计算�
 - 增长驱动力：企业 AI 解决方案（Gemini Enterprise MAU 环比 +40%）、AI 基础设施（GPU/TPU）、核心 GCP 服务。
 - 管理层表示：2026 年全年仍将受**供应限制**，而非需求不足。
 
-> 来源：[Alphabet Q1 2026 Earnings Release](https://www.publicnow.com/view/17A919ACC7338D2A53818AEC06A458C02B57152C)、[CRN Cloud Face-Off](https://www.crn.com/news/cloud/2026/aws-vs-google-cloud-vs-microsoft-azure-q1-earnings-face-off)
+> 来源：[Alphabet Q1 2026 Earnings Release](https://www.publicnow.com/view/17A919ACC7338D2A53818AEC06A458C02B57152C)、[CRN Cloud Face-Off](https://www.crn.com/news/cloud/2026/aws-vs-google-cloud-vs-microsoft-azure-q1-earnings-face-off)、[Synergy Research Q1 2026](https://www.crn.com/news/cloud/2026/cloud-market-share-q1-2026-aws-microsoft-google-battling-in-ai-era)、[Alibaba FY2026 Q4 Earnings](https://www.alibabacloud.com/blog/603121)、[Tencent Q1 2026 Earnings](https://finance.sina.com.cn/jjxw/2026-05-14/doc-inhxuwsv7146683.shtml)
 
 ### 3.3 Other Bets：Waymo 成为最大看点
 
