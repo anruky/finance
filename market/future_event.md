@@ -1,3 +1,12 @@
+
+## keep - AI not edit
+
+参考event_source.md,  总结过去一周的
+
+---
+## AI to edit below
+
+
 # 重点关注事件日历（2026年6月—9月）
 
 > 关注标的：Google (Alphabet/GOOGL)、腾讯 (00700.HK)、QQQ (Nasdaq-100 ETF)、DRAM 相关股票（Samsung、SK Hynix、Micron、NVIDIA）
