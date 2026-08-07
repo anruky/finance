@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Parameter Sensitivity Analysis</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, "Segoe UI", Arial, sans-serif; background: #f5f5f5; color: #333; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #4a148c, #7b1fa2); color: white; padding: 30px; border-radius: 12px; margin-bottom: 25px; }
+        .header h1 { font-size: 24px; }
+        .section { background: white; border-radius: 10px; padding: 25px 30px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .section h2 { color: #4a148c; margin-bottom: 15px; border-bottom: 2px solid #e1bee7; padding-bottom: 8px; }
+        .section h3 { color: #6a1b9a; margin: 20px 0 10px; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px; }
+        th { background: #7b1fa2; color: white; padding: 10px; text-align: center; }
+        td { padding: 8px; text-align: center; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background: #fafafa; }
+        .footer { text-align: center; padding: 20px; color: #999; font-size: 12px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Parameter Sensitivity Analysis</h1>
+        <p style="opacity:0.85;margin-top:5px;">How different parameters affect the hedge strategy performance</p>
+    </div>
+    <div class="section">
+        <h2>Sensitivity Tables</h2>
+        <p style="margin-bottom:15px;color:#666;">
+            Each table shows strategy performance when varying one parameter while keeping others at default.
+            Buy & Hold return for reference: all simulations use the same price data.
+        </p>
+        
+        <h3>Strike Price % Below Entry</h3>
+        <table>
+            <tr><th>Value</th><th>Total P&L</th><th>Strategy Return</th><th>Win Rate</th><th>ITM/Total</th></tr>
+            
+            <tr>
+                <td>1%</td>
+                <td style="color:#388e3c;font-weight:bold">$-354.94</td>
+                <td style="color:#388e3c">-0.35%</td>
+                <td>33.3%</td>
+                <td>7/12</td>
+            </tr>
+            <tr>
+                <td>2%</td>
+                <td style="color:#388e3c;font-weight:bold">$-935.92</td>
+                <td style="color:#388e3c">-0.94%</td>
+                <td>25.0%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>3%</td>
+                <td style="color:#388e3c;font-weight:bold">$-1,495.88</td>
+                <td style="color:#388e3c">-1.50%</td>
+                <td>16.7%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>5%</td>
+                <td style="color:#388e3c;font-weight:bold">$-2,615.80</td>
+                <td style="color:#388e3c">-2.62%</td>
+                <td>0.0%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>7%</td>
+                <td style="color:#388e3c;font-weight:bold">$-3,735.72</td>
+                <td style="color:#388e3c">-3.74%</td>
+                <td>0.0%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>10%</td>
+                <td style="color:#388e3c;font-weight:bold">$-4,901.40</td>
+                <td style="color:#388e3c">-4.90%</td>
+                <td>0.0%</td>
+                <td>3/12</td>
+            </tr>
+        </table>
+        <h3>Number of Put Contracts</h3>
+        <table>
+            <tr><th>Value</th><th>Total P&L</th><th>Strategy Return</th><th>Win Rate</th><th>ITM/Total</th></tr>
+            
+            <tr>
+                <td>1</td>
+                <td style="color:#388e3c;font-weight:bold">$-1,828.94</td>
+                <td style="color:#388e3c">-1.83%</td>
+                <td>16.7%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td style="color:#388e3c;font-weight:bold">$-1,495.88</td>
+                <td style="color:#388e3c">-1.50%</td>
+                <td>16.7%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td style="color:#388e3c;font-weight:bold">$-1,162.82</td>
+                <td style="color:#388e3c">-1.16%</td>
+                <td>33.3%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td style="color:#388e3c;font-weight:bold">$-829.76</td>
+                <td style="color:#388e3c">-0.83%</td>
+                <td>33.3%</td>
+                <td>6/12</td>
+            </tr>
+        </table>
+        <h3>Holding Period (Trading Days)</h3>
+        <table>
+            <tr><th>Value</th><th>Total P&L</th><th>Strategy Return</th><th>Win Rate</th><th>ITM/Total</th></tr>
+            
+            <tr>
+                <td>5d</td>
+                <td style="color:#388e3c;font-weight:bold">$-5,180.16</td>
+                <td style="color:#388e3c">-5.18%</td>
+                <td>7.7%</td>
+                <td>9/26</td>
+            </tr>
+            <tr>
+                <td>8d</td>
+                <td style="color:#388e3c;font-weight:bold">$-3,829.36</td>
+                <td style="color:#388e3c">-3.83%</td>
+                <td>0.0%</td>
+                <td>8/17</td>
+            </tr>
+            <tr>
+                <td>12d</td>
+                <td style="color:#388e3c;font-weight:bold">$-1,495.88</td>
+                <td style="color:#388e3c">-1.50%</td>
+                <td>16.7%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>15d</td>
+                <td style="color:#388e3c;font-weight:bold">$-1,311.94</td>
+                <td style="color:#388e3c">-1.31%</td>
+                <td>10.0%</td>
+                <td>4/10</td>
+            </tr>
+        </table>
+        <h3>Put Premium per Contract</h3>
+        <table>
+            <tr><th>Value</th><th>Total P&L</th><th>Strategy Return</th><th>Win Rate</th><th>ITM/Total</th></tr>
+            
+            <tr>
+                <td>$50</td>
+                <td style="color:#d32f2f;font-weight:bold">$424.12</td>
+                <td style="color:#d32f2f">+0.42%</td>
+                <td>58.3%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>$80</td>
+                <td style="color:#388e3c;font-weight:bold">$-295.88</td>
+                <td style="color:#388e3c">-0.30%</td>
+                <td>33.3%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>$100</td>
+                <td style="color:#388e3c;font-weight:bold">$-775.88</td>
+                <td style="color:#388e3c">-0.78%</td>
+                <td>25.0%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>$130</td>
+                <td style="color:#388e3c;font-weight:bold">$-1,495.88</td>
+                <td style="color:#388e3c">-1.50%</td>
+                <td>16.7%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>$180</td>
+                <td style="color:#388e3c;font-weight:bold">$-2,695.88</td>
+                <td style="color:#388e3c">-2.70%</td>
+                <td>0.0%</td>
+                <td>6/12</td>
+            </tr>
+            <tr>
+                <td>$250</td>
+                <td style="color:#388e3c;font-weight:bold">$-4,375.88</td>
+                <td style="color:#388e3c">-4.38%</td>
+                <td>0.0%</td>
+                <td>6/12</td>
+            </tr>
+        </table>
+    </div>
+    <div class="footer">
+        Parameter Sensitivity Analysis | hedge_simulation.py | For educational purposes only
+    </div>
+</div>
+</body>
+</html>

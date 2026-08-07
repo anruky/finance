@@ -1,6 +1,6 @@
 
 
-参考数据源，event_source.md , 生成一个最近一周的深度报告，使用yyyymmdd.md 存在当前目录.
+参考数据源，event_source.md , 生成一个最近一周的深度报告，使用summary_yyyymmdd.md 保存在当前目录. 报告必须包括X的热点讨论
 
 ## 信息源使用策略
 

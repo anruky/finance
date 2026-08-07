@@ -13,18 +13,19 @@
 
 ### 1.1 值得盯的热点人物
 
-| 人物 | 身份 | 看什么 |
-| :--- | :--- | :--- |
-| **Jensen Huang 黄仁勋** (@nvidia) | NVIDIA CEO | GPU/Rubin 路线图、开源 LLM 立场、AI 基础设施信号 |
-| **Elon Musk** (@elonmusk) | xAI / Tesla / X | Grok 模型、xAI 算力扩张、政治影响力 |
-| **Sam Altman** (@sama) | OpenAI CEO | GPT 系列发布、融资动向、AI 安全言论 |
-| **段永平** (@大道无形我有型) | 投资人 | 价值投资思路、苹果/腾讯持仓变动、长期思维 |
-| **Warren Buffett 巴菲特** | 伯克希尔 CEO | 仓位变化（13F）、年信、宏观判断 |
-| **Cathie Wood 木头姐** (@CathieDArk) | ARK Invest | 颠覆性创新方向、AI/机器人/基因编辑 |
-| **Serenity** (@SerenityYet) | 独立分析师 | AI 算力供需、HBM/DRAM 周期、半导体深度研究 |
-| **Dario Amodei** | Anthropic CEO | Claude 模型、AI 安全、scaling law 观点 |
-| **Sundar Pichai** | Alphabet CEO | Google Cloud、TPU、Gemini、搜索 + AI |
-| **Dr. Jim Fan** (@DrJimFan) | NVIDIA Senior Research Scientist | 具身智能、RL、仿真环境、AI Agent |
+| 人物                                | 身份                               | 看什么                               |
+| :-------------------------------- | :------------------------------- | :-------------------------------- |
+| **Jensen Huang 黄仁勋** (@nvidia)    | NVIDIA CEO                       | GPU/Rubin 路线图、开源 LLM 立场、AI 基础设施信号 |
+| **Elon Musk** (@elonmusk)         | xAI / Tesla / X                  | Grok 模型、xAI 算力扩张、政治影响力            |
+| **Sam Altman** (@sama)            | OpenAI CEO                       | GPT 系列发布、融资动向、AI 安全言论             |
+| **段永平** (@大道无形我有型)                | 投资人                              | 价值投资思路、苹果/腾讯持仓变动、长期思维             |
+| **Warren Buffett 巴菲特**            | 伯克希尔 CEO                         | 仓位变化（13F）、年信、宏观判断                 |
+| **Cathie Wood 木头姐** (@CathieDArk) | ARK Invest                       | 颠覆性创新方向、AI/机器人/基因编辑               |
+| **Serenity** (@SerenityYet)       | 独立分析师                            | AI 算力供需、HBM/DRAM 周期、半导体深度研究       |
+| **Dario Amodei**                  | Anthropic CEO                    | Claude 模型、AI 安全、scaling law 观点    |
+| **Sundar Pichai**                 | Alphabet CEO                     | Google Cloud、TPU、Gemini、搜索 + AI   |
+| **Dr. Jim Fan** (@DrJimFan)       | NVIDIA Senior Research Scientist | 具身智能、RL、仿真环境、AI Agent             |
+| 孙宇晨                               |                                  |                                   |
 
 ### 1.2 AI / 半导体领域值得关注的 X 账号
 
