@@ -21,7 +21,7 @@ DRAM 举例， 长期固定资金成本，一手DRAM 的价格 + 几手DRAM put 
 		 1.持有的DRAM 有一定的收益或者损失
 		 2。损失2手put的合同金
 
-用DRAM 2026的数据模拟， 假如从2026-01-05开始操作， 模拟一下收益。 生成一个模拟程序， 后面可以动态调整这些参数。 比如买call 的股价，买几手put等等。 
+用DRAM 2026的数据模拟， 使用真实的数据， 不要模拟任何数据， 利用不同策略，演算一下收益。 生成一个模拟程序， 后面可以动态调整这些参数。 比如买call 的股价，买几手put等等。 
 
 
 ## app
@@ -29,3 +29,5 @@ cd /Users/gavinz/git/finance/hedge && python3 hedge_app.py &
 http://localhost:5567
 
 lsof -ti:5567 | xargs kill
+
+结论 - 不能提高收益， 更多的是平衡风险。 在DRAM 大跌的时候能平衡风险。 
