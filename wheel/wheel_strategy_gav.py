@@ -121,6 +121,9 @@ class Config:
     })
     put_iv: float = 0.30
     call_iv: float = 0.22
+    dynamic_iv: bool = False               # True: use realized vol (from real prices) as IV
+    iv_rv_window: int = 21                 # rolling window (trading days) for realized vol
+    iv_vrp: float = 1.0                    # vol risk premium multiplier on realized vol (IV = RV * vrp)
     margin_rate: float = 0.11              # 11% annualized margin financing cost
     start_date: str = '2026-01-01'
     end_date: str = '2026-07-15'
@@ -225,6 +228,19 @@ def find_expiry_index(entry_idx: int, dates: List[str], dte: int) -> int:
     return len(dates) - 1
 
 
+def compute_realized_volatility(closes: List[float], idx: int, window: int = 21) -> Optional[float]:
+    """Annualized realized volatility from real log returns over `window` days ending at idx."""
+    start = max(0, idx - window + 1)
+    rets = [math.log(closes[i] / closes[i - 1]) for i in range(start + 1, idx + 1)]
+    if len(rets) < 5:
+        return None
+    mean = sum(rets) / len(rets)
+    var = sum((r - mean) ** 2 for r in rets) / (len(rets) - 1)
+    if var <= 0:
+        return None
+    return math.sqrt(var) * math.sqrt(252.0)  # annualized
+
+
 # ============================================================
 # Strategy Simulation
 # ============================================================
@@ -242,6 +258,12 @@ def simulate(config: Config) -> BacktestResult:
     lows = [d[3] for d in data]
     closes = [d[4] for d in data]
 
+    # Precompute realized volatility series (for dynamic IV mode)
+    rv_series: List[Optional[float]] = []
+    if config.dynamic_iv:
+        for i in range(len(closes)):
+            rv_series.append(compute_realized_volatility(closes, i, config.iv_rv_window))
+
     CS = config.contract_size  # 100
 
     # Initial: 2 lots capital, hold 1 lot stock + 1 lot cash
@@ -255,6 +277,8 @@ def simulate(config: Config) -> BacktestResult:
     portfolio_values: List[float] = []
     stock_gains_list: List[float] = []
     stock_losses_list: List[float] = []
+    put_ivs_used: List[float] = []
+    call_ivs_used: List[float] = []
 
     cycle_num = 0
     idx = 0
@@ -287,12 +311,26 @@ def simulate(config: Config) -> BacktestResult:
         put_target = targets['put']
         call_target = targets['call']
 
+        # ---- IV: dynamic (realized vol from real prices) or fixed ----
+        if config.dynamic_iv and entry_idx < len(rv_series):
+            rv = rv_series[entry_idx]
+            if rv is not None:
+                base_iv = rv * config.iv_vrp
+                put_iv = min(base_iv, 2.0)
+                call_iv = min(base_iv, 2.0)
+            else:
+                put_iv, call_iv = config.put_iv, config.call_iv
+        else:
+            put_iv, call_iv = config.put_iv, config.call_iv
+        put_ivs_used.append(put_iv)
+        call_ivs_used.append(call_iv)
+
         put_strike, put_prem = find_put_strike(
-            entry_price, T, config.r, config.put_iv,
+            entry_price, T, config.r, put_iv,
             put_target, actual_dte
         )
         call_strike, call_prem = find_call_strike(
-            entry_price, T, config.r, config.call_iv,
+            entry_price, T, config.r, call_iv,
             call_target, actual_dte
         )
 
@@ -526,8 +564,8 @@ def simulate(config: Config) -> BacktestResult:
         buy_hold_annualized_pct=round(buy_hold_annualized * 100, 2),
         buy_hold_max_drawdown_pct=round(bh_max_dd * 100, 2),
         backtest_days=backtest_days,
-        put_iv=round(config.put_iv * 100, 2),
-        call_iv=round(config.call_iv * 100, 2)
+        put_iv=round((sum(put_ivs_used) / len(put_ivs_used)) * 100, 2) if put_ivs_used else round(config.put_iv * 100, 2),
+        call_iv=round((sum(call_ivs_used) / len(call_ivs_used)) * 100, 2) if call_ivs_used else round(config.call_iv * 100, 2)
     )
 
 
