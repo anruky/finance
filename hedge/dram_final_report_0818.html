@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRAM ETF 对冲策略回测（收益 + 回撤）</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1080px; margin:0 auto; }
+h1 { font-size:26px; margin-bottom:6px; }
+h2 { font-size:19px; margin:32px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:12px; }
+.kpi .value { font-size:22px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:2px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+th:nth-child(2), td:nth-child(2) { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.callout-gold { background:rgba(245,195,68,.08); border:1px solid rgba(245,195,68,.35); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>DRAM ETF 对冲策略回测 <span style="color:var(--muted);font-size:15px;">（收益 + 回撤综合评估 · 真实期权数据）</span></h1>
+<p class="sub">数据源：DRAM_stock.json（93 交易日）+ DRAM_options.json（真实 weekly 期权链） · 生成于 2026-08-17 17:05</p>
+
+<div class="card">
+<h2>策略模型</h2>
+<div class="callout">
+<strong>股票：2026-04-02 买入 100 股 @ $27.76，一直持有到 2026-08-14 @ $57.32，中间不卖出。</strong>
+Put：每个 weekly 滚动日买入 N 张（真实成交价 vw），到期结算后滚动。
+<strong>基准 = B&H（0 Put）</strong>：收益 <span class="c-red">$+2,956</span>，最大回撤 <span class="c-green">$3,587（44.4%）</span>。
+</div>
+</div>
+
+<div class="card">
+<h2>核心结论</h2>
+<div class="callout-gold">
+<strong>买 Put 的本质是降低回撤、在大跌时保护。</strong>
+DRAM 这段是过山车行情（$27.76 → 最高 ~$80 → 暴跌到 $44.85），B&H 最大回撤高达 <span class="c-green">$3,587（44.4%）</span>。
+综合「收益 + 回撤」后，最优是 <strong class="c-gold">0% OTM / 2 张 Put</strong>：
+收益 <span class="c-red">$+3,511</span>（比 B&H 还多赚 <span class="c-red">$+555</span>），回撤降到 <span class="c-green">$1,871（25.3%，回撤比例降了 <span class="c-red">19.1%</span>）</span>。
+收益/回撤比 <strong class="c-gold">1.88</strong>，是 B&H（0.82）的 <strong class="c-gold">2.3 倍</strong>。
+</div>
+<div class="kpis">
+<div class="kpi"><div class="label">B&H 回撤比例</div><div class="value c-green">44.4%</div><div class="sub">回撤 $3,587</div></div>
+<div class="kpi"><div class="label">策略回撤比例</div><div class="value c-red">25.3%</div><div class="sub">回撤 $1,871</div></div>
+<div class="kpi"><div class="label">回撤比例降幅</div><div class="value c-red">19.1%</div><div class="sub">降低 $+1,716</div></div>
+<div class="kpi"><div class="label">B&H 收益</div><div class="value c-red">$+2,956</div><div class="sub">收益/回撤比 0.82</div></div>
+<div class="kpi"><div class="label">策略收益</div><div class="value c-red">$+3,511</div><div class="sub">0% OTM / 2 张</div></div>
+<div class="kpi"><div class="label">策略收益/回撤比</div><div class="value c-gold">1.88</div><div class="sub">B&H 为 0.82</div></div>
+</div>
+<p class="note">回撤比例 = 最大回撤 ÷ 峰值净值（从最高点回撤的百分比）。收益/回撤比 = 总收益 ÷ 最大回撤，越高越好。</p>
+</div>
+
+<div class="card">
+<h2>策略排名（按收益/回撤比降序）</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>#</th><th>目标 OTM</th><th>Put 张数</th><th>总 P&L</th><th>最大回撤</th><th>回撤比例</th><th>回撤降幅</th><th>收益/回撤比</th><th>行权</th><th>vs B&H</th></tr>
+<tr>
+<td>1</td>
+<td>0%</td>
+<td>2</td>
+<td><span class="c-red">$+3,511</span></td>
+<td class="c-green">$1,871</td>
+<td class="c-green">25.3%</td>
+<td class="c-red">$1,716</td>
+<td><strong>1.88</strong></td>
+<td>7/15</td>
+<td><span class="c-red">$+555</span></td>
+</tr>
+<tr>
+<td>2</td>
+<td>0%</td>
+<td>1</td>
+<td><span class="c-red">$+3,234</span></td>
+<td class="c-green">$1,895</td>
+<td class="c-green">27.5%</td>
+<td class="c-red">$1,692</td>
+<td><strong>1.71</strong></td>
+<td>7/15</td>
+<td><span class="c-red">$+278</span></td>
+</tr>
+<tr>
+<td>3</td>
+<td>5%</td>
+<td>2</td>
+<td><span class="c-red">$+2,978</span></td>
+<td class="c-green">$1,780</td>
+<td class="c-green">26.5%</td>
+<td class="c-red">$1,807</td>
+<td><strong>1.67</strong></td>
+<td>5/15</td>
+<td><span class="c-red">$+22</span></td>
+</tr>
+<tr>
+<td>4</td>
+<td>0%</td>
+<td>3</td>
+<td><span class="c-red">$+3,789</span></td>
+<td class="c-green">$2,344</td>
+<td class="c-green">28.8%</td>
+<td class="c-red">$1,243</td>
+<td><strong>1.62</strong></td>
+<td>7/15</td>
+<td><span class="c-red">$+833</span></td>
+</tr>
+<tr>
+<td>5</td>
+<td>5%</td>
+<td>3</td>
+<td><span class="c-red">$+2,989</span></td>
+<td class="c-green">$2,156</td>
+<td class="c-green">30.2%</td>
+<td class="c-red">$1,430</td>
+<td><strong>1.39</strong></td>
+<td>5/15</td>
+<td><span class="c-red">$+33</span></td>
+</tr>
+<tr>
+<td>6</td>
+<td>5%</td>
+<td>1</td>
+<td><span class="c-red">$+2,967</span></td>
+<td class="c-green">$2,532</td>
+<td class="c-green">34.9%</td>
+<td class="c-red">$1,055</td>
+<td><strong>1.17</strong></td>
+<td>5/15</td>
+<td><span class="c-red">$+11</span></td>
+</tr>
+<tr>
+<td>7</td>
+<td>10%</td>
+<td>1</td>
+<td><span class="c-red">$+2,642</span></td>
+<td class="c-green">$3,207</td>
+<td class="c-green">42.6%</td>
+<td class="c-red">$380</td>
+<td><strong>0.82</strong></td>
+<td>4/15</td>
+<td><span class="c-green">$-314</span></td>
+</tr>
+<tr>
+<td>8</td>
+<td>10%</td>
+<td>2</td>
+<td><span class="c-red">$+2,327</span></td>
+<td class="c-green">$2,828</td>
+<td class="c-green">40.4%</td>
+<td class="c-red">$759</td>
+<td><strong>0.82</strong></td>
+<td>4/15</td>
+<td><span class="c-green">$-629</span></td>
+</tr>
+<tr>
+<td>9</td>
+<td>10%</td>
+<td>3</td>
+<td><span class="c-red">$+2,013</span></td>
+<td class="c-green">$2,477</td>
+<td class="c-green">38.1%</td>
+<td class="c-red">$1,110</td>
+<td><strong>0.81</strong></td>
+<td>4/15</td>
+<td><span class="c-green">$-943</span></td>
+</tr>
+<tr>
+<td>10</td>
+<td>15%</td>
+<td>1</td>
+<td><span class="c-red">$+2,382</span></td>
+<td class="c-green">$3,745</td>
+<td class="c-green">48.4%</td>
+<td class="c-red">$-158</td>
+<td><strong>0.64</strong></td>
+<td>2/15</td>
+<td><span class="c-green">$-574</span></td>
+</tr>
+<tr>
+<td>11</td>
+<td>20%</td>
+<td>1</td>
+<td><span class="c-red">$+2,372</span></td>
+<td class="c-green">$3,798</td>
+<td class="c-green">48.9%</td>
+<td class="c-red">$-211</td>
+<td><strong>0.62</strong></td>
+<td>2/15</td>
+<td><span class="c-green">$-584</span></td>
+</tr>
+<tr>
+<td>12</td>
+<td>25%</td>
+<td>1</td>
+<td><span class="c-red">$+2,372</span></td>
+<td class="c-green">$3,798</td>
+<td class="c-green">48.9%</td>
+<td class="c-red">$-211</td>
+<td><strong>0.62</strong></td>
+<td>2/15</td>
+<td><span class="c-green">$-584</span></td>
+</tr>
+<tr>
+<td>13</td>
+<td>15%</td>
+<td>2</td>
+<td><span class="c-red">$+1,807</span></td>
+<td class="c-green">$3,904</td>
+<td class="c-green">52.7%</td>
+<td class="c-red">$-317</td>
+<td><strong>0.46</strong></td>
+<td>2/15</td>
+<td><span class="c-green">$-1,149</span></td>
+</tr>
+<tr>
+<td>14</td>
+<td>20%</td>
+<td>2</td>
+<td><span class="c-red">$+1,788</span></td>
+<td class="c-green">$4,008</td>
+<td class="c-green">53.6%</td>
+<td class="c-red">$-421</td>
+<td><strong>0.45</strong></td>
+<td>2/15</td>
+<td><span class="c-green">$-1,168</span></td>
+</tr>
+<tr>
+<td>15</td>
+<td>25%</td>
+<td>2</td>
+<td><span class="c-red">$+1,788</span></td>
+<td class="c-green">$4,008</td>
+<td class="c-green">53.6%</td>
+<td class="c-red">$-421</td>
+<td><strong>0.45</strong></td>
+<td>2/15</td>
+<td><span class="c-green">$-1,168</span></td>
+</tr>
+<tr>
+<td>16</td>
+<td>15%</td>
+<td>3</td>
+<td><span class="c-red">$+1,233</span></td>
+<td class="c-green">$4,062</td>
+<td class="c-green">57.4%</td>
+<td class="c-red">$-475</td>
+<td><strong>0.30</strong></td>
+<td>2/15</td>
+<td><span class="c-green">$-1,723</span></td>
+</tr>
+<tr>
+<td>17</td>
+<td>20%</td>
+<td>3</td>
+<td><span class="c-red">$+1,204</span></td>
+<td class="c-green">$4,219</td>
+<td class="c-green">58.8%</td>
+<td class="c-red">$-632</td>
+<td><strong>0.29</strong></td>
+<td>2/15</td>
+<td><span class="c-green">$-1,752</span></td>
+</tr>
+<tr>
+<td>18</td>
+<td>25%</td>
+<td>3</td>
+<td><span class="c-red">$+1,204</span></td>
+<td class="c-green">$4,219</td>
+<td class="c-green">58.8%</td>
+<td class="c-red">$-632</td>
+<td><strong>0.29</strong></td>
+<td>2/15</td>
+<td><span class="c-green">$-1,752</span></td>
+</tr>
+</table>
+</div>
+<p class="note">回撤比例 = 最大回撤 ÷ 峰值净值（从最高点回撤的百分比）。回撤降幅 = B&H 回撤 − 策略回撤（正 = 回撤被降低）。行权 = Put 到期 ITM 次数。<br>
+越靠上（ATM）降回撤越多；「vs B&H」为负说明收益有牺牲。综合最优看「收益/回撤比」。</p>
+</div>
+
+<div class="card">
+<h2>最优策略 Put 明细：0% OTM / 2 张</h2>
+<p style="font-size:14px;margin-bottom:10px;">股票不动收益 <span class="c-red">$+2,956</span>；累计保费 <span class="c-green">-$8,339</span>，赔付 <span class="c-red">+$8,894</span>，净 <span class="c-red">$+555</span>。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>滚动日</th><th>当日 spot</th><th>行权价</th><th>到期价</th><th>保费</th><th>赔付</th><th>ITM</th></tr>
+<tr>
+<td>2026-04-10</td>
+<td>$32.43</td>
+<td>$32.0</td>
+<td>$35.59</td>
+<td class="c-green">$228</td>
+<td class="c-red">$0</td>
+<td>否</td>
+</tr>
+<tr>
+<td>2026-05-08</td>
+<td>$52.80</td>
+<td>$53.0</td>
+<td>$51.10</td>
+<td class="c-green">$645</td>
+<td class="c-red">$380</td>
+<td>是</td>
+</tr>
+<tr>
+<td>2026-05-15</td>
+<td>$51.10</td>
+<td>$51.0</td>
+<td>$52.82</td>
+<td class="c-green">$472</td>
+<td class="c-red">$0</td>
+<td>否</td>
+</tr>
+<tr>
+<td>2026-05-22</td>
+<td>$52.82</td>
+<td>$53.0</td>
+<td>$63.20</td>
+<td class="c-green">$412</td>
+<td class="c-red">$0</td>
+<td>否</td>
+</tr>
+<tr>
+<td>2026-05-29</td>
+<td>$63.20</td>
+<td>$63.0</td>
+<td>$55.79</td>
+<td class="c-green">$557</td>
+<td class="c-red">$1,442</td>
+<td>是</td>
+</tr>
+<tr>
+<td>2026-06-05</td>
+<td>$55.79</td>
+<td>$56.0</td>
+<td>$65.01</td>
+<td class="c-green">$450</td>
+<td class="c-red">$0</td>
+<td>否</td>
+</tr>
+<tr>
+<td>2026-06-12</td>
+<td>$65.01</td>
+<td>$65.0</td>
+<td>$76.71</td>
+<td class="c-green">$609</td>
+<td class="c-red">$0</td>
+<td>否</td>
+</tr>
+<tr>
+<td>2026-06-22</td>
+<td>$80.72</td>
+<td>$81.0</td>
+<td>$71.88</td>
+<td class="c-green">$902</td>
+<td class="c-red">$1,824</td>
+<td>是</td>
+</tr>
+<tr>
+<td>2026-06-26</td>
+<td>$71.88</td>
+<td>$72.0</td>
+<td>$60.63</td>
+<td class="c-green">$598</td>
+<td class="c-red">$2,274</td>
+<td>是</td>
+</tr>
+<tr>
+<td>2026-07-06</td>
+<td>$64.76</td>
+<td>$65.0</td>
+<td>$63.04</td>
+<td class="c-green">$632</td>
+<td class="c-red">$392</td>
+<td>是</td>
+</tr>
+<tr>
+<td>2026-07-10</td>
+<td>$63.04</td>
+<td>$63.0</td>
+<td>$52.72</td>
+<td class="c-green">$659</td>
+<td class="c-red">$2,056</td>
+<td>是</td>
+</tr>
+<tr>
+<td>2026-07-17</td>
+<td>$52.72</td>
+<td>$53.0</td>
+<td>$53.20</td>
+<td class="c-green">$702</td>
+<td class="c-red">$0</td>
+<td>否</td>
+</tr>
+<tr>
+<td>2026-07-24</td>
+<td>$53.20</td>
+<td>$53.0</td>
+<td>$50.37</td>
+<td class="c-green">$471</td>
+<td class="c-red">$526</td>
+<td>是</td>
+</tr>
+<tr>
+<td>2026-07-31</td>
+<td>$50.37</td>
+<td>$50.0</td>
+<td>$50.60</td>
+<td class="c-green">$498</td>
+<td class="c-red">$0</td>
+<td>否</td>
+</tr>
+<tr>
+<td>2026-08-07</td>
+<td>$50.60</td>
+<td>$51.0</td>
+<td>$57.32</td>
+<td class="c-green">$503</td>
+<td class="c-red">$0</td>
+<td>否</td>
+</tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>现在如何买（基于最新期权数据 2026-08-14）</h2>
+<div class="callout-gold">
+最新 DRAM 现价 <strong class="c-gold">$57.32</strong>，最近到期日 <strong>2026-08-21</strong>（7 天后）。
+按最优策略 <strong class="c-gold">0% OTM / 2 张 Put</strong>，现在应这样操作：
+</div>
+<ol style="font-size:14px;padding-left:22px;line-height:2.0;">
+<li><strong>持有 100 股 DRAM</strong>（市值 $5,732），一直持有不动。</li>
+<li><strong>买入 2 张行权价 $57 的 Put</strong>（现价 $57.32 最接近的平值档），到期日 2026-08-21。</li>
+<li>该档 Put 成交量加权价 <strong>$1.90/股</strong>，每张合约 $189.82，2 张共 <strong class="c-green">-$379.64</strong>（占持仓 6.6%）。</li>
+<li>2 张 = 覆盖 200 股 vs 持有 100 股，即 <strong>2:1 过度对冲</strong>——下跌时 Put 赔付是股票亏损的 2 倍。</li>
+<li>到期日 2026-08-21 结算后，无论是否行权，<strong>下周五再买下一周期同档 Put</strong>，周而复始。</li>
+</ol>
+<div class="tbl-scroll">
+<table>
+<tr><th>到期日 spot</th><th>涨跌</th><th>股票 P&L</th><th>Put 赔付</th><th>净 P&L</th><th>净收益率</th></tr>
+<tr>
+<td>42.99</td>
+<td>-25%</td>
+<td class="c-green">-1,433</td>
+<td class="c-red">+2,802</td>
+<td class="c-red">+989</td>
+<td class="c-red">+17.3%</td>
+</tr><tr>
+<td>45.86</td>
+<td>-20%</td>
+<td class="c-green">-1,146</td>
+<td class="c-red">+2,229</td>
+<td class="c-red">+703</td>
+<td class="c-red">+12.3%</td>
+</tr><tr>
+<td>48.72</td>
+<td>-15%</td>
+<td class="c-green">-860</td>
+<td class="c-red">+1,656</td>
+<td class="c-red">+416</td>
+<td class="c-red">+7.3%</td>
+</tr><tr>
+<td>51.59</td>
+<td>-10%</td>
+<td class="c-green">-573</td>
+<td class="c-red">+1,082</td>
+<td class="c-red">+130</td>
+<td class="c-red">+2.3%</td>
+</tr><tr>
+<td>54.45</td>
+<td>-5%</td>
+<td class="c-green">-287</td>
+<td class="c-red">+509</td>
+<td class="c-green">-157</td>
+<td class="c-green">-2.7%</td>
+</tr><tr>
+<td>57.32</td>
+<td>+0%</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+0</td>
+<td class="c-green">-380</td>
+<td class="c-green">-6.6%</td>
+</tr><tr>
+<td>60.19</td>
+<td>+5%</td>
+<td class="c-red">+287</td>
+<td class="c-red">+0</td>
+<td class="c-green">-93</td>
+<td class="c-green">-1.6%</td>
+</tr><tr>
+<td>63.05</td>
+<td>+10%</td>
+<td class="c-red">+573</td>
+<td class="c-red">+0</td>
+<td class="c-red">+194</td>
+<td class="c-red">+3.4%</td>
+</tr><tr>
+<td>65.92</td>
+<td>+15%</td>
+<td class="c-red">+860</td>
+<td class="c-red">+0</td>
+<td class="c-red">+480</td>
+<td class="c-red">+8.4%</td>
+</tr><tr>
+<td>68.78</td>
+<td>+20%</td>
+<td class="c-red">+1,146</td>
+<td class="c-red">+0</td>
+<td class="c-red">+767</td>
+<td class="c-red">+13.4%</td>
+</tr>
+</table>
+</div>
+<p class="note">净 P&L = 股票 P&L + Put 赔付 − 保费（2 张 $380）。这是「微笑曲线」：<strong>大涨赚（股票）、大跌也赚（2:1 过度对冲）、只有横盘小波动（±5% 内）亏保费</strong>。正好匹配 DRAM 的剧烈波动特性。</p>
+</div>
+
+<div class="card">
+<h2>数据与结论说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>真实成交价</strong>：Put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价 + 假设 IV。</li>
+<li><strong>weekly 期权</strong>：数据只有最近一个到期日的链，Put 按周滚动（15 个周期）。</li>
+<li><strong>回撤口径</strong>：逐日净值 = 股票市值 + 累计 Put 现金流（买入扣保费、到期加赔付），MDD = 峰值到谷底最大回撤。</li>
+<li><strong>缺失周期</strong>：3 个周五无期权数据（2026-04-17, 2026-04-24, 2026-05-01），这些周无法买 Put，但股票仍持有，不影响 B&H 基准。</li>
+<li><strong>过山车行情是关键</strong>：DRAM 先涨后暴跌，ATM Put 在暴跌周期（尤其 06-26→07-02 大跌 15.6%）频繁行权（7/15），赔付超过保费、净赚，因此既降回撤又提收益；deep OTM Put 因太虚值，暴跌时也保护不足，依然跑输。</li>
+<li><strong>结果依赖这段行情</strong>：若未来波动收敛、不再有暴跌，ATM Put 的成本优势会消失。仅供研究，不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

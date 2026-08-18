@@ -64,7 +64,31 @@ def find_real_call(calls, target, dte, spot):
     return best
 
 
-def run(ticker, state_targets, min_vol=0, options_file=None):
+def strike_step(spot):
+    if spot < 100:
+        return 1.0
+    elif spot < 400:
+        return 2.5
+    else:
+        return 5.0
+
+
+def find_call_prem_near(calls, strike):
+    """Find the nearest call contract's premium at/near a given strike."""
+    best = None
+    for p in calls:
+        prem = p.get('vw')
+        if prem is None:
+            prem = p.get('c')
+        if prem is None or prem <= 0:
+            continue
+        if best is None or abs(p['strike'] - strike) < abs(best['strike'] - strike):
+            best = {'strike': p['strike'], 'prem': prem}
+    return best
+
+
+def run(ticker, state_targets, min_vol=0, options_file=None,
+        buy_call_otm=0.01, buy_call_num=2):
     stock = json.load(open(f"{DATA_DIR}/{ticker}_stock.json"))
     if options_file is None:
         options_file = f"{ticker}_options.json"
@@ -97,7 +121,8 @@ def run(ticker, state_targets, min_vol=0, options_file=None):
     cycles = []
     portfolio_values = []
     total_prem = 0.0
-    total_interest = 0.0
+    total_call_cost = 0.0
+    total_call_value = 0.0
     stock_gains = 0.0
     stock_losses = 0.0
     state_counts = {}
@@ -135,7 +160,8 @@ def run(ticker, state_targets, min_vol=0, options_file=None):
         put_sel = find_real_put(chain['puts'], targets['put'], dte, spot)
         call_sel = find_real_call(chain['calls'], targets['call'], dte, spot)
         if put_sel is None or call_sel is None:
-            idx = expiry_idx
+            # 空链（节假日等）：延后到下一个交易日再卖，不跳过整个周期
+            idx += 1
             continue
 
         put_strike = put_sel['strike']
@@ -146,52 +172,61 @@ def run(ticker, state_targets, min_vol=0, options_file=None):
         cash += prem
         total_prem += prem
 
-        # Action 1
+        # Action 1：股价触及 call 价 → 买 2 手 1% OTM call（不融资买股票）
+        step = strike_step(spot)
         action1 = False
         action1_date = ''
-        margin_loan = 0.0
-        margin_interest = 0.0
+        buy_call_strike = 0.0
+        buy_call_cost = 0.0
         for d in range(idx + 1, expiry_idx + 1):
             if highs[d] >= call_strike:
                 action1 = True
                 action1_date = dates[d]
-                margin_loan = call_strike * CS
-                shares += CS
+                # 买 buy_call_num 手 buy_call_otm OTM call（行权价 = call_strike * (1+otm)，取整到档位）
+                buy_call_strike = round(call_strike * (1 + buy_call_otm) / step) * step
+                sel = find_call_prem_near(chain['calls'], buy_call_strike)
+                if sel is not None:
+                    buy_call_strike = sel['strike']
+                    buy_call_cost = buy_call_num * sel['prem'] * CS
+                else:
+                    buy_call_cost = 0.0
+                cash -= buy_call_cost
+                total_call_cost += buy_call_cost
+                num_action1 += 1
                 break
-        if action1:
-            days_holding = (datetime.strptime(expiry, '%Y-%m-%d') -
-                            datetime.strptime(action1_date, '%Y-%m-%d')).days
-            margin_interest = margin_loan * MARGIN_RATE * (max(days_holding, 1) / 365.0)
-            total_interest += margin_interest
-            num_action1 += 1
 
         call_ex = expiry_price >= call_strike
         put_ex = expiry_price < put_strike
 
+        # 买 call 到期价值（内在价值）
+        buy_call_value = 0.0
+        if action1 and buy_call_strike > 0:
+            buy_call_value = max(expiry_price - buy_call_strike, 0.0) * buy_call_num * CS
+        total_call_value += buy_call_value
+
         if action1:
             if call_ex:
+                # 卖 call 被行权，交割 1 手股票 → 0 手股票 + 现金
                 cash += call_strike * CS
                 shares -= CS
                 result_state = 'B'
-                cash -= margin_loan + margin_interest
+                cash += buy_call_value
             elif put_ex:
+                # 卖 put 被行权，买入 1 手股票 → 2 手股票
                 cash -= put_strike * CS
                 shares += CS
                 result_state = 'C'
-                cash += 2 * expiry_price * CS - margin_loan - margin_interest
-                shares -= 2 * CS
             else:
+                # 都没行权 → 1 手股票 + 1 手现金
                 result_state = 'D'
-                cash += expiry_price * CS - margin_loan - margin_interest
-                shares -= CS
         else:
             if put_ex:
+                # 卖 put 被行权，买入 1 手股票 → 2 手股票
                 cash -= put_strike * CS
                 shares += CS
                 result_state = 'E'
-                cash += expiry_price * CS
-                shares -= CS
             elif call_ex:
+                # 防御分支（股价触及 call_strike 时 action1 必已触发，通常不会到）
                 cash += call_strike * CS
                 shares -= CS
                 cash -= expiry_price * CS
@@ -200,9 +235,19 @@ def run(ticker, state_targets, min_vol=0, options_file=None):
             else:
                 result_state = 'A'
 
+        # 下一周期开始前归一化持仓到 1 手股票 + 1 手现金
+        if result_state == 'B':
+            # 0 手股票 → 买回 1 手
+            shares += CS
+            cash -= expiry_price * CS
+        elif result_state in ('C', 'E'):
+            # 2 手股票 → 卖出 1 手
+            shares -= CS
+            cash += expiry_price * CS
+
         portfolio_after = cash + shares * expiry_price
         cycle_pnl = portfolio_after - portfolio_before
-        stock_pnl = cycle_pnl - prem + margin_interest
+        stock_pnl = cycle_pnl - prem + buy_call_cost - buy_call_value
         portfolio_values.append(portfolio_after)
         if stock_pnl >= 0:
             stock_gains += stock_pnl
@@ -215,6 +260,9 @@ def run(ticker, state_targets, min_vol=0, options_file=None):
             'spot': round(spot, 2), 'exp_px': round(expiry_price, 2),
             'put': put_strike, 'call': call_strike,
             'prem': round(prem, 0), 'action1': action1, 'state': result_state,
+            'buy_call_strike': buy_call_strike,
+            'buy_call_cost': round(buy_call_cost, 0),
+            'buy_call_value': round(buy_call_value, 0),
             'pnl': round(cycle_pnl, 0), 'value': round(portfolio_after, 0),
         })
 
@@ -241,7 +289,7 @@ def run(ticker, state_targets, min_vol=0, options_file=None):
         'total_ret': total_return * 100, 'ann': ann * 100, 'dd': max_dd * 100,
         'bh_ret': bh_ret * 100, 'bh_ann': bh_ann * 100,
         'cycles': len(cycles), 'action1': num_action1,
-        'premium': total_prem, 'interest': total_interest,
+        'premium': total_prem, 'call_cost': total_call_cost, 'call_value': total_call_value,
         'gains': stock_gains, 'losses': stock_losses,
         'states': state_counts, 'cycle_list': cycles,
     }
