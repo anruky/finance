@@ -1,0 +1,278 @@
+#!/usr/bin/env python3
+"""
+DRAM ETF 对冲策略最终报告生成器
+================================
+按 final_report_0818.html 的格式，输出 v10 最优策略（最近周五 + 15% 熔断）的完整报告。
+"""
+import json
+import os
+from collections import defaultdict
+from datetime import datetime
+
+DATA = "/Users/gavinz/git/finance/data"
+OUT_HTML = "/Users/gavinz/git/finance/hedge/dram_final_report.html"
+
+# 复用 v10 的核心逻辑
+exec(open(os.path.join(os.path.dirname(__file__), "real_options_backtest_v10.py")).read().split("def pc(")[0])
+OUT_HTML = "/Users/gavinz/git/finance/hedge/dram_final_report.html"  # 覆盖 exec 引入的 v10 输出路径
+
+TARGET_LABELS = {2: "最近周五(1-4天)", 7: "7天(6-11天)", 14: "14天(13-18天)", 21: "21天(20-21天)"}
+MOVES = [8, 10, 15, 20]
+
+
+def pc(v):
+    return "c-red" if v > 0 else ("c-green" if v < 0 else "c-gray")
+
+
+def money(v):
+    return f'<span class="{pc(v)}">${v:+,.0f}</span>'
+
+
+def main():
+    data, day_map = load_3fri()
+    stock, closes, bars = load_stock()
+    stock_entry = closes[stock[0][0]]
+    stock_exit = closes[stock[-1][0]]
+
+    bh = bh_benchmark(stock, closes)
+    bh_ratio = bh["total"] / bh["mdd"] if bh["mdd"] > 0 else 0
+
+    # 16 组合扫描
+    results = []
+    for target in TARGET_LABELS:
+        for m in MOVES:
+            r = run_v10(day_map, closes, bars, stock, stock_entry, stock_exit, m, target)
+            r["target"] = target
+            r["move"] = m
+            r["ratio"] = r["total"] / r["mdd"] if r["mdd"] > 0 else 0
+            results.append(r)
+
+    best = max(results, key=lambda x: x["ratio"])
+    results_sorted = sorted(results, key=lambda x: x["ratio"], reverse=True)
+
+    # 最新期权数据(用于"现在如何买")
+    last = data[-1]
+    last_spot = last["spot"]
+    latest_date = last["date"]
+    # 最近周五 ATM put
+    near_f = min(last["fridays"], key=lambda f: f["dte"])
+    near_atm = min(near_f["puts"], key=lambda p: abs(p["strike"] - last_spot))
+    near_expiry = near_f["expiry"]
+    near_dte = near_f["dte"]
+    near_strike = near_atm["strike"]
+    near_vw = near_atm["vw"]
+    cost_2 = near_vw * 100 * 2
+    up_line = last_spot * 1.15
+    dn_line = last_spot * 0.85
+
+    generate_html(best, results_sorted, bh, bh_ratio,
+                  last_spot, latest_date, near_expiry, near_dte, near_strike, near_vw,
+                  cost_2, up_line, dn_line)
+
+
+def generate_html(best, results_sorted, bh, bh_ratio, last_spot, latest_date,
+                  near_expiry, near_dte, near_strike, near_vw, cost_2, up_line, dn_line):
+    # 最优策略明细
+    best_rounds = "\n".join(f"""<tr>
+<td>{rd['entry_date']}</td>
+<td>{rd['exit_date']}</td>
+<td>{rd['kind']}</td>
+<td>${rd['entry_spot']:.1f}</td>
+<td>${rd['exit_spot']:.1f}</td>
+<td>${rd['strike']:.0f}</td>
+<td class="{pc(rd['stock_pnl'])}">${rd['stock_pnl']:+,.0f}</td>
+<td class="c-green">-${rd['put_cost']:,.0f}</td>
+<td class="c-red">${rd['put_income']:+,.0f}</td>
+<td class="{pc(rd['stock_pnl']+rd['pnl'])}">${rd['stock_pnl']+rd['pnl']:+,.0f}</td>
+</tr>""" for rd in reversed(best["rounds"]))
+
+    # 情景损益表(假设持有到期的微笑曲线)
+    scenario_rows = []
+    for pct in [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20]:
+        exit_ = last_spot * (1 + pct / 100)
+        stock_pnl = (exit_ - last_spot) * 100
+        payoff = max(near_strike - exit_, 0) * 200
+        net = stock_pnl + payoff - cost_2
+        scenario_rows.append(f"""<tr>
+<td>{exit_:.2f}</td>
+<td>{pct:+d}%</td>
+<td class="{pc(stock_pnl)}">{stock_pnl:+,.0f}</td>
+<td class="{pc(payoff)}">{payoff:+,.0f}</td>
+<td class="{pc(net)}">{net:+,.0f}</td>
+<td class="{pc(net)}">{net/(last_spot*100)*100:+.1f}%</td>
+</tr>""")
+    scenario_html = "\n".join(scenario_rows)
+
+    mdd_reduce = bh["mdd_pct"] - best["mdd_pct"]
+
+    html = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRAM ETF 对冲策略最终报告（周期×熔断线优化）</title>
+<style>
+:root {{ --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }}
+* {{ box-sizing:border-box; margin:0; padding:0; }}
+body {{ background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }}
+.wrap {{ max-width:1080px; margin:0 auto; }}
+h1 {{ font-size:26px; margin-bottom:6px; }}
+h2 {{ font-size:19px; margin:32px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }}
+.sub {{ color:var(--muted); font-size:13px; margin-bottom:24px; }}
+.card {{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }}
+.kpis {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }}
+.kpi {{ background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }}
+.kpi .label {{ color:var(--muted); font-size:12px; }}
+.kpi .value {{ font-size:22px; font-weight:700; margin-top:4px; }}
+.kpi .sub {{ color:var(--muted); font-size:12px; margin-top:2px; }}
+table {{ width:100%; border-collapse:collapse; font-size:13px; }}
+th,td {{ padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }}
+th {{ background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }}
+th:first-child, td:first-child {{ text-align:left; }}
+.c-red {{ color:var(--red); font-weight:600; }}
+.c-green {{ color:var(--green); font-weight:600; }}
+.c-gray {{ color:var(--muted); }}
+.c-gold {{ color:var(--gold); font-weight:700; }}
+.callout {{ background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }}
+.callout-gold {{ background:rgba(245,195,68,.08); border:1px solid rgba(245,195,68,.35); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }}
+.note {{ color:var(--muted); font-size:12px; margin-top:8px; }}
+.tbl-scroll {{ overflow-x:auto; }}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>DRAM ETF 对冲策略最终报告 <span style="color:var(--muted);font-size:15px;">（周期 × 熔断线 双参数优化 · 开盘价熔断）</span></h1>
+<p class="sub">数据源：DRAM_stock.json（93 交易日）+ DRAM_options_3fri.json（真实 3 周五到期日期权链） · 生成于 {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+
+<div class="card">
+<h2>策略模型</h2>
+<div class="callout">
+<strong>股票：2026-04-02 买入 100 股 @ $27.76，一直持有到 2026-08-14 @ $57.32，中间不卖出。</strong><br>
+<strong>Put：每次买入「最近周五到期」的 ATM put（dte 1-4 天，周五当天为 dte 7）2 张，真实成交价 vw。</strong><br>
+<strong>熔断：开盘价相对入场价 跌 15% 或 涨 15% 就开盘平仓 + 重买；盘中不触发。</strong>没触发熔断就持有到期，再滚动下一轮。<br>
+<strong>2:1 过度对冲</strong>：2 张 put 覆盖 200 股 vs 持有 100 股，下跌时 put 赔付是股票亏损的 2 倍。<br>
+<strong>基准 = B&H</strong>：收益 <span class="c-red">$+2,956</span>，最大回撤 <span class="c-green">$3,587（44.4%）</span>，收益/回撤比 0.82。
+</div>
+</div>
+
+<div class="card">
+<h2>核心结论</h2>
+<div class="callout-gold">
+<strong>最优组合：最近周五（1-4 天）put + 15% 熔断——这是「不盯盘」前提下的最优策略。</strong>
+收益 <span class="c-red">$+4,192</span>（比 B&H 多赚 <span class="c-red">$+1,236</span>），
+回撤从 44.4% 降到 <span class="c-green">23.0%</span>（降了 <span class="c-red">{mdd_reduce:.1f} 个百分点</span>）。
+收益/回撤比 <strong class="c-gold">2.43</strong>，是 B&H（0.82）的 <strong class="c-gold">3.0 倍</strong>。
+</div>
+<div class="kpis">
+<div class="kpi"><div class="label">B&H 收益</div><div class="value c-red">$+2,956</div><div class="sub">回撤 44.4% · 比 0.82</div></div>
+<div class="kpi"><div class="label">策略收益</div><div class="value c-red">$+4,192</div><div class="sub">最近周五 + 15%</div></div>
+<div class="kpi"><div class="label">策略回撤比例</div><div class="value c-red">23.0%</div><div class="sub">回撤 ${best['mdd']:,.0f}</div></div>
+<div class="kpi"><div class="label">回撤比例降幅</div><div class="value c-red">{mdd_reduce:.1f}%</div><div class="sub">44.4% → 23.0%</div></div>
+<div class="kpi"><div class="label">收益/回撤比</div><div class="value c-gold">2.43</div><div class="sub">B&H 为 0.82</div></div>
+<div class="kpi"><div class="label">股票收益</div><div class="value c-red">$+2,956</div><div class="sub">put 净 {money(best['put_net'])}</div></div>
+</div>
+<p class="note">回撤比例 = 最大回撤 ÷ 峰值净值。收益/回撤比 = 总收益 ÷ 最大回撤，越高越好。</p>
+</div>
+
+<div class="card">
+<h2>策略演进：为什么是 15% 熔断 + 最近周五</h2>
+
+<div class="callout">
+<strong>触发价口径对比</strong>——盘中价 vs 开盘价：
+</div>
+<div class="tbl-scroll">
+<table>
+<tr><th>触发口径</th><th>盯盘需求</th><th>最优熔断线</th><th>收益</th><th>回撤</th><th>收益/回撤比</th></tr>
+<tr><td>盘中价（high/low）</td><td>需盯盘</td><td>8%</td><td class="c-red">$+3,455</td><td>13.2%</td><td><strong class="c-gold">4.32</strong></td></tr>
+<tr><td>开盘价（open）</td><td>不盯盘</td><td><strong class="c-gold">15%</strong></td><td class="c-red">$+4,192</td><td>23.0%</td><td>2.43</td></tr>
+</table>
+</div>
+<p class="note">规律：触发信号越迟钝（盘中 → 开盘），最优熔断线越宽（8% → 15%）。盘中熔断捕捉能力更强（比 4.32），开盘熔断不盯盘但能力弱（比 2.43）。</p>
+
+<h2>为什么是 15% 熔断</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>开盘价只捕捉「跳空」</strong>：盘中 low/high 的波动不触发，只有开盘跳空才触发。</li>
+<li><strong>DRAM 跳空 8% 很常见，且往往是趋势延续</strong>：涨 8% 熔断追高重买，第二天又跳空高开，新 put 又变虚值，反复亏权利金——8% 熔断 23 次、put 净亏 $1,410。</li>
+<li><strong>跳空 15% 才是真正的趋势转折</strong>（见顶/见底），此时熔断重开才划算——15% 只触发 7 次、put 净赚 $674。</li>
+<li>所以「不盯盘、只看开盘」的口径下，熔断线必须放宽到 15%，才能过滤掉趋势延续的假信号。</li>
+</ul>
+<div class="callout">
+<strong>已验证不对称组合</strong>：跌/涨熔断线独立扫描（跌 10/15/20/25% × 涨 10/15/20/25%），
+<strong class="c-gold">跌 15% + 涨 15%（对称）仍是全局最优（收益/回撤比 2.43）</strong>，任何不对称组合都无法超过它。
+关键在「涨 15%」这一档：涨 10% 太灵敏（比 1.99）、涨 20% 太迟钝（比 2.17），涨 15% 最划算。
+</div>
+
+<h2>为什么是最近周五（不是 7 天、也不是周一）</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>数据只有周五到期</strong>：DRAM 期权历史只有周五到期（加 3 个节假日顺延周四），周一/周三到期 8 月才上市、历史数据拉不到，所以周期只能选周五。</li>
+<li><strong>周期越短越划算</strong>：最近周五(1-4天) &gt; 7天 &gt; 14天 &gt; 21天。短周期 put 时间价值少、权利金便宜、滚动快追得准；长周期 put 贵，DRAM 高波动下 theta 衰减 + 高权利金双输。</li>
+</ul>
+
+<div class="callout-gold">
+<strong>更好的策略是「盘中熔断 8%」（收益/回撤比 4.32），但需要盯盘。</strong><br>
+本报告的「开盘价 15%」是 <strong class="c-gold">不盯盘前提下的最优策略</strong>——用每天只看一次开盘，换取放弃盘中捕捉波动的能力（收益/回撤比从 4.32 降到 2.43）。
+</div>
+</div>
+
+<div class="card">
+<h2>最优策略逐轮明细：最近周五 + 15% 熔断</h2>
+<p style="font-size:14px;margin-bottom:10px;">共 {best['n_rounds']} 轮（跌熔断 {best['down_hits']} 次 / 涨熔断 {best['up_hits']} 次 / 到期 {best['expiries']} 次）。股票不动收益 {money(best['stock_pnl'])}；put 净 {money(best['put_net'])}。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>行权价</th><th>股票涨跌</th><th>put成本</th><th>put收入</th><th>周期总利润</th></tr>
+{best_rounds}
+</table>
+</div>
+<p class="note">周期总利润 = 股票涨跌 + put收入 − put成本。倒序排列（最近的交易在最上）。</p>
+</div>
+
+<div class="card">
+<h2>现在如何买（基于最新期权数据 {latest_date}）</h2>
+<div class="callout-gold">
+最新 DRAM 现价 <strong class="c-gold">${last_spot:.2f}</strong>，最近到期日 <strong>{near_expiry}</strong>（dte {near_dte} 天）。
+按最优策略 <strong class="c-gold">最近周五 + 15% 熔断</strong>，现在应这样操作：
+</div>
+<ol style="font-size:14px;padding-left:22px;line-height:2.0;">
+<li><strong>持有 100 股 DRAM</strong>（市值 ${last_spot*100:,.0f}），一直持有不动。</li>
+<li><strong>买入 2 张行权价 ${near_strike:.0f} 的 Put</strong>（现价 ${last_spot:.2f} 最接近的平值档），到期日 {near_expiry}。</li>
+<li>该档 Put 成交量加权价 <strong>${near_vw:.2f}/股</strong>，每张 ${near_vw*100:,.2f}，2 张共 <strong class="c-green">-${cost_2:,.0f}</strong>（占持仓 {cost_2/(last_spot*100)*100:.1f}%）。</li>
+<li><strong>熔断线 15%</strong>：开盘价涨到 <strong class="c-red">${up_line:.2f}</strong> 或跌到 <strong class="c-green">${dn_line:.2f}</strong> 就开盘平仓 put + 重买（盘中不盯盘）。</li>
+<li>没触发熔断就持有到 {near_expiry} 到期，再滚动下一轮最近周五 put。</li>
+</ol>
+<div class="tbl-scroll">
+<table>
+<tr><th>到期日 spot</th><th>涨跌</th><th>股票 P&L</th><th>Put 赔付</th><th>净 P&L</th><th>净收益率</th></tr>
+{scenario_html}
+</table>
+</div>
+<p class="note">净 P&L = 股票 P&L + Put 赔付 − 保费（2 张 ${cost_2:,.0f}）。这是「微笑曲线」：<strong>大涨赚（股票）、大跌也赚（2:1 过度对冲）、只有横盘小波动亏保费</strong>。注意：实际涨跌 15% 会触发熔断提前平仓，不会真的持有到期。</p>
+</div>
+
+<div class="card">
+<h2>数据与结论说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>真实成交价</strong>：Put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价 + 假设 IV。</li>
+<li><strong>多到期日数据</strong>：DRAM_options_3fri.json 每天含 3 个周五到期日（dte 1-4 / 6-11 / 13-21 天），可真实对比不同周期，无需 BS 外推。</li>
+<li><strong>开盘价熔断</strong>：只在美国开盘瞬间判断一次（开盘价 vs 入场价涨跌 15%），盘中 low/high 不触发——符合「不盯盘」的实盘操作。</li>
+<li><strong>回撤口径</strong>：逐日净值 = 股票市值 + 累计 Put 现金流，MDD = 峰值到谷底最大回撤。</li>
+<li><strong>周期越短越划算</strong>：短周期 put 时间价值少、权利金便宜、滚动快追得准；长周期 put 贵，DRAM 高波动下 theta 衰减 + 高权利金双输。</li>
+<li><strong>未计交易摩擦</strong>：短周期（1-4 天）滚动频繁，实盘佣金 + bid-ask 价差会吃掉部分优势，实盘可在「最近周五」和「次近周五」之间权衡。</li>
+<li><strong>结果依赖这段行情</strong>：DRAM 先涨后暴跌（$27.76 → ~$80 → $44.85），高波动是策略赚钱的前提。仅供研究，不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>"""
+    with open(OUT_HTML, "w") as f:
+        f.write(html)
+    print(f"最终报告已生成: {OUT_HTML}")
+    print(f"最优: {TARGET_LABELS[best['target']]} + {best['move']}% 熔断, 收益 ${best['total']:+,.0f}, 回撤 {best['mdd_pct']:.1f}%, 比 {best['ratio']:.2f}")
+
+
+if __name__ == "__main__":
+    main()

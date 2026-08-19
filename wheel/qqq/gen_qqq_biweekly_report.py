@@ -10,7 +10,7 @@ import run_local_backtest as m
 BUY_CALL_OTM = 0.0   # 买 call 的 OTM（0% = ATM，最及时）
 BUY_CALL_NUM = 3     # 买 call 手数
 
-r = m.run('QQQ', m.make_targets(50, 6, 15, 15), options_file='QQQ_options_2wk.json',
+r = m.run('QQQ', m.make_targets(20, 6, 10, 15), options_file='QQQ_options_2wk.json',
           buy_call_otm=BUY_CALL_OTM, buy_call_num=BUY_CALL_NUM)
 
 stock = json.load(open('/Users/gavinz/git/finance/data/QQQ_stock.json'))
@@ -134,11 +134,11 @@ for c, chg_str, chg_cls, pnl_cls, bh_val, bh_pnl, bh_pnl_cls in reversed(cycle_r
 
 # Put/Call OTM per state (for strategy params table)
 state_meta = {
-    'A': ('低波动（均到期作废）', '50%', '6%'),
-    'B': ('大涨（call被行权）', '50%', '6%'),
-    'C': ('剧烈震荡后下行', '15%', '15%'),
-    'D': ('涨后回调', '50%', '6%'),
-    'E': ('大跌（put被行权）', '15%', '15%'),
+    'A': ('低波动（均到期作废）', '20%', '6%'),
+    'B': ('大涨（call被行权）', '20%', '6%'),
+    'C': ('剧烈震荡后下行', '10%', '15%'),
+    'D': ('涨后回调', '20%', '6%'),
+    'E': ('大跌（put被行权）', '10%', '15%'),
 }
 otm_stat = defaultdict(lambda: {'put': [], 'call': []})
 for c in r['cycle_list']:
@@ -226,7 +226,7 @@ html = f"""<!DOCTYPE html>
 <body>
 <div class="wrap">
 <h1>QQQ Wheel 策略 · 2周周期最优配置 <span style="color:var(--muted);font-size:15px;">（真实期权数据）</span></h1>
-<p class="sub">区间 2024-08-19 ~ 2026-08-14（499 交易日）· 真实历史期权数据（VWAP）· 周期 14 天（周五到期）· 参数 A/B/D 50%/6%，C/E 15%/15%</p>
+<p class="sub">区间 2024-08-19 ~ 2026-08-14（499 交易日）· 真实历史期权数据（VWAP）· 周期 14 天（周五到期）· 参数 A/B/D 20%/6%，C/E 10%/15%</p>
 
 <div class="kpis">
   <div class="kpi"><div class="label">策略年化收益</div><div class="value c-pos">{r['ann']:.2f}%</div></div>
@@ -245,6 +245,27 @@ html = f"""<!DOCTYPE html>
 <tbody>{yearly_rows}</tbody>
 </table>
 <p class="note">白色=当年跑赢买入持有，灰色=跑输。2024 为 8月19日起的区间，2026 为截至 8月14日的区间。</p>
+</div>
+
+<div class="card">
+<h2>策略模型</h2>
+<p style="font-size:14px;line-height:1.9;">
+<strong>资金结构</strong>：2 手资金 = 1 手持股 + 1 手现金，整体看涨。<br>
+<strong>操作周期</strong>：每两周（周五到期）卖 1 手 put + 1 手 call，收权利金。<br>
+<strong>每日监控（触价对冲）</strong>：股价一旦触及卖出的 call 行权价，买 <strong>{BUY_CALL_NUM} 手 {BUY_CALL_OTM*100:.0f}% OTM（ATM）call</strong> 对冲踏空上行（不融资买股）。<br>
+<strong>遇假日</strong>：期权到期日顺延到前一个交易日（周四）。
+</p>
+<table>
+<thead><tr><th>状态</th><th>含义</th><th>触发买call</th><th>到期结果</th><th>周期末持仓</th></tr></thead>
+<tbody>
+<tr><td class="bold">A</td><td>低波动</td><td>否</td><td>put/call 均作废</td><td>1手股票 + 1手现金</td></tr>
+<tr><td class="bold">B</td><td>大涨</td><td>是</td><td>call 被行权</td><td>0手股票 + 现金（+call残值）</td></tr>
+<tr><td class="bold">C</td><td>先涨后崩</td><td>是</td><td>put 被行权</td><td>2手股票</td></tr>
+<tr><td class="bold">D</td><td>涨后回调</td><td>是</td><td>put/call 均作废</td><td>1手股票 + 1手现金</td></tr>
+<tr><td class="bold">E</td><td>大跌</td><td>否</td><td>put 被行权</td><td>2手股票</td></tr>
+</tbody>
+</table>
+<p class="note">下一周期：B/C/E 先归一化到 1手股票+1手现金（B 买回 1 手，C/E 卖出 1 手），再按各状态参数卖新一轮 put/call。</p>
 </div>
 
 <div class="card">

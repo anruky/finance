@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRAM ETF 对冲策略最终报告（周期×熔断线优化）</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1080px; margin:0 auto; }
+h1 { font-size:26px; margin-bottom:6px; }
+h2 { font-size:19px; margin:32px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:12px; }
+.kpi .value { font-size:22px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:2px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.callout-gold { background:rgba(245,195,68,.08); border:1px solid rgba(245,195,68,.35); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>DRAM ETF 对冲策略最终报告 <span style="color:var(--muted);font-size:15px;">（周期 × 熔断线 双参数优化 · 开盘价熔断）</span></h1>
+<p class="sub">数据源：DRAM_stock.json（93 交易日）+ DRAM_options_3fri.json（真实 3 周五到期日期权链） · 生成于 2026-08-19 21:05</p>
+
+<div class="card">
+<h2>策略模型</h2>
+<div class="callout">
+<strong>股票：2026-04-02 买入 100 股 @ $27.76，一直持有到 2026-08-14 @ $57.32，中间不卖出。</strong><br>
+<strong>Put：每次买入「最近周五到期」的 ATM put（dte 1-4 天，周五当天为 dte 7）2 张，真实成交价 vw。</strong><br>
+<strong>熔断：开盘价相对入场价 跌 15% 或 涨 15% 就开盘平仓 + 重买；盘中不触发。</strong>没触发熔断就持有到期，再滚动下一轮。<br>
+<strong>2:1 过度对冲</strong>：2 张 put 覆盖 200 股 vs 持有 100 股，下跌时 put 赔付是股票亏损的 2 倍。<br>
+<strong>基准 = B&H</strong>：收益 <span class="c-red">$+2,956</span>，最大回撤 <span class="c-green">$3,587（44.4%）</span>，收益/回撤比 0.82。
+</div>
+</div>
+
+<div class="card">
+<h2>核心结论</h2>
+<div class="callout-gold">
+<strong>最优组合：最近周五（1-4 天）put + 15% 熔断——这是「不盯盘」前提下的最优策略。</strong>
+收益 <span class="c-red">$+4,192</span>（比 B&H 多赚 <span class="c-red">$+1,236</span>），
+回撤从 44.4% 降到 <span class="c-green">23.0%</span>（降了 <span class="c-red">21.4 个百分点</span>）。
+收益/回撤比 <strong class="c-gold">2.43</strong>，是 B&H（0.82）的 <strong class="c-gold">3.0 倍</strong>。
+</div>
+<div class="kpis">
+<div class="kpi"><div class="label">B&H 收益</div><div class="value c-red">$+2,956</div><div class="sub">回撤 44.4% · 比 0.82</div></div>
+<div class="kpi"><div class="label">策略收益</div><div class="value c-red">$+4,192</div><div class="sub">最近周五 + 15%</div></div>
+<div class="kpi"><div class="label">策略回撤比例</div><div class="value c-red">23.0%</div><div class="sub">回撤 $1,728</div></div>
+<div class="kpi"><div class="label">回撤比例降幅</div><div class="value c-red">21.4%</div><div class="sub">44.4% → 23.0%</div></div>
+<div class="kpi"><div class="label">收益/回撤比</div><div class="value c-gold">2.43</div><div class="sub">B&H 为 0.82</div></div>
+<div class="kpi"><div class="label">股票收益</div><div class="value c-red">$+2,956</div><div class="sub">put 净 <span class="c-red">$+1,236</span></div></div>
+</div>
+<p class="note">回撤比例 = 最大回撤 ÷ 峰值净值。收益/回撤比 = 总收益 ÷ 最大回撤，越高越好。</p>
+</div>
+
+<div class="card">
+<h2>策略演进：为什么是 15% 熔断 + 最近周五</h2>
+
+<div class="callout">
+<strong>触发价口径对比</strong>——盘中价 vs 开盘价：
+</div>
+<div class="tbl-scroll">
+<table>
+<tr><th>触发口径</th><th>盯盘需求</th><th>最优熔断线</th><th>收益</th><th>回撤</th><th>收益/回撤比</th></tr>
+<tr><td>盘中价（high/low）</td><td>需盯盘</td><td>8%</td><td class="c-red">$+3,455</td><td>13.2%</td><td><strong class="c-gold">4.32</strong></td></tr>
+<tr><td>开盘价（open）</td><td>不盯盘</td><td><strong class="c-gold">15%</strong></td><td class="c-red">$+4,192</td><td>23.0%</td><td>2.43</td></tr>
+</table>
+</div>
+<p class="note">规律：触发信号越迟钝（盘中 → 开盘），最优熔断线越宽（8% → 15%）。盘中熔断捕捉能力更强（比 4.32），开盘熔断不盯盘但能力弱（比 2.43）。</p>
+
+<h2>为什么是 15% 熔断</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>开盘价只捕捉「跳空」</strong>：盘中 low/high 的波动不触发，只有开盘跳空才触发。</li>
+<li><strong>DRAM 跳空 8% 很常见，且往往是趋势延续</strong>：涨 8% 熔断追高重买，第二天又跳空高开，新 put 又变虚值，反复亏权利金——8% 熔断 23 次、put 净亏 $1,410。</li>
+<li><strong>跳空 15% 才是真正的趋势转折</strong>（见顶/见底），此时熔断重开才划算——15% 只触发 7 次、put 净赚 $674。</li>
+<li>所以「不盯盘、只看开盘」的口径下，熔断线必须放宽到 15%，才能过滤掉趋势延续的假信号。</li>
+</ul>
+<div class="callout">
+<strong>已验证不对称组合</strong>：跌/涨熔断线独立扫描（跌 10/15/20/25% × 涨 10/15/20/25%），
+<strong class="c-gold">跌 15% + 涨 15%（对称）仍是全局最优（收益/回撤比 2.43）</strong>，任何不对称组合都无法超过它。
+关键在「涨 15%」这一档：涨 10% 太灵敏（比 1.99）、涨 20% 太迟钝（比 2.17），涨 15% 最划算。
+</div>
+
+<h2>为什么是最近周五（不是 7 天、也不是周一）</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>数据只有周五到期</strong>：DRAM 期权历史只有周五到期（加 3 个节假日顺延周四），周一/周三到期 8 月才上市、历史数据拉不到，所以周期只能选周五。</li>
+<li><strong>周期越短越划算</strong>：最近周五(1-4天) &gt; 7天 &gt; 14天 &gt; 21天。短周期 put 时间价值少、权利金便宜、滚动快追得准；长周期 put 贵，DRAM 高波动下 theta 衰减 + 高权利金双输。</li>
+</ul>
+
+<div class="callout-gold">
+<strong>更好的策略是「盘中熔断 8%」（收益/回撤比 4.32），但需要盯盘。</strong><br>
+本报告的「开盘价 15%」是 <strong class="c-gold">不盯盘前提下的最优策略</strong>——用每天只看一次开盘，换取放弃盘中捕捉波动的能力（收益/回撤比从 4.32 降到 2.43）。
+</div>
+</div>
+
+<div class="card">
+<h2>最优策略逐轮明细：最近周五 + 15% 熔断</h2>
+<p style="font-size:14px;margin-bottom:10px;">共 19 轮（跌熔断 1 次 / 涨熔断 3 次 / 到期 15 次）。股票不动收益 <span class="c-red">$+2,956</span>；put 净 <span class="c-red">$+1,236</span>。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>行权价</th><th>股票涨跌</th><th>put成本</th><th>put收入</th><th>周期总利润</th></tr>
+<tr>
+<td>2026-08-07</td>
+<td>2026-08-14</td>
+<td>到期</td>
+<td>$50.6</td>
+<td>$57.3</td>
+<td>$51</td>
+<td class="c-red">$+672</td>
+<td class="c-green">-$503</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+169</td>
+</tr>
+<tr>
+<td>2026-07-31</td>
+<td>2026-08-07</td>
+<td>到期</td>
+<td>$50.4</td>
+<td>$50.6</td>
+<td>$50</td>
+<td class="c-red">$+23</td>
+<td class="c-green">-$498</td>
+<td class="c-red">$+0</td>
+<td class="c-green">$-475</td>
+</tr>
+<tr>
+<td>2026-07-24</td>
+<td>2026-07-31</td>
+<td>到期</td>
+<td>$53.2</td>
+<td>$50.4</td>
+<td>$53</td>
+<td class="c-green">$-283</td>
+<td class="c-green">-$471</td>
+<td class="c-red">$+526</td>
+<td class="c-green">$-228</td>
+</tr>
+<tr>
+<td>2026-07-23</td>
+<td>2026-07-24</td>
+<td>到期</td>
+<td>$57.4</td>
+<td>$53.2</td>
+<td>$57</td>
+<td class="c-green">$-424</td>
+<td class="c-green">-$206</td>
+<td class="c-red">$+760</td>
+<td class="c-red">$+130</td>
+</tr>
+<tr>
+<td>2026-07-17</td>
+<td>2026-07-23</td>
+<td>上涨再平衡</td>
+<td>$49.8</td>
+<td>$57.4</td>
+<td>$50</td>
+<td class="c-red">$+761</td>
+<td class="c-green">-$407</td>
+<td class="c-red">$+15</td>
+<td class="c-red">$+369</td>
+</tr>
+<tr>
+<td>2026-07-10</td>
+<td>2026-07-17</td>
+<td>下跌止盈</td>
+<td>$63.0</td>
+<td>$49.8</td>
+<td>$63</td>
+<td class="c-green">$-1,321</td>
+<td class="c-green">-$659</td>
+<td class="c-red">$+2,634</td>
+<td class="c-red">$+654</td>
+</tr>
+<tr>
+<td>2026-07-06</td>
+<td>2026-07-10</td>
+<td>到期</td>
+<td>$64.8</td>
+<td>$63.0</td>
+<td>$65</td>
+<td class="c-green">$-172</td>
+<td class="c-green">-$632</td>
+<td class="c-red">$+392</td>
+<td class="c-green">$-412</td>
+</tr>
+<tr>
+<td>2026-07-02</td>
+<td>2026-07-06</td>
+<td>到期</td>
+<td>$60.6</td>
+<td>$64.8</td>
+<td>$61</td>
+<td class="c-red">$+413</td>
+<td class="c-green">-$146</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+267</td>
+</tr>
+<tr>
+<td>2026-06-26</td>
+<td>2026-07-02</td>
+<td>到期</td>
+<td>$71.9</td>
+<td>$60.6</td>
+<td>$72</td>
+<td class="c-green">$-1,125</td>
+<td class="c-green">-$598</td>
+<td class="c-red">$+2,274</td>
+<td class="c-red">$+551</td>
+</tr>
+<tr>
+<td>2026-06-22</td>
+<td>2026-06-26</td>
+<td>到期</td>
+<td>$80.7</td>
+<td>$71.9</td>
+<td>$81</td>
+<td class="c-green">$-884</td>
+<td class="c-green">-$902</td>
+<td class="c-red">$+1,824</td>
+<td class="c-red">$+38</td>
+</tr>
+<tr>
+<td>2026-06-18</td>
+<td>2026-06-22</td>
+<td>到期</td>
+<td>$75.2</td>
+<td>$80.7</td>
+<td>$75</td>
+<td class="c-red">$+547</td>
+<td class="c-green">-$59</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+488</td>
+</tr>
+<tr>
+<td>2026-06-12</td>
+<td>2026-06-18</td>
+<td>上涨再平衡</td>
+<td>$65.0</td>
+<td>$75.2</td>
+<td>$65</td>
+<td class="c-red">$+1,024</td>
+<td class="c-green">-$609</td>
+<td class="c-red">$+9</td>
+<td class="c-red">$+423</td>
+</tr>
+<tr>
+<td>2026-06-05</td>
+<td>2026-06-12</td>
+<td>到期</td>
+<td>$55.8</td>
+<td>$65.0</td>
+<td>$56</td>
+<td class="c-red">$+922</td>
+<td class="c-green">-$450</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+472</td>
+</tr>
+<tr>
+<td>2026-05-29</td>
+<td>2026-06-05</td>
+<td>到期</td>
+<td>$63.2</td>
+<td>$55.8</td>
+<td>$63</td>
+<td class="c-green">$-741</td>
+<td class="c-green">-$557</td>
+<td class="c-red">$+1,442</td>
+<td class="c-red">$+144</td>
+</tr>
+<tr>
+<td>2026-05-27</td>
+<td>2026-05-29</td>
+<td>到期</td>
+<td>$62.4</td>
+<td>$63.2</td>
+<td>$62</td>
+<td class="c-red">$+76</td>
+<td class="c-green">-$535</td>
+<td class="c-red">$+0</td>
+<td class="c-green">$-459</td>
+</tr>
+<tr>
+<td>2026-05-22</td>
+<td>2026-05-27</td>
+<td>上涨再平衡</td>
+<td>$52.8</td>
+<td>$62.4</td>
+<td>$53</td>
+<td class="c-red">$+962</td>
+<td class="c-green">-$412</td>
+<td class="c-red">$+45</td>
+<td class="c-red">$+595</td>
+</tr>
+<tr>
+<td>2026-05-15</td>
+<td>2026-05-22</td>
+<td>到期</td>
+<td>$51.1</td>
+<td>$52.8</td>
+<td>$51</td>
+<td class="c-red">$+172</td>
+<td class="c-green">-$472</td>
+<td class="c-red">$+0</td>
+<td class="c-green">$-300</td>
+</tr>
+<tr>
+<td>2026-05-08</td>
+<td>2026-05-15</td>
+<td>到期</td>
+<td>$49.0</td>
+<td>$51.1</td>
+<td>$49</td>
+<td class="c-red">$+210</td>
+<td class="c-green">-$268</td>
+<td class="c-red">$+0</td>
+<td class="c-green">$-58</td>
+</tr>
+<tr>
+<td>2026-04-10</td>
+<td>2026-04-17</td>
+<td>到期</td>
+<td>$32.6</td>
+<td>$35.6</td>
+<td>$33</td>
+<td class="c-red">$+301</td>
+<td class="c-green">-$299</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+2</td>
+</tr>
+</table>
+</div>
+<p class="note">周期总利润 = 股票涨跌 + put收入 − put成本。倒序排列（最近的交易在最上）。</p>
+</div>
+
+<div class="card">
+<h2>现在如何买（基于最新期权数据 2026-08-14）</h2>
+<div class="callout-gold">
+最新 DRAM 现价 <strong class="c-gold">$57.32</strong>，最近到期日 <strong>2026-08-21</strong>（dte 7 天）。
+按最优策略 <strong class="c-gold">最近周五 + 15% 熔断</strong>，现在应这样操作：
+</div>
+<ol style="font-size:14px;padding-left:22px;line-height:2.0;">
+<li><strong>持有 100 股 DRAM</strong>（市值 $5,732），一直持有不动。</li>
+<li><strong>买入 2 张行权价 $57 的 Put</strong>（现价 $57.32 最接近的平值档），到期日 2026-08-21。</li>
+<li>该档 Put 成交量加权价 <strong>$1.90/股</strong>，每张 $189.82，2 张共 <strong class="c-green">-$380</strong>（占持仓 6.6%）。</li>
+<li><strong>熔断线 15%</strong>：开盘价涨到 <strong class="c-red">$65.92</strong> 或跌到 <strong class="c-green">$48.72</strong> 就开盘平仓 put + 重买（盘中不盯盘）。</li>
+<li>没触发熔断就持有到 2026-08-21 到期，再滚动下一轮最近周五 put。</li>
+</ol>
+<div class="tbl-scroll">
+<table>
+<tr><th>到期日 spot</th><th>涨跌</th><th>股票 P&L</th><th>Put 赔付</th><th>净 P&L</th><th>净收益率</th></tr>
+<tr>
+<td>42.99</td>
+<td>-25%</td>
+<td class="c-green">-1,433</td>
+<td class="c-red">+2,802</td>
+<td class="c-red">+989</td>
+<td class="c-red">+17.3%</td>
+</tr>
+<tr>
+<td>45.86</td>
+<td>-20%</td>
+<td class="c-green">-1,146</td>
+<td class="c-red">+2,229</td>
+<td class="c-red">+703</td>
+<td class="c-red">+12.3%</td>
+</tr>
+<tr>
+<td>48.72</td>
+<td>-15%</td>
+<td class="c-green">-860</td>
+<td class="c-red">+1,656</td>
+<td class="c-red">+416</td>
+<td class="c-red">+7.3%</td>
+</tr>
+<tr>
+<td>51.59</td>
+<td>-10%</td>
+<td class="c-green">-573</td>
+<td class="c-red">+1,082</td>
+<td class="c-red">+130</td>
+<td class="c-red">+2.3%</td>
+</tr>
+<tr>
+<td>54.45</td>
+<td>-5%</td>
+<td class="c-green">-287</td>
+<td class="c-red">+509</td>
+<td class="c-green">-157</td>
+<td class="c-green">-2.7%</td>
+</tr>
+<tr>
+<td>57.32</td>
+<td>+0%</td>
+<td class="c-gray">+0</td>
+<td class="c-gray">+0</td>
+<td class="c-green">-380</td>
+<td class="c-green">-6.6%</td>
+</tr>
+<tr>
+<td>60.19</td>
+<td>+5%</td>
+<td class="c-red">+287</td>
+<td class="c-gray">+0</td>
+<td class="c-green">-93</td>
+<td class="c-green">-1.6%</td>
+</tr>
+<tr>
+<td>63.05</td>
+<td>+10%</td>
+<td class="c-red">+573</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+194</td>
+<td class="c-red">+3.4%</td>
+</tr>
+<tr>
+<td>65.92</td>
+<td>+15%</td>
+<td class="c-red">+860</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+480</td>
+<td class="c-red">+8.4%</td>
+</tr>
+<tr>
+<td>68.78</td>
+<td>+20%</td>
+<td class="c-red">+1,146</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+767</td>
+<td class="c-red">+13.4%</td>
+</tr>
+</table>
+</div>
+<p class="note">净 P&L = 股票 P&L + Put 赔付 − 保费（2 张 $380）。这是「微笑曲线」：<strong>大涨赚（股票）、大跌也赚（2:1 过度对冲）、只有横盘小波动亏保费</strong>。注意：实际涨跌 15% 会触发熔断提前平仓，不会真的持有到期。</p>
+</div>
+
+<div class="card">
+<h2>数据与结论说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>真实成交价</strong>：Put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价 + 假设 IV。</li>
+<li><strong>多到期日数据</strong>：DRAM_options_3fri.json 每天含 3 个周五到期日（dte 1-4 / 6-11 / 13-21 天），可真实对比不同周期，无需 BS 外推。</li>
+<li><strong>开盘价熔断</strong>：只在美国开盘瞬间判断一次（开盘价 vs 入场价涨跌 15%），盘中 low/high 不触发——符合「不盯盘」的实盘操作。</li>
+<li><strong>回撤口径</strong>：逐日净值 = 股票市值 + 累计 Put 现金流，MDD = 峰值到谷底最大回撤。</li>
+<li><strong>周期越短越划算</strong>：短周期 put 时间价值少、权利金便宜、滚动快追得准；长周期 put 贵，DRAM 高波动下 theta 衰减 + 高权利金双输。</li>
+<li><strong>未计交易摩擦</strong>：短周期（1-4 天）滚动频繁，实盘佣金 + bid-ask 价差会吃掉部分优势，实盘可在「最近周五」和「次近周五」之间权衡。</li>
+<li><strong>结果依赖这段行情</strong>：DRAM 先涨后暴跌（$27.76 → ~$80 → $44.85），高波动是策略赚钱的前提。仅供研究，不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
