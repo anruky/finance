@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRAM 对冲 v10 —— 周期 × 熔断线对比</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1080px; margin:0 auto; }
+h1 { font-size:26px; margin-bottom:6px; }
+h2 { font-size:19px; margin:32px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout-gold { background:rgba(245,195,68,.08); border:1px solid rgba(245,195,68,.35); border-radius:10px; padding:14px 16px; margin:12px 0; font-size:14px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>DRAM 对冲 v10 <span style="color:var(--muted);font-size:15px;">（周期 × 熔断线二维对比）</span></h1>
+<p class="sub">开盘价熔断 · 2手put · 生成于 2026-08-21 20:11</p>
+
+<div class="card">
+<h2>核心结论</h2>
+<div class="callout-gold">
+全局最优：<strong class="c-gold">7天(6-11天) + 熔断 15%</strong>。
+收益 <span class="c-red">$+3,630</span>，回撤 28.5%，收益/回撤比 1.91。
+周期越短越划算：最近周五(1-4天) &gt; 7天 &gt; 14天 &gt; 21天。
+</div>
+</div>
+
+<div class="card">
+<h2>总收益矩阵（周期 × 熔断线）</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>周期\熔断线</th><th>8%</th><th>10%</th><th>15%</th><th>20%</th></tr>
+<tr><td>最近周五(1-4天)</td><td class="c-red">$+2,561</td><td class="c-red">$+102</td><td class="c-red">$+3,063</td><td class="c-red">$+3,204</td></tr><tr><td>7天(6-11天)</td><td class="c-red">$+1,546</td><td class="c-red">$+2,065</td><td class="c-gold">$+3,630 ★</td><td class="c-red">$+3,522</td></tr><tr><td>14天(13-18天)</td><td class="c-red">$+1,112</td><td class="c-red">$+1,917</td><td class="c-red">$+2,060</td><td class="c-red">$+1,606</td></tr><tr><td>21天(20-21天)</td><td class="c-red">$+791</td><td class="c-red">$+1,178</td><td class="c-red">$+1,866</td><td class="c-red">$+2,309</td></tr>
+</table>
+</div>
+<p class="note">B&H 基准：收益 $+2,956，回撤 44.4%，比 0.82。★ = 全局最优(收益/回撤比)。</p>
+</div>
+
+<div class="card">
+<h2>收益/回撤比矩阵</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>周期\熔断线</th><th>8%</th><th>10%</th><th>15%</th><th>20%</th></tr>
+<tr><td>最近周五(1-4天)</td><td class="">1.79</td><td class="">0.03</td><td class="">1.61</td><td class="">1.69</td></tr><tr><td>7天(6-11天)</td><td class="">0.89</td><td class="">1.09</td><td class="c-gold">1.91 ★</td><td class="">1.85</td></tr><tr><td>14天(13-18天)</td><td class="">0.59</td><td class="">1.03</td><td class="">0.95</td><td class="">0.63</td></tr><tr><td>21天(20-21天)</td><td class="">0.38</td><td class="">0.48</td><td class="">0.82</td><td class="">1.38</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>最优策略逐轮明细：7天(6-11天) + 熔断 15%</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>股票涨跌</th><th>put成本</th><th>put收入</th><th>周期总利润</th></tr>
+<tr>
+<td>2026-08-07</td>
+<td>2026-08-14</td>
+<td>到期</td>
+<td>$50.6</td>
+<td>$57.3</td>
+<td class="c-red">$+672</td>
+<td class="c-green">-$503</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+169</td>
+</tr>
+<tr>
+<td>2026-07-28</td>
+<td>2026-08-07</td>
+<td>到期</td>
+<td>$48.3</td>
+<td>$50.6</td>
+<td class="c-red">$+234</td>
+<td class="c-green">-$721</td>
+<td class="c-red">$+0</td>
+<td class="c-green">$-487</td>
+</tr>
+<tr>
+<td>2026-07-23</td>
+<td>2026-07-28</td>
+<td>下跌止盈</td>
+<td>$57.4</td>
+<td>$48.3</td>
+<td class="c-green">$-917</td>
+<td class="c-green">-$651</td>
+<td class="c-red">$+1,747</td>
+<td class="c-red">$+179</td>
+</tr>
+<tr>
+<td>2026-07-17</td>
+<td>2026-07-23</td>
+<td>上涨再平衡</td>
+<td>$49.8</td>
+<td>$57.4</td>
+<td class="c-red">$+761</td>
+<td class="c-green">-$407</td>
+<td class="c-red">$+15</td>
+<td class="c-red">$+369</td>
+</tr>
+<tr>
+<td>2026-07-10</td>
+<td>2026-07-17</td>
+<td>下跌止盈</td>
+<td>$63.0</td>
+<td>$49.8</td>
+<td class="c-green">$-1,321</td>
+<td class="c-green">-$659</td>
+<td class="c-red">$+2,634</td>
+<td class="c-red">$+654</td>
+</tr>
+<tr>
+<td>2026-07-02</td>
+<td>2026-07-10</td>
+<td>到期</td>
+<td>$60.6</td>
+<td>$63.0</td>
+<td class="c-red">$+241</td>
+<td class="c-green">-$552</td>
+<td class="c-red">$+0</td>
+<td class="c-green">$-311</td>
+</tr>
+<tr>
+<td>2026-06-26</td>
+<td>2026-07-02</td>
+<td>到期</td>
+<td>$71.9</td>
+<td>$60.6</td>
+<td class="c-green">$-1,125</td>
+<td class="c-green">-$598</td>
+<td class="c-red">$+2,274</td>
+<td class="c-red">$+551</td>
+</tr>
+<tr>
+<td>2026-06-18</td>
+<td>2026-06-26</td>
+<td>到期</td>
+<td>$75.2</td>
+<td>$71.9</td>
+<td class="c-green">$-337</td>
+<td class="c-green">-$725</td>
+<td class="c-red">$+624</td>
+<td class="c-green">$-438</td>
+</tr>
+<tr>
+<td>2026-06-12</td>
+<td>2026-06-18</td>
+<td>上涨再平衡</td>
+<td>$65.0</td>
+<td>$75.2</td>
+<td class="c-red">$+1,024</td>
+<td class="c-green">-$609</td>
+<td class="c-red">$+9</td>
+<td class="c-red">$+423</td>
+</tr>
+<tr>
+<td>2026-06-05</td>
+<td>2026-06-12</td>
+<td>到期</td>
+<td>$55.8</td>
+<td>$65.0</td>
+<td class="c-red">$+922</td>
+<td class="c-green">-$450</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+472</td>
+</tr>
+<tr>
+<td>2026-05-27</td>
+<td>2026-06-05</td>
+<td>到期</td>
+<td>$62.4</td>
+<td>$55.8</td>
+<td class="c-green">$-665</td>
+<td class="c-green">-$908</td>
+<td class="c-red">$+1,242</td>
+<td class="c-green">$-331</td>
+</tr>
+<tr>
+<td>2026-05-22</td>
+<td>2026-05-27</td>
+<td>上涨再平衡</td>
+<td>$52.8</td>
+<td>$62.4</td>
+<td class="c-red">$+962</td>
+<td class="c-green">-$412</td>
+<td class="c-red">$+45</td>
+<td class="c-red">$+595</td>
+</tr>
+<tr>
+<td>2026-05-15</td>
+<td>2026-05-22</td>
+<td>到期</td>
+<td>$51.1</td>
+<td>$52.8</td>
+<td class="c-red">$+172</td>
+<td class="c-green">-$472</td>
+<td class="c-red">$+0</td>
+<td class="c-green">$-300</td>
+</tr>
+<tr>
+<td>2026-05-11</td>
+<td>2026-05-15</td>
+<td>到期</td>
+<td>$54.9</td>
+<td>$51.1</td>
+<td class="c-green">$-381</td>
+<td class="c-green">-$485</td>
+<td class="c-red">$+780</td>
+<td class="c-green">$-86</td>
+</tr>
+<tr>
+<td>2026-05-05</td>
+<td>2026-05-11</td>
+<td>上涨再平衡</td>
+<td>$44.4</td>
+<td>$54.9</td>
+<td class="c-red">$+1,051</td>
+<td class="c-green">-$277</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+774</td>
+</tr>
+<tr>
+<td>2026-04-07</td>
+<td>2026-04-14</td>
+<td>上涨再平衡</td>
+<td>$29.1</td>
+<td>$34.3</td>
+<td class="c-red">$+524</td>
+<td class="c-green">-$267</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+257</td>
+</tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>周期</strong>：最近周五(dte 1-4天) / 7天(6-11天) / 14天(13-18天) / 21天(20-21天)，对应买入 dte 最接近该天数的周五到期 put。</li>
+<li><strong>熔断</strong>：开盘价相对入场价 跌/涨 move% 触发，开盘平仓+重买；盘中不触发。</li>
+<li><strong>对冲</strong>：2手 put 对 100股(2:1过度对冲)。</li>
+<li><strong>未计交易摩擦</strong>：短周期滚动频繁，实盘佣金+价差会吃掉部分优势。</li>
+<li><strong>仅供研究</strong>：不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

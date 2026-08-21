@@ -2,7 +2,7 @@
 """
 DRAM ETF 对冲策略最终报告生成器
 ================================
-按 final_report_0818.html 的格式，输出 v10 最优策略（最近周五 + 15% 熔断）的完整报告。
+按 final_report_0818.html 的格式，输出 v10 最优策略（7 天 + 15% 熔断）的完整报告。
 """
 import json
 import os
@@ -54,8 +54,8 @@ def main():
     last = data[-1]
     last_spot = last["spot"]
     latest_date = last["date"]
-    # 最近周五 ATM put
-    near_f = min(last["fridays"], key=lambda f: f["dte"])
+    # 次近周五(7天) ATM put（跳过 dte=0 的当天到期期权）
+    near_f = min([f for f in last["fridays"] if f["dte"] > 0], key=lambda f: abs(f["dte"] - 7))
     near_atm = min(near_f["puts"], key=lambda p: abs(p["strike"] - last_spot))
     near_expiry = near_f["expiry"]
     near_dte = near_f["dte"]
@@ -152,7 +152,7 @@ th:first-child, td:first-child {{ text-align:left; }}
 <h2>策略模型</h2>
 <div class="callout">
 <strong>股票：2026-04-02 买入 100 股 @ $27.76，一直持有到 2026-08-14 @ $57.32，中间不卖出。</strong><br>
-<strong>Put：每次买入「最近周五到期」的 ATM put（dte 1-4 天，周五当天为 dte 7）2 张，真实成交价 vw。</strong><br>
+<strong>Put：每次买入「7 天到期」的 ATM put（次近周五，dte 6-11 天）2 张，真实成交价 vw。</strong><br>
 <strong>熔断：开盘价相对入场价 跌 15% 或 涨 15% 就开盘平仓 + 重买；盘中不触发。</strong>没触发熔断就持有到期，再滚动下一轮。<br>
 <strong>2:1 过度对冲</strong>：2 张 put 覆盖 200 股 vs 持有 100 股，下跌时 put 赔付是股票亏损的 2 倍。<br>
 <strong>基准 = B&H</strong>：收益 <span class="c-red">$+2,956</span>，最大回撤 <span class="c-green">$3,587（44.4%）</span>，收益/回撤比 0.82。
@@ -162,24 +162,24 @@ th:first-child, td:first-child {{ text-align:left; }}
 <div class="card">
 <h2>核心结论</h2>
 <div class="callout-gold">
-<strong>最优组合：最近周五（1-4 天）put + 15% 熔断——这是「不盯盘」前提下的最优策略。</strong>
-收益 <span class="c-red">$+4,192</span>（比 B&H 多赚 <span class="c-red">$+1,236</span>），
-回撤从 44.4% 降到 <span class="c-green">23.0%</span>（降了 <span class="c-red">{mdd_reduce:.1f} 个百分点</span>）。
-收益/回撤比 <strong class="c-gold">2.43</strong>，是 B&H（0.82）的 <strong class="c-gold">3.0 倍</strong>。
+<strong>最优组合：7 天 put + 15% 熔断——这是「不盯盘」前提下的最优策略。</strong>
+收益 <span class="c-red">${best['total']:+,.0f}</span>（比 B&H 多赚 <span class="c-red">${best['total']-bh['total']:+,.0f}</span>），
+回撤从 44.4% 降到 <span class="c-green">{best['mdd_pct']:.1f}%</span>（降了 <span class="c-red">{mdd_reduce:.1f} 个百分点</span>）。
+收益/回撤比 <strong class="c-gold">{best['ratio']:.2f}</strong>，是 B&H（0.82）的 <strong class="c-gold">{best['ratio']/bh_ratio:.1f} 倍</strong>。
 </div>
 <div class="kpis">
-<div class="kpi"><div class="label">B&H 收益</div><div class="value c-red">$+2,956</div><div class="sub">回撤 44.4% · 比 0.82</div></div>
-<div class="kpi"><div class="label">策略收益</div><div class="value c-red">$+4,192</div><div class="sub">最近周五 + 15%</div></div>
-<div class="kpi"><div class="label">策略回撤比例</div><div class="value c-red">23.0%</div><div class="sub">回撤 ${best['mdd']:,.0f}</div></div>
-<div class="kpi"><div class="label">回撤比例降幅</div><div class="value c-red">{mdd_reduce:.1f}%</div><div class="sub">44.4% → 23.0%</div></div>
-<div class="kpi"><div class="label">收益/回撤比</div><div class="value c-gold">2.43</div><div class="sub">B&H 为 0.82</div></div>
-<div class="kpi"><div class="label">股票收益</div><div class="value c-red">$+2,956</div><div class="sub">put 净 {money(best['put_net'])}</div></div>
+<div class="kpi"><div class="label">B&H 收益</div><div class="value c-red">${bh['total']:+,.0f}</div><div class="sub">回撤 {bh['mdd_pct']:.1f}% · 比 {bh_ratio:.2f}</div></div>
+<div class="kpi"><div class="label">策略收益</div><div class="value c-red">${best['total']:+,.0f}</div><div class="sub">7天 + 15%</div></div>
+<div class="kpi"><div class="label">策略回撤比例</div><div class="value c-red">{best['mdd_pct']:.1f}%</div><div class="sub">回撤 ${best['mdd']:,.0f}</div></div>
+<div class="kpi"><div class="label">回撤比例降幅</div><div class="value c-red">{mdd_reduce:.1f}%</div><div class="sub">44.4% → {best['mdd_pct']:.1f}%</div></div>
+<div class="kpi"><div class="label">收益/回撤比</div><div class="value c-gold">{best['ratio']:.2f}</div><div class="sub">B&H 为 {bh_ratio:.2f}</div></div>
+<div class="kpi"><div class="label">股票收益</div><div class="value c-red">${best['stock_pnl']:+,.0f}</div><div class="sub">put 净 {money(best['put_net'])}</div></div>
 </div>
 <p class="note">回撤比例 = 最大回撤 ÷ 峰值净值。收益/回撤比 = 总收益 ÷ 最大回撤，越高越好。</p>
 </div>
 
 <div class="card">
-<h2>策略演进：为什么是 15% 熔断 + 最近周五</h2>
+<h2>策略演进：为什么是 15% 熔断 + 7 天</h2>
 
 <div class="callout">
 <strong>触发价口径对比</strong>——盘中价 vs 开盘价：
@@ -188,10 +188,10 @@ th:first-child, td:first-child {{ text-align:left; }}
 <table>
 <tr><th>触发口径</th><th>盯盘需求</th><th>最优熔断线</th><th>收益</th><th>回撤</th><th>收益/回撤比</th></tr>
 <tr><td>盘中价（high/low）</td><td>需盯盘</td><td>8%</td><td class="c-red">$+3,455</td><td>13.2%</td><td><strong class="c-gold">4.32</strong></td></tr>
-<tr><td>开盘价（open）</td><td>不盯盘</td><td><strong class="c-gold">15%</strong></td><td class="c-red">$+4,192</td><td>23.0%</td><td>2.43</td></tr>
+<tr><td>开盘价（open）</td><td>不盯盘</td><td><strong class="c-gold">15%</strong></td><td class="c-red">$+3,630</td><td>28.5%</td><td>1.91</td></tr>
 </table>
 </div>
-<p class="note">规律：触发信号越迟钝（盘中 → 开盘），最优熔断线越宽（8% → 15%）。盘中熔断捕捉能力更强（比 4.32），开盘熔断不盯盘但能力弱（比 2.43）。</p>
+<p class="note">规律：触发信号越迟钝（盘中 → 开盘），最优熔断线越宽（8% → 15%）。盘中熔断捕捉能力更强（比 4.32），开盘熔断不盯盘但能力弱（比 1.91）。</p>
 
 <h2>为什么是 15% 熔断</h2>
 <ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
@@ -202,24 +202,24 @@ th:first-child, td:first-child {{ text-align:left; }}
 </ul>
 <div class="callout">
 <strong>已验证不对称组合</strong>：跌/涨熔断线独立扫描（跌 10/15/20/25% × 涨 10/15/20/25%），
-<strong class="c-gold">跌 15% + 涨 15%（对称）仍是全局最优（收益/回撤比 2.43）</strong>，任何不对称组合都无法超过它。
-关键在「涨 15%」这一档：涨 10% 太灵敏（比 1.99）、涨 20% 太迟钝（比 2.17），涨 15% 最划算。
+<strong class="c-gold">跌 15% + 涨 15%（对称）仍是全局最优（收益/回撤比 1.91）</strong>，任何不对称组合都无法超过它。
+关键在「涨 15%」这一档：涨 10% 太灵敏（比 1.76）、涨 20% 太迟钝（比 1.85），涨 15% 最划算。
 </div>
 
-<h2>为什么是最近周五（不是 7 天、也不是周一）</h2>
+<h2>为什么是 7 天（不是最近周五、也不是周一）</h2>
 <ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
 <li><strong>数据只有周五到期</strong>：DRAM 期权历史只有周五到期（加 3 个节假日顺延周四），周一/周三到期 8 月才上市、历史数据拉不到，所以周期只能选周五。</li>
-<li><strong>周期越短越划算</strong>：最近周五(1-4天) &gt; 7天 &gt; 14天 &gt; 21天。短周期 put 时间价值少、权利金便宜、滚动快追得准；长周期 put 贵，DRAM 高波动下 theta 衰减 + 高权利金双输。</li>
+<li><strong>7 天最优（次近周五）</strong>：15% 熔断下，7天($3,630) &gt; 最近周五1-4天($3,063) &gt; 14天($2,060) &gt; 21天($1,866)。7 天是平衡点——比长周期便宜、比 1-4 天稳定（避开节假日 dte=0 边界、滚动不过于频繁）。</li>
 </ul>
 
 <div class="callout-gold">
 <strong>更好的策略是「盘中熔断 8%」（收益/回撤比 4.32），但需要盯盘。</strong><br>
-本报告的「开盘价 15%」是 <strong class="c-gold">不盯盘前提下的最优策略</strong>——用每天只看一次开盘，换取放弃盘中捕捉波动的能力（收益/回撤比从 4.32 降到 2.43）。
+本报告的「开盘价 15%」是 <strong class="c-gold">不盯盘前提下的最优策略</strong>——用每天只看一次开盘，换取放弃盘中捕捉波动的能力（收益/回撤比从 4.32 降到 1.91）。
 </div>
 </div>
 
 <div class="card">
-<h2>最优策略逐轮明细：最近周五 + 15% 熔断</h2>
+<h2>最优策略逐轮明细：7 天 + 15% 熔断</h2>
 <p style="font-size:14px;margin-bottom:10px;">共 {best['n_rounds']} 轮（跌熔断 {best['down_hits']} 次 / 涨熔断 {best['up_hits']} 次 / 到期 {best['expiries']} 次）。股票不动收益 {money(best['stock_pnl'])}；put 净 {money(best['put_net'])}。</p>
 <div class="tbl-scroll">
 <table>
@@ -234,14 +234,14 @@ th:first-child, td:first-child {{ text-align:left; }}
 <h2>现在如何买（基于最新期权数据 {latest_date}）</h2>
 <div class="callout-gold">
 最新 DRAM 现价 <strong class="c-gold">${last_spot:.2f}</strong>，最近到期日 <strong>{near_expiry}</strong>（dte {near_dte} 天）。
-按最优策略 <strong class="c-gold">最近周五 + 15% 熔断</strong>，现在应这样操作：
+按最优策略 <strong class="c-gold">7 天 + 15% 熔断</strong>，现在应这样操作：
 </div>
 <ol style="font-size:14px;padding-left:22px;line-height:2.0;">
 <li><strong>持有 100 股 DRAM</strong>（市值 ${last_spot*100:,.0f}），一直持有不动。</li>
 <li><strong>买入 2 张行权价 ${near_strike:.0f} 的 Put</strong>（现价 ${last_spot:.2f} 最接近的平值档），到期日 {near_expiry}。</li>
 <li>该档 Put 成交量加权价 <strong>${near_vw:.2f}/股</strong>，每张 ${near_vw*100:,.2f}，2 张共 <strong class="c-green">-${cost_2:,.0f}</strong>（占持仓 {cost_2/(last_spot*100)*100:.1f}%）。</li>
 <li><strong>熔断线 15%</strong>：开盘价涨到 <strong class="c-red">${up_line:.2f}</strong> 或跌到 <strong class="c-green">${dn_line:.2f}</strong> 就开盘平仓 put + 重买（盘中不盯盘）。</li>
-<li>没触发熔断就持有到 {near_expiry} 到期，再滚动下一轮最近周五 put。</li>
+<li>没触发熔断就持有到 {near_expiry} 到期，再滚动下一轮 7 天 put。</li>
 </ol>
 <div class="tbl-scroll">
 <table>
@@ -259,8 +259,8 @@ th:first-child, td:first-child {{ text-align:left; }}
 <li><strong>多到期日数据</strong>：DRAM_options_3fri.json 每天含 3 个周五到期日（dte 1-4 / 6-11 / 13-21 天），可真实对比不同周期，无需 BS 外推。</li>
 <li><strong>开盘价熔断</strong>：只在美国开盘瞬间判断一次（开盘价 vs 入场价涨跌 15%），盘中 low/high 不触发——符合「不盯盘」的实盘操作。</li>
 <li><strong>回撤口径</strong>：逐日净值 = 股票市值 + 累计 Put 现金流，MDD = 峰值到谷底最大回撤。</li>
-<li><strong>周期越短越划算</strong>：短周期 put 时间价值少、权利金便宜、滚动快追得准；长周期 put 贵，DRAM 高波动下 theta 衰减 + 高权利金双输。</li>
-<li><strong>未计交易摩擦</strong>：短周期（1-4 天）滚动频繁，实盘佣金 + bid-ask 价差会吃掉部分优势，实盘可在「最近周五」和「次近周五」之间权衡。</li>
+<li><strong>7 天最优</strong>：15% 熔断下 7天($3,630) 优于最近周五1-4天($3,063)、14天($2,060)、21天($1,866)。7 天是权利金成本与滚动频率的平衡点。</li>
+<li><strong>未计交易摩擦</strong>：实盘佣金 + bid-ask 价差会吃掉部分优势，周期越短越明显。</li>
 <li><strong>结果依赖这段行情</strong>：DRAM 先涨后暴跌（$27.76 → ~$80 → $44.85），高波动是策略赚钱的前提。仅供研究，不构成投资建议。</li>
 </ul>
 </div>

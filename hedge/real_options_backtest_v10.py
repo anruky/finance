@@ -31,7 +31,11 @@ def load_stock():
 
 
 def pick_friday(day, target=7):
-    return min(day["fridays"], key=lambda f: abs(f["dte"] - target))
+    # 跳过 dte=0 的当天到期期权（节假日顺延会出现，无保护意义）
+    valid = [f for f in day["fridays"] if f["dte"] > 0]
+    if not valid:
+        return min(day["fridays"], key=lambda f: abs(f["dte"] - target))
+    return min(valid, key=lambda f: abs(f["dte"] - target))
 
 
 def atm_put(friday, spot):
