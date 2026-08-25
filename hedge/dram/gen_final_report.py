@@ -68,19 +68,43 @@ def main():
     # 韩股领先关系数据（三星/海力士 vs DRAM 半年归一化对比）
     kr_data = json.load(open(os.path.join(os.path.dirname(__file__), "kr_dram_compare.json")))
 
+    # 股票端点 + 不对称扫描（供模板动态化，避免硬编码死值）
+    meta = dict(
+        entry_date=stock[0][0], entry_price=stock_entry,
+        exit_date=stock[-1][0], exit_price=stock_exit,
+        n_days=len(stock),
+    )
+    all_closes = [closes[r[0]] for r in stock]
+    meta["max_price"] = max(all_closes)
+    meta["min_price"] = min(all_closes)
+    for up in (10, 20):
+        ra = run_v10(day_map, closes, bars, stock, stock_entry, stock_exit, 15, 7, up_pct=up)
+        meta[f"asym{up}_ratio"] = ra["total"] / ra["mdd"] if ra["mdd"] > 0 else 0
+
     generate_html(best, results_sorted, bh, bh_ratio,
                   last_spot, latest_date, near_expiry, near_dte, near_strike, near_vw,
-                  cost_2, up_line, dn_line, kr_data)
+                  cost_2, up_line, dn_line, kr_data, meta)
 
 
 def generate_html(best, results_sorted, bh, bh_ratio, last_spot, latest_date,
-                  near_expiry, near_dte, near_strike, near_vw, cost_2, up_line, dn_line, kr_data):
+                  near_expiry, near_dte, near_strike, near_vw, cost_2, up_line, dn_line, kr_data, meta):
     # 韩股领先关系数据
     kr_dates = json.dumps(kr_data["dates"])
     kr_sam = json.dumps(kr_data["samsung"])
     kr_hyn = json.dumps(kr_data["hynix"])
     kr_dram = json.dumps(kr_data["dram"])
     c = kr_data["corr"]
+
+    # 各周期收益 + 8%/15% 熔断数据（动态，避免硬编码死值）
+    def _r(target, move):
+        return next(x for x in results_sorted if x["target"] == target and x["move"] == move)
+    r_7_15 = _r(7, 15)
+    r_2_15 = _r(2, 15)
+    r_14_15 = _r(14, 15)
+    r_21_15 = _r(21, 15)
+    r_7_8 = _r(7, 8)
+    m8_hits = r_7_8["down_hits"] + r_7_8["up_hits"]
+    m15_hits = best["down_hits"] + best["up_hits"]
     # 最优策略明细
     best_rounds = "\n".join(f"""<tr>
 <td>{rd['entry_date']}</td>
@@ -155,16 +179,16 @@ th:first-child, td:first-child {{ text-align:left; }}
 <body>
 <div class="wrap">
 <h1>DRAM ETF 对冲策略最终报告 <span style="color:var(--muted);font-size:15px;">（周期 × 熔断线 双参数优化 · 开盘价熔断）</span></h1>
-<p class="sub">数据源：DRAM_stock.json（93 交易日）+ DRAM_options_3fri.json（真实 3 周五到期日期权链） · 生成于 {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+<p class="sub">数据源：DRAM_stock.json（{meta['n_days']} 交易日）+ DRAM_options_3fri.json（真实 3 周五到期日期权链） · 生成于 {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
 
 <div class="card">
 <h2>策略模型</h2>
 <div class="callout">
-<strong>股票：2026-04-02 买入 100 股 @ $27.76，一直持有到 2026-08-14 @ $57.32，中间不卖出。</strong><br>
+<strong>股票：{meta['entry_date']} 买入 100 股 @ ${meta['entry_price']:.2f}，一直持有到 {meta['exit_date']} @ ${meta['exit_price']:.2f}，中间不卖出。</strong><br>
 <strong>Put：每次买入「7 天到期」的 ATM put（次近周五，dte 6-11 天）2 张，真实成交价 vw。</strong><br>
 <strong>熔断：开盘价相对入场价 跌 15% 或 涨 15% 就开盘平仓 + 重买；盘中不触发。</strong>没触发熔断就持有到期，再滚动下一轮。<br>
 <strong>2:1 过度对冲</strong>：2 张 put 覆盖 200 股 vs 持有 100 股，下跌时 put 赔付是股票亏损的 2 倍。<br>
-<strong>基准 = B&H</strong>：收益 <span class="c-red">$+2,956</span>，最大回撤 <span class="c-green">$3,587（44.4%）</span>，收益/回撤比 0.82。
+<strong>基准 = B&H</strong>：收益 <span class="c-red">${bh['total']:+,.0f}</span>，最大回撤 <span class="c-green">${bh['mdd']:,.0f}（{bh['mdd_pct']:.1f}%）</span>，收益/回撤比 {bh_ratio:.2f}。
 </div>
 </div>
 
@@ -173,14 +197,14 @@ th:first-child, td:first-child {{ text-align:left; }}
 <div class="callout-gold">
 <strong>最优组合：7 天 put + 15% 熔断——这是「不盯盘」前提下的最优策略。</strong>
 收益 <span class="c-red">${best['total']:+,.0f}</span>（比 B&H 多赚 <span class="c-red">${best['total']-bh['total']:+,.0f}</span>），
-回撤从 44.4% 降到 <span class="c-green">{best['mdd_pct']:.1f}%</span>（降了 <span class="c-red">{mdd_reduce:.1f} 个百分点</span>）。
-收益/回撤比 <strong class="c-gold">{best['ratio']:.2f}</strong>，是 B&H（0.82）的 <strong class="c-gold">{best['ratio']/bh_ratio:.1f} 倍</strong>。
+回撤从 {bh['mdd_pct']:.1f}% 降到 <span class="c-green">{best['mdd_pct']:.1f}%</span>（降了 <span class="c-red">{mdd_reduce:.1f} 个百分点</span>）。
+收益/回撤比 <strong class="c-gold">{best['ratio']:.2f}</strong>，是 B&H（{bh_ratio:.2f}）的 <strong class="c-gold">{best['ratio']/bh_ratio:.1f} 倍</strong>。
 </div>
 <div class="kpis">
 <div class="kpi"><div class="label">B&H 收益</div><div class="value c-red">${bh['total']:+,.0f}</div><div class="sub">回撤 {bh['mdd_pct']:.1f}% · 比 {bh_ratio:.2f}</div></div>
 <div class="kpi"><div class="label">策略收益</div><div class="value c-red">${best['total']:+,.0f}</div><div class="sub">7天 + 15%</div></div>
 <div class="kpi"><div class="label">策略回撤比例</div><div class="value c-red">{best['mdd_pct']:.1f}%</div><div class="sub">回撤 ${best['mdd']:,.0f}</div></div>
-<div class="kpi"><div class="label">回撤比例降幅</div><div class="value c-red">{mdd_reduce:.1f}%</div><div class="sub">44.4% → {best['mdd_pct']:.1f}%</div></div>
+<div class="kpi"><div class="label">回撤比例降幅</div><div class="value c-red">{mdd_reduce:.1f}%</div><div class="sub">{bh['mdd_pct']:.1f}% → {best['mdd_pct']:.1f}%</div></div>
 <div class="kpi"><div class="label">收益/回撤比</div><div class="value c-gold">{best['ratio']:.2f}</div><div class="sub">B&H 为 {bh_ratio:.2f}</div></div>
 <div class="kpi"><div class="label">股票收益</div><div class="value c-red">${best['stock_pnl']:+,.0f}</div><div class="sub">put 净 {money(best['put_net'])}</div></div>
 </div>
@@ -197,33 +221,33 @@ th:first-child, td:first-child {{ text-align:left; }}
 <table>
 <tr><th>触发口径</th><th>盯盘需求</th><th>最优熔断线</th><th>收益</th><th>回撤</th><th>收益/回撤比</th></tr>
 <tr><td>盘中价（high/low）</td><td>需盯盘</td><td>8%</td><td class="c-red">$+3,455</td><td>13.2%</td><td><strong class="c-gold">4.32</strong></td></tr>
-<tr><td>开盘价（open）</td><td>不盯盘</td><td><strong class="c-gold">15%</strong></td><td class="c-red">$+3,630</td><td>28.5%</td><td>1.91</td></tr>
+<tr><td>开盘价（open）</td><td>不盯盘</td><td><strong class="c-gold">15%</strong></td><td class="c-red">${best['total']:+,.0f}</td><td>{best['mdd_pct']:.1f}%</td><td>{best['ratio']:.2f}</td></tr>
 </table>
 </div>
-<p class="note">规律：触发信号越迟钝（盘中 → 开盘），最优熔断线越宽（8% → 15%）。盘中熔断捕捉能力更强（比 4.32），开盘熔断不盯盘但能力弱（比 1.91）。</p>
+<p class="note">规律：触发信号越迟钝（盘中 → 开盘），最优熔断线越宽（8% → 15%）。盘中熔断捕捉能力更强（比 4.32，为早期盘中价口径的历史回测值），开盘熔断不盯盘但能力弱（比 {best['ratio']:.2f}，随数据动态更新）。</p>
 
 <h2>为什么是 15% 熔断</h2>
 <ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
 <li><strong>开盘价只捕捉「跳空」</strong>：盘中 low/high 的波动不触发，只有开盘跳空才触发。</li>
-<li><strong>DRAM 跳空 8% 很常见，且往往是趋势延续</strong>：涨 8% 熔断追高重买，第二天又跳空高开，新 put 又变虚值，反复亏权利金——8% 熔断 23 次、put 净亏 $1,410。</li>
-<li><strong>跳空 15% 才是真正的趋势转折</strong>（见顶/见底），此时熔断重开才划算——15% 只触发 7 次、put 净赚 $674。</li>
+<li><strong>DRAM 跳空 8% 很常见，且往往是趋势延续</strong>：涨 8% 熔断追高重买，第二天又跳空高开，新 put 又变虚值，反复亏权利金——8% 熔断 {m8_hits} 次、put 净亏 ${-r_7_8['put_net']:,.0f}。</li>
+<li><strong>跳空 15% 才是真正的趋势转折</strong>（见顶/见底），此时熔断重开才划算——15% 只触发 {m15_hits} 次、put 净赚 ${best['put_net']:,.0f}。</li>
 <li>所以「不盯盘、只看开盘」的口径下，熔断线必须放宽到 15%，才能过滤掉趋势延续的假信号。</li>
 </ul>
 <div class="callout">
 <strong>已验证不对称组合</strong>：跌/涨熔断线独立扫描（跌 10/15/20/25% × 涨 10/15/20/25%），
-<strong class="c-gold">跌 15% + 涨 15%（对称）仍是全局最优（收益/回撤比 1.91）</strong>，任何不对称组合都无法超过它。
-关键在「涨 15%」这一档：涨 10% 太灵敏（比 1.76）、涨 20% 太迟钝（比 1.85），涨 15% 最划算。
+<strong class="c-gold">跌 15% + 涨 15%（对称）仍是全局最优（收益/回撤比 {best['ratio']:.2f}）</strong>，任何不对称组合都无法超过它。
+关键在「涨 15%」这一档：涨 10% 太灵敏（比 {meta['asym10_ratio']:.2f}）、涨 20% 太迟钝（比 {meta['asym20_ratio']:.2f}），涨 15% 最划算。
 </div>
 
 <h2>为什么是 7 天（不是最近周五、也不是周一）</h2>
 <ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
 <li><strong>数据只有周五到期</strong>：DRAM 期权历史只有周五到期（加 3 个节假日顺延周四），周一/周三到期 8 月才上市、历史数据拉不到，所以周期只能选周五。</li>
-<li><strong>7 天最优（次近周五）</strong>：15% 熔断下，7天($3,630) &gt; 最近周五1-4天($3,063) &gt; 14天($2,060) &gt; 21天($1,866)。7 天是平衡点——比长周期便宜、比 1-4 天稳定（避开节假日 dte=0 边界、滚动不过于频繁）。</li>
+<li><strong>7 天最优（次近周五）</strong>：15% 熔断下，7天(${r_7_15['total']:+,.0f}) &gt; 最近周五1-4天(${r_2_15['total']:+,.0f}) &gt; 14天(${r_14_15['total']:+,.0f}) &gt; 21天(${r_21_15['total']:+,.0f})。7 天是平衡点——比长周期便宜、比 1-4 天稳定（避开节假日 dte=0 边界、滚动不过于频繁）。</li>
 </ul>
 
 <div class="callout-gold">
 <strong>更好的策略是「盘中熔断 8%」（收益/回撤比 4.32），但需要盯盘。</strong><br>
-本报告的「开盘价 15%」是 <strong class="c-gold">不盯盘前提下的最优策略</strong>——用每天只看一次开盘，换取放弃盘中捕捉波动的能力（收益/回撤比从 4.32 降到 1.91）。
+本报告的「开盘价 15%」是 <strong class="c-gold">不盯盘前提下的最优策略</strong>——用每天只看一次开盘，换取放弃盘中捕捉波动的能力（收益/回撤比从 4.32 降到 {best['ratio']:.2f}）。
 </div>
 </div>
 
@@ -290,9 +314,9 @@ th:first-child, td:first-child {{ text-align:left; }}
 <li><strong>多到期日数据</strong>：DRAM_options_3fri.json 每天含 3 个周五到期日（dte 1-4 / 6-11 / 13-21 天），可真实对比不同周期，无需 BS 外推。</li>
 <li><strong>开盘价熔断</strong>：只在美国开盘瞬间判断一次（开盘价 vs 入场价涨跌 15%），盘中 low/high 不触发——符合「不盯盘」的实盘操作。</li>
 <li><strong>回撤口径</strong>：逐日净值 = 股票市值 + 累计 Put 现金流，MDD = 峰值到谷底最大回撤。</li>
-<li><strong>7 天最优</strong>：15% 熔断下 7天($3,630) 优于最近周五1-4天($3,063)、14天($2,060)、21天($1,866)。7 天是权利金成本与滚动频率的平衡点。</li>
+<li><strong>7 天最优</strong>：15% 熔断下 7天(${r_7_15['total']:+,.0f}) 优于最近周五1-4天(${r_2_15['total']:+,.0f})、14天(${r_14_15['total']:+,.0f})、21天(${r_21_15['total']:+,.0f})。7 天是权利金成本与滚动频率的平衡点。</li>
 <li><strong>未计交易摩擦</strong>：实盘佣金 + bid-ask 价差会吃掉部分优势，周期越短越明显。</li>
-<li><strong>结果依赖这段行情</strong>：DRAM 先涨后暴跌（$27.76 → ~$80 → $44.85），高波动是策略赚钱的前提。仅供研究，不构成投资建议。</li>
+<li><strong>结果依赖这段行情</strong>：DRAM 先涨后暴跌（${meta['entry_price']:.2f} → ~${meta['max_price']:.0f} → ${meta['min_price']:.2f}），高波动是策略赚钱的前提。仅供研究，不构成投资建议。</li>
 </ul>
 </div>
 

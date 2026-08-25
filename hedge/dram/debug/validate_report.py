@@ -145,7 +145,7 @@ cc = re.search(r"收益 <span[^>]*>\$\+?([0-9,]+)</span>（比 B&H 多赚 <span[
 cc_strat, cc_putnet = money(cc.group(1)), money(cc.group(2))
 cc2 = re.search(r"降到 <span[^>]*>([0-9.]+)%</span>（降了 <span[^>]*>([0-9.]+) 个百分点</span>）", html)
 cc_mddpct, cc_drop = float(cc2.group(1)), float(cc2.group(2))
-cc3 = re.search(r"收益/回撤比 <strong[^>]*>([0-9.]+)</strong>，是 B&H（0.82）的 <strong[^>]*>([0-9.]+) 倍</strong>", html)
+cc3 = re.search(r"收益/回撤比 <strong[^>]*>([0-9.]+)</strong>，是 B&H（[0-9.]+）的 <strong[^>]*>([0-9.]+) 倍</strong>", html)
 cc_ratio, cc_mult = float(cc3.group(1)), float(cc3.group(2))
 
 # 逐轮
@@ -339,10 +339,13 @@ L.append("## 总览\n")
 s = R["summary"]
 L.append(f"- **A. 动态数字 vs 独立重算**：{s['dynamic']['pass']}/{s['dynamic']['total']} 通过 —— 报告里实时计算的部分与源数据一致 ✅")
 L.append(f"- **B. 报告内部算术**：{s['internal']['pass']}/{s['internal']['total']} 通过 —— KPI 分解自洽 ✅")
-L.append(f"- **C. 硬编码叙述 vs 动态/当前数据**：{s['stale']['fail']} 处不一致 ❌（gen_final_report.py 模板里的“死值”未随数据更新）\n")
-L.append("> ⚠️ **核心结论**：报告被“部分更新”了——KPI、逐轮明细、现在如何买、情景表已用当前 99 日数据重算，")
-L.append("> 但模板里硬编码的叙述（B&H=2956/0.82、出场 57.32/08-14、周期扫描 3630/3063/2060/1866、")
-L.append("> 盘中 4.32、不对称 1.76/1.85/1.91）仍是旧 93 日快照的数字，与动态数字及当前数据互相打架。\n")
+stale_fail = s['stale']['fail']
+if stale_fail == 0:
+    L.append(f"- **C. 硬编码叙述 vs 动态/当前数据**：{stale_fail} 处不一致 ✅（报告已全部动态化，无写死死值）\n")
+    L.append("> ✅ **核心结论**：报告叙述已全部动态化——B&H、周期扫描、开盘行、不对称组合等数字均从回测结果实时计算，与动态 KPI 完全一致，随数据更新自动刷新。\n")
+else:
+    L.append(f"- **C. 硬编码叙述 vs 动态/当前数据**：{stale_fail} 处不一致 ❌（gen_final_report.py 模板里的死值未随数据更新）\n")
+    L.append("> ⚠️ **核心结论**：报告仍存在硬编码死值，叙述数字与动态 KPI 不一致（详见下方 C 类检查表）。\n")
 L.append("---\n")
 
 def dump(cat, title):
@@ -362,17 +365,13 @@ dump("dynamic", "A. 动态数字 vs 独立重算（期望吻合）")
 dump("internal", "B. 报告内部算术（自身印证）")
 dump("stale", "C. 硬编码叙述不一致（核心问题）")
 
-L.append("## 根因与建议\n")
-L.append("1. **根因**：`gen_final_report.py` 的 HTML 模板把若干数字写成字符串常量：")
-L.append("   - 策略模型 callout：`@ $27.76 … 持有到 2026-08-14 @ $57.32`、`B&H 收益 $2,956、回撤 $3,587(44.4%)、比 0.82`；")
-L.append("   - 策略演进：`7天($3,630) > 最近周五($3,063) > 14天($2,060) > 21天($1,866)`、盘中 `4.32`、不对称 `1.76/1.85/1.91`。")
-L.append("   这些常量只在“数据是 93 日、收盘 57.32”时才正确；数据扩展到 99 日后，动态部分变了，死值没变 → 自相矛盾。")
-L.append("2. **巧合正确的部分**：B&H 最大回撤 $3,587（44.4%）在 99 日数据下仍成立（最大回撤发生在早期，未被近期数据改变），")
-L.append("   所以 callout 里的回撤数字反而没出错，只有“收益 2956 / 比 0.82 / 出场 57.32”是错的。")
-L.append("3. **修复建议（不改本报告，供参考）**：把上述死值改为用 `{bh['total']}`、`{bh_ratio:.2f}`、`{stock_exit}`、`{stock[-1][0]}`")
-L.append("   等变量填充，或在生成报告时统一从 `bh` / `best` / `sweep` 取值，避免叙述与数字脱节。重新运行生成器即可消除全部 C 类不一致。")
-L.append("4. **已验证无误的部分**：KPI 分解（2947=2652+295、降幅 15.9、倍率 2.1）、逐轮“总利润=股票+收入+成本”全部 17 行、")
-L.append("   情景微笑曲线（用声明参数 54.28/54/340 重算吻合）、韩股相关性展示值与 `kr_dram_compare.json` 的 corr 一致、半年端点收益均正确。")
+L.append("## 结论\n")
+if stale_fail == 0:
+    L.append("✅ `gen_final_report.py` 模板中的死值已全部改为从 `bh` / `best` / `sweep` / `meta` 动态取值，叙述数字与动态 KPI 完全一致，随数据更新自动刷新。")
+else:
+    L.append("1. **根因**：`gen_final_report.py` 的 HTML 模板把若干数字写成字符串常量，数据更新后动态部分变了、死值没变 → 自相矛盾。")
+    L.append("2. **修复建议**：把死值改为用 `{bh['total']}`、`{bh_ratio:.2f}` 等变量填充，或统一从 `bh` / `best` / `sweep` 取值。重新运行生成器即可消除 C 类不一致。")
+L.append("**其余 A/B 类检查**：KPI 分解（策略收益=股票+put净）、逐轮「总利润=股票+收入+成本」、情景微笑曲线、韩股相关性、半年端点收益均自洽。")
 L.append("")
 L.append("> 注：韩股相关性若用报告显示（已舍入到 1 位）的归一化序列独立重算，会与 json 存储精确值有约 0.02–0.04 偏差")
 L.append("> （显示序列已舍入所致），故以 json 中存储的精确 corr 为准。")

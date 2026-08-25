@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKHY 对冲策略最终报告（涨/跌熔断不对称优化）</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1080px; margin:0 auto; }
+h1 { font-size:26px; margin-bottom:6px; }
+h2 { font-size:19px; margin:32px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:12px; }
+.kpi .value { font-size:22px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:2px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.callout-gold { background:rgba(245,195,68,.08); border:1px solid rgba(245,195,68,.35); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.callout-warn { background:rgba(245,195,68,.06); border:1px solid rgba(245,195,68,.3); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>SKHY 对冲策略最终报告 <span style="color:var(--muted);font-size:15px;">（涨熔断 × 跌熔断 不对称优化 · 开盘价熔断）</span></h1>
+<p class="sub">数据源：SKHY_stock.json（31 交易日）+ SKHY_options_3fri.json（真实 3 周五到期日期权链） · 生成于 2026-08-25 17:35</p>
+
+<div class="card">
+<h2>策略模型</h2>
+<div class="callout">
+<strong>股票：2026-07-13 买入 100 股 @ $152.35，一直持有到 2026-08-24 @ $155.37，中间不卖出。</strong><br>
+<strong>Put：每次买入「最近周五(1-4天)」的 ATM put 2 张，真实成交价 vw。</strong><br>
+<strong>熔断（不对称）</strong>：开盘价相对入场价 <strong class="c-green">跌 15%</strong> 或 <strong class="c-red">涨 8%</strong> 就开盘平仓 + 重买；盘中不触发。没触发就持有到期，再滚动下一轮。<br>
+<strong>2:1 过度对冲</strong>：2 张 put 覆盖 200 股 vs 持有 100 股，下跌时 put 赔付是股票亏损的 2 倍。<br>
+<strong>基准 = B&H</strong>：收益 <span class="c-red">$+302</span>，最大回撤 <span class="c-green">$6,713（34.6%）</span>，收益/回撤比 0.04。
+</div>
+</div>
+
+<div class="card">
+<h2>核心结论</h2>
+<div class="callout-gold">
+<strong>最优组合：最近周五(1-4天) put + 跌 15% / 涨 8% 熔断（不对称）——这是「不盯盘」前提下的最优策略。</strong><br>
+收益 <span class="c-red">$+4,973</span>（比 B&H 多赚 <span class="c-red">$+4,671</span>），
+回撤从 34.6% 降到 <span class="c-green">22.9%</span>（降了 <span class="c-red">11.7 个百分点</span>）。
+收益/回撤比 <strong class="c-gold">1.00</strong>，是 B&H（0.04）的 <strong class="c-gold">22.3 倍</strong>。
+</div>
+<div class="kpis">
+<div class="kpi"><div class="label">B&H 收益</div><div class="value c-red">$+302</div><div class="sub">回撤 34.6% · 比 0.04</div></div>
+<div class="kpi"><div class="label">策略收益</div><div class="value c-red">$+4,973</div><div class="sub">最近周五(1-4天) · 跌15%/涨8%</div></div>
+<div class="kpi"><div class="label">策略回撤比例</div><div class="value c-red">22.9%</div><div class="sub">回撤 $4,957</div></div>
+<div class="kpi"><div class="label">回撤比例降幅</div><div class="value c-red">+11.7%</div><div class="sub">34.6% → 22.9%</div></div>
+<div class="kpi"><div class="label">收益/回撤比</div><div class="value c-gold">1.00</div><div class="sub">B&H 为 0.04</div></div>
+<div class="kpi"><div class="label">股票收益</div><div class="value c-red">$+302</div><div class="sub">put 净 <span class="c-red">$+4,671</span></div></div>
+</div>
+<p class="note">回撤比例 = 最大回撤 ÷ 峰值净值。收益/回撤比 = 总收益 ÷ 最大回撤，越高越好。</p>
+</div>
+
+<div class="card">
+<h2>涨熔断 × 跌熔断 不对称扫描（总收益）</h2>
+<p style="font-size:13px;color:var(--muted);margin-bottom:8px;">周期 = 最近周五(1-4天)（先由对称扫描确定）。★ = 全局最优（收益/回撤比）。行 = 跌熔断，列 = 涨熔断。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>跌\涨</th><th>8%</th><th>10%</th><th>12%</th><th>15%</th><th>18%</th><th>20%</th><th>25%</th></tr>
+<tr><td>8%</td><td class="c-green">$-93</td><td class="c-red">$+820</td><td class="c-red">$+1,148</td><td class="c-green">$-1,166</td><td class="c-green">$-2,291</td><td class="c-green">$-2,291</td><td class="c-green">$-2,472</td></tr><tr><td>10%</td><td class="c-red">$+1,644</td><td class="c-red">$+307</td><td class="c-green">$-1,655</td><td class="c-green">$-1,655</td><td class="c-green">$-2,780</td><td class="c-green">$-2,780</td><td class="c-green">$-2,961</td></tr><tr><td>12%</td><td class="c-red">$+1,644</td><td class="c-red">$+307</td><td class="c-green">$-1,655</td><td class="c-green">$-1,655</td><td class="c-green">$-2,780</td><td class="c-green">$-2,780</td><td class="c-green">$-2,961</td></tr><tr><td>15%</td><td class="c-gold">$+4,973 ★</td><td class="c-red">$+3,637</td><td class="c-red">$+1,675</td><td class="c-red">$+1,675</td><td class="c-red">$+1,675</td><td class="c-red">$+1,675</td><td class="c-green">$-800</td></tr><tr><td>18%</td><td class="c-red">$+526</td><td class="c-green">$-298</td><td class="c-green">$-2,260</td><td class="c-green">$-2,260</td><td class="c-green">$-2,260</td><td class="c-green">$-2,260</td><td class="c-green">$-2,441</td></tr><tr><td>20%</td><td class="c-red">$+526</td><td class="c-green">$-298</td><td class="c-green">$-2,260</td><td class="c-green">$-2,260</td><td class="c-green">$-2,260</td><td class="c-green">$-2,260</td><td class="c-green">$-2,441</td></tr><tr><td>25%</td><td class="c-red">$+526</td><td class="c-green">$-298</td><td class="c-green">$-2,260</td><td class="c-green">$-2,260</td><td class="c-green">$-2,260</td><td class="c-green">$-2,260</td><td class="c-green">$-2,441</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>收益/回撤比 矩阵</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>跌\涨</th><th>8%</th><th>10%</th><th>12%</th><th>15%</th><th>18%</th><th>20%</th><th>25%</th></tr>
+<tr><td>8%</td><td class="">-0.02</td><td class="">0.19</td><td class="">0.27</td><td class="">-0.18</td><td class="">-0.33</td><td class="">-0.33</td><td class="">-0.36</td></tr><tr><td>10%</td><td class="">0.33</td><td class="">0.06</td><td class="">-0.23</td><td class="">-0.23</td><td class="">-0.37</td><td class="">-0.37</td><td class="">-0.40</td></tr><tr><td>12%</td><td class="">0.33</td><td class="">0.06</td><td class="">-0.23</td><td class="">-0.23</td><td class="">-0.37</td><td class="">-0.37</td><td class="">-0.40</td></tr><tr><td>15%</td><td class="c-gold">1.00 ★</td><td class="">0.70</td><td class="">0.22</td><td class="">0.22</td><td class="">0.22</td><td class="">0.22</td><td class="">-0.11</td></tr><tr><td>18%</td><td class="">0.11</td><td class="">-0.05</td><td class="">-0.29</td><td class="">-0.29</td><td class="">-0.29</td><td class="">-0.29</td><td class="">-0.31</td></tr><tr><td>20%</td><td class="">0.11</td><td class="">-0.05</td><td class="">-0.29</td><td class="">-0.29</td><td class="">-0.29</td><td class="">-0.29</td><td class="">-0.31</td></tr><tr><td>25%</td><td class="">0.11</td><td class="">-0.05</td><td class="">-0.29</td><td class="">-0.29</td><td class="">-0.29</td><td class="">-0.29</td><td class="">-0.31</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>为什么是「跌 15% + 涨 8%」</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>涨熔断要更灵敏（8%），不是对称的 15%</strong>：SKHY 是次新股，涨得急、来回波动频繁——涨 8% 就追高，能精准捕捉「涨了又回调」的每一波（如 07-14 涨 8% 追高到 strike 181，07-15 大跌 16% 时高行权价 put 赔付 $3,667）。涨熔断太迟钝（15%）会让 put 停留在旧行权价，回调时保护不足。</li>
+<li><strong>跌熔断 15%</strong>：跌到 15% 才止盈落袋，只捕捉真正的趋势下跌，避免小波动反复付权利金。</li>
+<li><strong>对称 15% 只是 DRAM 的结论</strong>：DRAM 是涨 8% 追高后继续涨、反复亏权利金，所以 DRAM 最优是涨 15%；SKHY 的波动节奏相反（涨了就回调），最优涨熔断是 8%。<strong>两标的最优参数不能通用。</strong></li>
+</ul>
+<div class="callout-warn">
+<strong>⚠️ 过拟合警示</strong>：SKHY 仅 31 个交易日、10 轮交易。最优的「涨 8%」高度依赖「涨了就回调」这个具体节奏（尤其 07-15 那笔 $3,667 赔付）。若未来 SKHY 变成单边慢涨（涨了不回调），8% 追高会频繁亏权利金。这个参数是短数据下的拟合结果，稳定性远低于长周期回测，仅供研究。
+</div>
+</div>
+
+<div class="card">
+<h2>最优策略逐轮明细：跌 15% / 涨 8% 熔断</h2>
+<p style="font-size:14px;margin-bottom:10px;">共 10 轮（跌熔断 2 次 / 涨熔断 5 次 / 到期 3 次）。股票不动收益 <span class="c-red">$+302</span>；put 净 <span class="c-red">$+4,671</span>。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>波动比例</th><th>行权价</th><th>股票涨跌</th><th>put成本</th><th>成本占比</th><th>put收入</th><th>周期总利润</th></tr>
+<tr>
+<td>2026-08-14</td>
+<td>2026-08-21</td>
+<td>到期</td>
+<td>$169.3</td>
+<td>$163.4</td>
+<td class="c-green">-3.5%</td>
+<td>$170</td>
+<td class="c-green">$-591</td>
+<td class="c-green">-$1,751</td>
+<td class="c-green">10.3%</td>
+<td class="c-red">$+1,318</td>
+<td class="c-green">$-1,024</td>
+</tr>
+<tr>
+<td>2026-08-12</td>
+<td>2026-08-14</td>
+<td>上涨再平衡</td>
+<td>$150.7</td>
+<td>$169.3</td>
+<td class="c-red">+12.4%</td>
+<td>$150</td>
+<td class="c-red">$+1,862</td>
+<td class="c-green">-$887</td>
+<td class="c-green">5.9%</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+974</td>
+</tr>
+<tr>
+<td>2026-08-07</td>
+<td>2026-08-12</td>
+<td>上涨再平衡</td>
+<td>$137.9</td>
+<td>$150.7</td>
+<td class="c-red">+9.3%</td>
+<td>$140</td>
+<td class="c-red">$+1,279</td>
+<td class="c-green">-$1,661</td>
+<td class="c-green">12.0%</td>
+<td class="c-red">$+179</td>
+<td class="c-green">$-204</td>
+</tr>
+<tr>
+<td>2026-07-31</td>
+<td>2026-08-07</td>
+<td>到期</td>
+<td>$159.9</td>
+<td>$137.9</td>
+<td class="c-green">-13.7%</td>
+<td>$160</td>
+<td class="c-green">$-2,197</td>
+<td class="c-green">-$2,634</td>
+<td class="c-green">16.5%</td>
+<td class="c-red">$+4,418</td>
+<td class="c-green">$-413</td>
+</tr>
+<tr>
+<td>2026-07-29</td>
+<td>2026-07-31</td>
+<td>上涨再平衡</td>
+<td>$129.9</td>
+<td>$159.9</td>
+<td class="c-red">+23.0%</td>
+<td>$130</td>
+<td class="c-red">$+2,993</td>
+<td class="c-green">-$1,115</td>
+<td class="c-green">8.6%</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+1,877</td>
+</tr>
+<tr>
+<td>2026-07-24</td>
+<td>2026-07-29</td>
+<td>下跌止盈</td>
+<td>$154.6</td>
+<td>$129.9</td>
+<td class="c-green">-15.9%</td>
+<td>$155</td>
+<td class="c-green">$-2,462</td>
+<td class="c-green">-$2,147</td>
+<td class="c-green">13.9%</td>
+<td class="c-red">$+5,010</td>
+<td class="c-red">$+401</td>
+</tr>
+<tr>
+<td>2026-07-23</td>
+<td>2026-07-24</td>
+<td>到期</td>
+<td>$170.7</td>
+<td>$154.6</td>
+<td class="c-green">-9.5%</td>
+<td>$170</td>
+<td class="c-green">$-1,615</td>
+<td class="c-green">-$849</td>
+<td class="c-green">5.0%</td>
+<td class="c-red">$+3,086</td>
+<td class="c-red">$+622</td>
+</tr>
+<tr>
+<td>2026-07-17</td>
+<td>2026-07-23</td>
+<td>上涨再平衡</td>
+<td>$152.1</td>
+<td>$170.7</td>
+<td class="c-red">+12.2%</td>
+<td>$152</td>
+<td class="c-red">$+1,860</td>
+<td class="c-green">-$2,086</td>
+<td class="c-green">13.7%</td>
+<td class="c-red">$+77</td>
+<td class="c-green">$-149</td>
+</tr>
+<tr>
+<td>2026-07-15</td>
+<td>2026-07-17</td>
+<td>下跌止盈</td>
+<td>$181.8</td>
+<td>$152.1</td>
+<td class="c-green">-16.3%</td>
+<td>$180</td>
+<td class="c-green">$-2,970</td>
+<td class="c-green">-$1,911</td>
+<td class="c-green">10.5%</td>
+<td class="c-red">$+5,578</td>
+<td class="c-red">$+697</td>
+</tr>
+<tr>
+<td>2026-07-14</td>
+<td>2026-07-15</td>
+<td>上涨再平衡</td>
+<td>$168.1</td>
+<td>$181.8</td>
+<td class="c-red">+8.1%</td>
+<td>$170</td>
+<td class="c-red">$+1,370</td>
+<td class="c-green">-$1,067</td>
+<td class="c-green">6.3%</td>
+<td class="c-red">$+1,115</td>
+<td class="c-red">$+1,418</td>
+</tr>
+</table>
+</div>
+<p class="note">周期总利润 = 股票涨跌 + put收入 − put成本。倒序排列（最近的交易在最上）。</p>
+</div>
+
+<div class="card">
+<h2>现在如何买（基于最新期权数据 2026-08-24）</h2>
+<div class="callout-gold">
+最新 SKHY 现价 <strong class="c-gold">$155.37</strong>，最近到期日 <strong>2026-08-28</strong>（dte 4 天）。
+按最优策略 <strong class="c-gold">最近周五(1-4天) + 跌 15% / 涨 8%</strong>，现在应这样操作：
+</div>
+<ol style="font-size:14px;padding-left:22px;line-height:2.0;">
+<li><strong>持有 100 股 SKHY</strong>（市值 $15,537），一直持有不动。</li>
+<li><strong>买入 2 张行权价 $155 的 Put</strong>（现价 $155.37 最接近的平值档），到期日 2026-08-28。</li>
+<li>该档 Put 成交量加权价 <strong>$5.36/股</strong>，每张 $536.34，2 张共 <strong class="c-green">-$1,073</strong>（占持仓 6.9%）。</li>
+<li><strong>熔断线（不对称）</strong>：开盘价涨到 <strong class="c-red">$167.80</strong>（涨 8%）或跌到 <strong class="c-green">$132.06</strong>（跌 15%）就开盘平仓 put + 重买（盘中不盯盘）。</li>
+<li>没触发熔断就持有到 2026-08-28 到期，再滚动下一轮 最近周五(1-4天) put。</li>
+</ol>
+<div class="tbl-scroll">
+<table>
+<tr><th>到期日 spot</th><th>涨跌</th><th>股票 P&L</th><th>Put 赔付</th><th>净 P&L</th><th>净收益率</th></tr>
+<tr>
+<td>116.53</td>
+<td>-25%</td>
+<td class="c-green">-3,884</td>
+<td class="c-red">+7,694</td>
+<td class="c-red">+2,738</td>
+<td class="c-red">+17.6%</td>
+</tr>
+<tr>
+<td>124.30</td>
+<td>-20%</td>
+<td class="c-green">-3,107</td>
+<td class="c-red">+6,141</td>
+<td class="c-red">+1,961</td>
+<td class="c-red">+12.6%</td>
+</tr>
+<tr>
+<td>132.06</td>
+<td>-15%</td>
+<td class="c-green">-2,331</td>
+<td class="c-red">+4,587</td>
+<td class="c-red">+1,184</td>
+<td class="c-red">+7.6%</td>
+</tr>
+<tr>
+<td>139.83</td>
+<td>-10%</td>
+<td class="c-green">-1,554</td>
+<td class="c-red">+3,033</td>
+<td class="c-red">+407</td>
+<td class="c-red">+2.6%</td>
+</tr>
+<tr>
+<td>147.60</td>
+<td>-5%</td>
+<td class="c-green">-777</td>
+<td class="c-red">+1,480</td>
+<td class="c-green">-370</td>
+<td class="c-green">-2.4%</td>
+</tr>
+<tr>
+<td>155.37</td>
+<td>+0%</td>
+<td class="c-gray">+0</td>
+<td class="c-gray">+0</td>
+<td class="c-green">-1,073</td>
+<td class="c-green">-6.9%</td>
+</tr>
+<tr>
+<td>163.14</td>
+<td>+5%</td>
+<td class="c-red">+777</td>
+<td class="c-gray">+0</td>
+<td class="c-green">-296</td>
+<td class="c-green">-1.9%</td>
+</tr>
+<tr>
+<td>170.91</td>
+<td>+10%</td>
+<td class="c-red">+1,554</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+481</td>
+<td class="c-red">+3.1%</td>
+</tr>
+<tr>
+<td>178.68</td>
+<td>+15%</td>
+<td class="c-red">+2,331</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+1,258</td>
+<td class="c-red">+8.1%</td>
+</tr>
+<tr>
+<td>186.44</td>
+<td>+20%</td>
+<td class="c-red">+3,107</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+2,035</td>
+<td class="c-red">+13.1%</td>
+</tr>
+</table>
+</div>
+<p class="note">净 P&L = 股票 P&L + Put 赔付 − 保费（2 张 $1,073）。这是「微笑曲线」：<strong>大涨赚（股票）、大跌也赚（2:1 过度对冲）、只有横盘小波动亏保费</strong>。注意：实际涨跌 8%/15% 会触发熔断提前平仓，不会真的持有到期。</p>
+</div>
+
+<div class="card">
+<h2>与 DRAM 同期对比（2026-07-13 ~ 2026-08-24，31 交易日）</h2>
+<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">同一时间窗口（SKHY 上市至今）。SKHY 用其最优参数；DRAM 用原报告策略（7天+15% 对称）<strong>延续滚动</strong>（从 4 月建仓滚到现在，不重新建仓）。资金收益率 = 策略净值变化 ÷ 期初市值（100 股 × 首日收盘价）。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>指标</th><th>SKHY（最优：最近周五(1-4天) 跌15%/涨8%）</th><th>DRAM（7天+15% 对称，延续滚动）</th></tr>
+<tr><td>B&H 资金收益率</td><td class="c-red">+2.0%</td><td class="c-green">-5.3%</td></tr>
+<tr><td>B&H 回撤比例</td><td class="c-green">34.6%</td><td class="c-green">26.8%</td></tr>
+<tr><td><strong>策略资金收益率</strong></td><td class="c-red"><strong>+32.6%</strong></td><td class="c-red">+17.7%</td></tr>
+<tr><td><strong>策略回撤比例</strong></td><td class="c-green"><strong>22.9%</strong></td><td class="c-green">20.5%</td></tr>
+<tr><td><strong>收益/回撤比</strong></td><td class="c-red"><strong>1.00</strong></td><td class="c-red">0.74</td></tr>
+</table>
+</div>
+<div class="callout">
+<strong>同期对比结论</strong>：同样这 31 个交易日里，<strong>DRAM 跌了 -5.3%，SKHY 涨了 +2.0%</strong>。买 put 对冲在两者身上都赚钱，但幅度不同：
+<ul style="font-size:13px;padding-left:20px;line-height:1.9;">
+<li><strong>SKHY 买 put 大赚</strong>：策略收益率 +32.6%（B&H 仅 +2.0%），回撤从 34.6% 降到 22.9%——因为次新股波动极大（一周动辄 ±15%），put 频繁赔付、远超保费。</li>
+<li><strong>DRAM 同期买 put 也赚</strong>：策略收益率 +17.7%（B&H -5.3%），回撤从 26.8% 降到 20.5%——7 月 DRAM 有两波大跌（07-10、07-23 附近），put 赔付超过了保费，把下跌的股票亏损扭转为净赚。</li>
+<li><strong>核心规律</strong>：买 put 对冲的收益，取决于「实际波动 vs 隐含波动」的差。两者这段都正期望，但 SKHY 次新股波动更极端（一周 ±15%），put 赔付幅度更大，所以赚得更多（+32.6% vs +17.7%）。</li>
+</ul>
+</div>
+</div>
+
+<div class="card">
+<h2>数据与结论说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>⚠️ 数据长度限制</strong>：SKHY 于 2026-07-13 在 Nasdaq 上市（ADR），至今仅 31 个交易日（约 6 周）。样本极少，仅 10 轮交易，本报告的参数结论可靠性远低于长周期回测，仅供研究参考。</li>
+<li><strong>真实成交价</strong>：Put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价 + 假设 IV。</li>
+<li><strong>多到期日数据</strong>：SKHY_options_3fri.json 每天含 3 个周五到期日（dte 1-4 / 6-11 / 13-21 天），可真实对比不同周期，无需 BS 外推。</li>
+<li><strong>开盘价熔断</strong>：只在美国开盘瞬间判断一次，盘中 low/high 不触发——符合「不盯盘」的实盘操作。</li>
+<li><strong>回撤口径</strong>：逐日净值 = 股票市值 + 累计 Put 现金流，MDD = 峰值到谷底最大回撤。</li>
+<li><strong>不对称扫描</strong>：涨熔断与跌熔断独立扫描（7×7 组合），发现 SKHY 最优是「跌 15% + 涨 8%」，与 DRAM 的对称 15% 不同——两标的最优参数不能通用。</li>
+<li><strong>未计交易摩擦</strong>：实盘佣金 + bid-ask 价差会吃掉部分优势，周期越短越明显。</li>
+<li><strong>结果依赖这段行情</strong>：SKHY 先涨后暴跌（$152.35 → ~$194 → $126.79），高波动是策略赚钱的前提。仅供研究，不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

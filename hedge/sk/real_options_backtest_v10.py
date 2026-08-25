@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DRAM 对冲策略 v10 —— 周期 × 熔断线 二维对比
+SKHY 对冲策略 v10 —— 周期 × 熔断线 二维对比
 ==================================================
 对比不同 put 周期(最近周五1-4天 / 7天 / 14天 / 21天) × 熔断线(8/10/15/20%)。
 口径: 开盘价熔断(盘中不触发), 2手put(2:1对冲)。
@@ -12,19 +12,19 @@ from collections import defaultdict
 from datetime import datetime
 
 DATA = "/Users/gavinz/git/finance/data"
-OUT_HTML = "/Users/gavinz/git/finance/hedge/dram/dram_v10_backtest_report.html"
+OUT_HTML = "/Users/gavinz/git/finance/hedge/sk/skhy_v10_backtest_report.html"
 
 TARGET_LABELS = {2: "最近周五(1-4天)", 7: "7天(6-11天)", 14: "14天(13-18天)", 21: "21天(20-21天)"}
 MOVES = [8, 10, 15, 20]
 
 
 def load_3fri():
-    data = json.load(open(os.path.join(DATA, "DRAM_options_3fri.json")))
+    data = json.load(open(os.path.join(DATA, "SKHY_options_3fri.json")))
     return data, {d["date"]: d for d in data}
 
 
 def load_stock():
-    stock = json.load(open(os.path.join(DATA, "DRAM_stock.json")))
+    stock = json.load(open(os.path.join(DATA, "SKHY_stock.json")))
     closes = {r[0]: r[4] for r in stock}
     bars = {r[0]: r for r in stock}
     return stock, closes, bars
@@ -253,7 +253,7 @@ def main():
     print(f"\n全局最优(收益/回撤比): {TARGET_LABELS[best['target']]} + 熔断 {best['move']}%")
     print(f"  收益 ${best['total']:+,.0f}, 回撤 {best['mdd_pct']:.1f}%, 比 {best['ratio']:.2f}")
 
-    json.dump({"bh": bh, "results": results}, open("/tmp/dram_v10_results.json", "w"), indent=2, default=str)
+    json.dump({"bh": bh, "results": results}, open("/tmp/skhy_v10_results.json", "w"), indent=2, default=str)
     generate_html(best, bh, results)
 
 
@@ -301,7 +301,7 @@ def generate_html(best, bh, results):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DRAM 对冲 v10 —— 周期 × 熔断线对比</title>
+<title>SKHY 对冲 v10 —— 周期 × 熔断线对比</title>
 <style>
 :root {{ --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
   --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }}
@@ -326,7 +326,7 @@ th:first-child, td:first-child {{ text-align:left; }}
 </head>
 <body>
 <div class="wrap">
-<h1>DRAM 对冲 v10 <span style="color:var(--muted);font-size:15px;">（周期 × 熔断线二维对比）</span></h1>
+<h1>SKHY 对冲 v10 <span style="color:var(--muted);font-size:15px;">（周期 × 熔断线二维对比）</span></h1>
 <p class="sub">开盘价熔断 · 2手put · 生成于 {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
 
 <div class="card">
