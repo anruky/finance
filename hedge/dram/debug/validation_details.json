@@ -1,0 +1,2334 @@
+{
+  "checks": [
+    {
+      "cat": "dynamic",
+      "group": "动态KPI",
+      "name": "B&H收益=重算",
+      "expected": 2652,
+      "got": 2652,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "动态KPI",
+      "name": "策略收益=重算",
+      "expected": 2947,
+      "got": 2947,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "动态KPI",
+      "name": "策略回撤%=重算",
+      "expected": 28.5,
+      "got": 28.5,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "动态KPI",
+      "name": "策略回撤$=重算",
+      "expected": 1901,
+      "got": 1901,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "动态KPI",
+      "name": "收益/回撤比=重算",
+      "expected": 1.55,
+      "got": 1.55,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "动态KPI",
+      "name": "股票收益=重算B&H",
+      "expected": 2652,
+      "got": 2652,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "动态KPI",
+      "name": "B&H比=重算",
+      "expected": 0.74,
+      "got": 0.74,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "动态KPI",
+      "name": "B&H回撤%=重算",
+      "expected": 44.4,
+      "got": 44.4,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "轮数",
+      "name": "总轮数=重算",
+      "expected": 17,
+      "got": 17,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "轮数",
+      "name": "跌+涨+到期=总轮数",
+      "expected": 17,
+      "got": 17,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "轮数",
+      "name": "跌熔断=",
+      "expected": 2,
+      "got": 2,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "轮数",
+      "name": "涨熔断=",
+      "expected": 5,
+      "got": 5,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "轮数",
+      "name": "到期=",
+      "expected": 10,
+      "got": 10,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "现在如何买",
+      "name": "现价=当期spot",
+      "expected": 54.28,
+      "got": 54.28,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "现在如何买",
+      "name": "到期日=",
+      "expected": "2026-08-28",
+      "got": "2026-08-28",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "现在如何买",
+      "name": "dte=",
+      "expected": 4,
+      "got": 4,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "现在如何买",
+      "name": "行权价=当期ATM",
+      "expected": 54.0,
+      "got": 54.0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "现在如何买",
+      "name": "vw=当期",
+      "expected": 1.7,
+      "got": 1.7,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "现在如何买",
+      "name": "保费=vw*200",
+      "expected": 340,
+      "got": 340,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "现在如何买",
+      "name": "涨线=spot*1.15",
+      "expected": 62.42,
+      "got": 62.42,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "现在如何买",
+      "name": "跌线=spot*0.85",
+      "expected": 46.14,
+      "got": 46.14,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "现在如何买",
+      "name": "占比=cost/(spot*100)",
+      "expected": 6.3,
+      "got": 6.3,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行1 总利润=股票+收入+成本",
+      "expected": -344,
+      "got": -344,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行2 总利润=股票+收入+成本",
+      "expected": 169,
+      "got": 169,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行3 总利润=股票+收入+成本",
+      "expected": -487,
+      "got": -487,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行4 总利润=股票+收入+成本",
+      "expected": 179,
+      "got": 179,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行5 总利润=股票+收入+成本",
+      "expected": 369,
+      "got": 369,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行6 总利润=股票+收入+成本",
+      "expected": 654,
+      "got": 654,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行7 总利润=股票+收入+成本",
+      "expected": -311,
+      "got": -311,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行8 总利润=股票+收入+成本",
+      "expected": 551,
+      "got": 551,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行9 总利润=股票+收入+成本",
+      "expected": -438,
+      "got": -438,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行10 总利润=股票+收入+成本",
+      "expected": 423,
+      "got": 424,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行11 总利润=股票+收入+成本",
+      "expected": 472,
+      "got": 472,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行12 总利润=股票+收入+成本",
+      "expected": -331,
+      "got": -331,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行13 总利润=股票+收入+成本",
+      "expected": 595,
+      "got": 595,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行14 总利润=股票+收入+成本",
+      "expected": -300,
+      "got": -300,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行15 总利润=股票+收入+成本",
+      "expected": -86,
+      "got": -86,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行16 总利润=股票+收入+成本",
+      "expected": 774,
+      "got": 774,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮分解",
+      "name": "行17 总利润=股票+收入+成本",
+      "expected": 257,
+      "got": 257,
+      "pass": true,
+      "note": "显示分量各自取整后合可能与一次性取整的总利润差±1（四舍五入）"
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 入场日",
+      "expected": "2026-08-14",
+      "got": "2026-08-14",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 出场日",
+      "expected": "2026-08-21",
+      "got": "2026-08-21",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 入场spot",
+      "expected": 57.3,
+      "got": 57.3,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 出场spot",
+      "expected": 57.7,
+      "got": 57.7,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 行权价",
+      "expected": 57,
+      "got": 57,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 股票涨跌",
+      "expected": 36,
+      "got": 36,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 put成本",
+      "expected": 380,
+      "got": 380,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 put收入",
+      "expected": 0,
+      "got": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行1 周期总利润",
+      "expected": -344,
+      "got": -344,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 入场日",
+      "expected": "2026-08-07",
+      "got": "2026-08-07",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 出场日",
+      "expected": "2026-08-14",
+      "got": "2026-08-14",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 入场spot",
+      "expected": 50.6,
+      "got": 50.6,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 出场spot",
+      "expected": 57.3,
+      "got": 57.3,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 行权价",
+      "expected": 51,
+      "got": 51,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 股票涨跌",
+      "expected": 672,
+      "got": 672,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 put成本",
+      "expected": 503,
+      "got": 503,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 put收入",
+      "expected": 0,
+      "got": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行2 周期总利润",
+      "expected": 169,
+      "got": 169,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 入场日",
+      "expected": "2026-07-28",
+      "got": "2026-07-28",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 出场日",
+      "expected": "2026-08-07",
+      "got": "2026-08-07",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 入场spot",
+      "expected": 48.3,
+      "got": 48.3,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 出场spot",
+      "expected": 50.6,
+      "got": 50.6,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 行权价",
+      "expected": 48,
+      "got": 48,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 股票涨跌",
+      "expected": 234,
+      "got": 234,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 put成本",
+      "expected": 721,
+      "got": 721,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 put收入",
+      "expected": 0,
+      "got": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行3 周期总利润",
+      "expected": -487,
+      "got": -487,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 入场日",
+      "expected": "2026-07-23",
+      "got": "2026-07-23",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 出场日",
+      "expected": "2026-07-28",
+      "got": "2026-07-28",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 方式",
+      "expected": "下跌止盈",
+      "got": "下跌止盈",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 入场spot",
+      "expected": 57.4,
+      "got": 57.4,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 出场spot",
+      "expected": 48.3,
+      "got": 48.3,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 行权价",
+      "expected": 57,
+      "got": 57,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 股票涨跌",
+      "expected": -917,
+      "got": -917,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 put成本",
+      "expected": 651,
+      "got": 651,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 put收入",
+      "expected": 1747,
+      "got": 1747,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行4 周期总利润",
+      "expected": 179,
+      "got": 179,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 入场日",
+      "expected": "2026-07-17",
+      "got": "2026-07-17",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 出场日",
+      "expected": "2026-07-23",
+      "got": "2026-07-23",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 方式",
+      "expected": "上涨再平衡",
+      "got": "上涨再平衡",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 入场spot",
+      "expected": 49.8,
+      "got": 49.8,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 出场spot",
+      "expected": 57.4,
+      "got": 57.4,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 行权价",
+      "expected": 50,
+      "got": 50,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 股票涨跌",
+      "expected": 761,
+      "got": 761,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 put成本",
+      "expected": 407,
+      "got": 407,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 put收入",
+      "expected": 15,
+      "got": 15,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行5 周期总利润",
+      "expected": 369,
+      "got": 369,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 入场日",
+      "expected": "2026-07-10",
+      "got": "2026-07-10",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 出场日",
+      "expected": "2026-07-17",
+      "got": "2026-07-17",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 方式",
+      "expected": "下跌止盈",
+      "got": "下跌止盈",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 入场spot",
+      "expected": 63.0,
+      "got": 63.0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 出场spot",
+      "expected": 49.8,
+      "got": 49.8,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 行权价",
+      "expected": 63,
+      "got": 63,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 股票涨跌",
+      "expected": -1321,
+      "got": -1321,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 put成本",
+      "expected": 659,
+      "got": 659,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 put收入",
+      "expected": 2634,
+      "got": 2634,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行6 周期总利润",
+      "expected": 654,
+      "got": 654,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 入场日",
+      "expected": "2026-07-02",
+      "got": "2026-07-02",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 出场日",
+      "expected": "2026-07-10",
+      "got": "2026-07-10",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 入场spot",
+      "expected": 60.6,
+      "got": 60.6,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 出场spot",
+      "expected": 63.0,
+      "got": 63.0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 行权价",
+      "expected": 61,
+      "got": 61,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 股票涨跌",
+      "expected": 241,
+      "got": 241,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 put成本",
+      "expected": 552,
+      "got": 552,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 put收入",
+      "expected": 0,
+      "got": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行7 周期总利润",
+      "expected": -311,
+      "got": -311,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 入场日",
+      "expected": "2026-06-26",
+      "got": "2026-06-26",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 出场日",
+      "expected": "2026-07-02",
+      "got": "2026-07-02",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 入场spot",
+      "expected": 71.9,
+      "got": 71.9,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 出场spot",
+      "expected": 60.6,
+      "got": 60.6,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 行权价",
+      "expected": 72,
+      "got": 72,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 股票涨跌",
+      "expected": -1125,
+      "got": -1125,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 put成本",
+      "expected": 598,
+      "got": 598,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 put收入",
+      "expected": 2274,
+      "got": 2274,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行8 周期总利润",
+      "expected": 551,
+      "got": 551,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 入场日",
+      "expected": "2026-06-18",
+      "got": "2026-06-18",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 出场日",
+      "expected": "2026-06-26",
+      "got": "2026-06-26",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 入场spot",
+      "expected": 75.2,
+      "got": 75.2,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 出场spot",
+      "expected": 71.9,
+      "got": 71.9,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 行权价",
+      "expected": 75,
+      "got": 75,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 股票涨跌",
+      "expected": -337,
+      "got": -337,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 put成本",
+      "expected": 725,
+      "got": 725,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 put收入",
+      "expected": 624,
+      "got": 624,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行9 周期总利润",
+      "expected": -438,
+      "got": -438,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 入场日",
+      "expected": "2026-06-12",
+      "got": "2026-06-12",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 出场日",
+      "expected": "2026-06-18",
+      "got": "2026-06-18",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 方式",
+      "expected": "上涨再平衡",
+      "got": "上涨再平衡",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 入场spot",
+      "expected": 65.0,
+      "got": 65.0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 出场spot",
+      "expected": 75.2,
+      "got": 75.2,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 行权价",
+      "expected": 65,
+      "got": 65,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 股票涨跌",
+      "expected": 1024,
+      "got": 1024,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 put成本",
+      "expected": 609,
+      "got": 609,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 put收入",
+      "expected": 9,
+      "got": 9,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行10 周期总利润",
+      "expected": 423,
+      "got": 423,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 入场日",
+      "expected": "2026-06-05",
+      "got": "2026-06-05",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 出场日",
+      "expected": "2026-06-12",
+      "got": "2026-06-12",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 入场spot",
+      "expected": 55.8,
+      "got": 55.8,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 出场spot",
+      "expected": 65.0,
+      "got": 65.0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 行权价",
+      "expected": 56,
+      "got": 56,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 股票涨跌",
+      "expected": 922,
+      "got": 922,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 put成本",
+      "expected": 450,
+      "got": 450,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 put收入",
+      "expected": 0,
+      "got": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行11 周期总利润",
+      "expected": 472,
+      "got": 472,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 入场日",
+      "expected": "2026-05-27",
+      "got": "2026-05-27",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 出场日",
+      "expected": "2026-06-05",
+      "got": "2026-06-05",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 入场spot",
+      "expected": 62.4,
+      "got": 62.4,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 出场spot",
+      "expected": 55.8,
+      "got": 55.8,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 行权价",
+      "expected": 62,
+      "got": 62,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 股票涨跌",
+      "expected": -665,
+      "got": -665,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 put成本",
+      "expected": 908,
+      "got": 908,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 put收入",
+      "expected": 1242,
+      "got": 1242,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行12 周期总利润",
+      "expected": -331,
+      "got": -331,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 入场日",
+      "expected": "2026-05-22",
+      "got": "2026-05-22",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 出场日",
+      "expected": "2026-05-27",
+      "got": "2026-05-27",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 方式",
+      "expected": "上涨再平衡",
+      "got": "上涨再平衡",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 入场spot",
+      "expected": 52.8,
+      "got": 52.8,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 出场spot",
+      "expected": 62.4,
+      "got": 62.4,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 行权价",
+      "expected": 53,
+      "got": 53,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 股票涨跌",
+      "expected": 962,
+      "got": 962,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 put成本",
+      "expected": 412,
+      "got": 412,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 put收入",
+      "expected": 45,
+      "got": 45,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行13 周期总利润",
+      "expected": 595,
+      "got": 595,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 入场日",
+      "expected": "2026-05-15",
+      "got": "2026-05-15",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 出场日",
+      "expected": "2026-05-22",
+      "got": "2026-05-22",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 入场spot",
+      "expected": 51.1,
+      "got": 51.1,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 出场spot",
+      "expected": 52.8,
+      "got": 52.8,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 行权价",
+      "expected": 51,
+      "got": 51,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 股票涨跌",
+      "expected": 172,
+      "got": 172,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 put成本",
+      "expected": 472,
+      "got": 472,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 put收入",
+      "expected": 0,
+      "got": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行14 周期总利润",
+      "expected": -300,
+      "got": -300,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 入场日",
+      "expected": "2026-05-11",
+      "got": "2026-05-11",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 出场日",
+      "expected": "2026-05-15",
+      "got": "2026-05-15",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 方式",
+      "expected": "到期",
+      "got": "到期",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 入场spot",
+      "expected": 54.9,
+      "got": 54.9,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 出场spot",
+      "expected": 51.1,
+      "got": 51.1,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 行权价",
+      "expected": 55,
+      "got": 55,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 股票涨跌",
+      "expected": -381,
+      "got": -381,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 put成本",
+      "expected": 485,
+      "got": 485,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 put收入",
+      "expected": 780,
+      "got": 780,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行15 周期总利润",
+      "expected": -86,
+      "got": -86,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 入场日",
+      "expected": "2026-05-05",
+      "got": "2026-05-05",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 出场日",
+      "expected": "2026-05-11",
+      "got": "2026-05-11",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 方式",
+      "expected": "上涨再平衡",
+      "got": "上涨再平衡",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 入场spot",
+      "expected": 44.4,
+      "got": 44.4,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 出场spot",
+      "expected": 54.9,
+      "got": 54.9,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 行权价",
+      "expected": 44,
+      "got": 44,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 股票涨跌",
+      "expected": 1051,
+      "got": 1051,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 put成本",
+      "expected": 277,
+      "got": 277,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 put收入",
+      "expected": 0,
+      "got": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行16 周期总利润",
+      "expected": 774,
+      "got": 774,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 入场日",
+      "expected": "2026-04-07",
+      "got": "2026-04-07",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 出场日",
+      "expected": "2026-04-14",
+      "got": "2026-04-14",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 方式",
+      "expected": "上涨再平衡",
+      "got": "上涨再平衡",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 入场spot",
+      "expected": 29.1,
+      "got": 29.1,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 出场spot",
+      "expected": 34.3,
+      "got": 34.3,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 行权价",
+      "expected": 29,
+      "got": 29,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 股票涨跌",
+      "expected": 524,
+      "got": 524,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 put成本",
+      "expected": 267,
+      "got": 267,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 put收入",
+      "expected": 0,
+      "got": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "逐轮一致性",
+      "name": "行17 周期总利润",
+      "expected": 257,
+      "got": 257,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=40.71 净P&L",
+      "expected": 961,
+      "got": 961,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=40.71 净收益率%",
+      "expected": 17.7,
+      "got": 17.7,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=43.42 净P&L",
+      "expected": 690,
+      "got": 690,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=43.42 净收益率%",
+      "expected": 12.7,
+      "got": 12.7,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=46.14 净P&L",
+      "expected": 418,
+      "got": 418,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=46.14 净收益率%",
+      "expected": 7.7,
+      "got": 7.7,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=48.85 净P&L",
+      "expected": 147,
+      "got": 147,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=48.85 净收益率%",
+      "expected": 2.7,
+      "got": 2.7,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=51.57 净P&L",
+      "expected": -125,
+      "got": -125,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=51.57 净收益率%",
+      "expected": -2.3,
+      "got": -2.3,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=54.28 净P&L",
+      "expected": -340,
+      "got": -340,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=54.28 净收益率%",
+      "expected": -6.3,
+      "got": -6.3,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=56.99 净P&L",
+      "expected": -69,
+      "got": -69,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=56.99 净收益率%",
+      "expected": -1.3,
+      "got": -1.3,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=59.71 净P&L",
+      "expected": 203,
+      "got": 203,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=59.71 净收益率%",
+      "expected": 3.7,
+      "got": 3.7,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=62.42 净P&L",
+      "expected": 474,
+      "got": 474,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=62.42 净收益率%",
+      "expected": 8.7,
+      "got": 8.7,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=65.14 净P&L",
+      "expected": 746,
+      "got": 746,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "情景表",
+      "name": "spot=65.14 净收益率%",
+      "expected": 13.7,
+      "got": 13.7,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "周期扫描",
+      "name": "当前: 最近周五/7/14/21",
+      "expected": "2379/2947/1756/1562",
+      "got": "2379/2947/1756/1562",
+      "pass": true,
+      "note": "当前数据重算的正确值"
+    },
+    {
+      "cat": "dynamic",
+      "group": "不对称",
+      "name": "当前: 跌15+涨10/15/20 比",
+      "expected": "1.43/1.55/1.29",
+      "got": "1.43/1.55/1.29",
+      "pass": true,
+      "note": "当前数据重算的正确值"
+    },
+    {
+      "cat": "dynamic",
+      "group": "韩股端点",
+      "name": "三星收益%=报告标签",
+      "expected": 44,
+      "got": 44,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "韩股端点",
+      "name": "海力士收益%",
+      "expected": 101,
+      "got": 101,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "韩股端点",
+      "name": "DRAM收益%",
+      "expected": 96,
+      "got": 96,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "韩股相关性",
+      "name": "韩股当天 vs DRAM 当天（韩股先动） 三星(报告值=json)",
+      "expected": 0.42,
+      "got": 0.42,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "韩股相关性",
+      "name": "韩股当天 vs DRAM 当天（韩股先动） 海力士(报告值=json)",
+      "expected": 0.45,
+      "got": 0.45,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "韩股相关性",
+      "name": "DRAM 隔夜 vs 韩股次日（美股先动） 三星(报告值=json)",
+      "expected": 0.39,
+      "got": 0.39,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "韩股相关性",
+      "name": "DRAM 隔夜 vs 韩股次日（美股先动） 海力士(报告值=json)",
+      "expected": 0.45,
+      "got": 0.45,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "韩股相关性",
+      "name": "韩股当天 vs DRAM 次日（跨天预测） 三星(报告值=json)",
+      "expected": -0.16,
+      "got": -0.16,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "dynamic",
+      "group": "韩股相关性",
+      "name": "韩股当天 vs DRAM 次日（跨天预测） 海力士(报告值=json)",
+      "expected": -0.21,
+      "got": -0.21,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "internal",
+      "group": "内部",
+      "name": "策略收益=股票+put净",
+      "expected": 2947,
+      "got": 2947,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "internal",
+      "group": "内部",
+      "name": "回撤降幅=44.4-28.5",
+      "expected": 15.9,
+      "got": 15.9,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "internal",
+      "group": "内部",
+      "name": "倍率=1.55/0.74",
+      "expected": 2.1,
+      "got": 2.1,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "internal",
+      "group": "内部",
+      "name": "B&H比=收益/回撤",
+      "expected": 0.74,
+      "got": 0.74,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "internal",
+      "group": "内部",
+      "name": "策略比=收益/回撤$",
+      "expected": 1.55,
+      "got": 1.55,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码B&H",
+      "name": "callout收益2956 vs KPI2652",
+      "expected": 2652,
+      "got": 2956,
+      "pass": false,
+      "note": "gen_final_report.py 模板写死 2956，但动态 KPI 已更新为 2652"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码B&H",
+      "name": "callout比0.82 vs KPI0.74",
+      "expected": 0.74,
+      "got": 0.82,
+      "pass": false,
+      "note": "写死 0.82"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码出场",
+      "name": "callout出场57.32/08-14 vs 当前54.28/08-24",
+      "expected": "54.28/2026-08-24",
+      "got": "57.32/2026-08-14",
+      "pass": false,
+      "note": "写死 57.32/08-14，与当前数据及逐轮表(含08-21)冲突"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码周期扫描",
+      "name": "7天 3630 vs 当前",
+      "expected": 2947,
+      "got": 3630,
+      "pass": false,
+      "note": "写死 3630；当前数据重算为 2947"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码周期扫描",
+      "name": "最近周五 3063 vs 当前",
+      "expected": 2379,
+      "got": 3063,
+      "pass": false,
+      "note": "写死 3063；当前为 2379"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码周期扫描",
+      "name": "14天 2060 vs 当前",
+      "expected": 1756,
+      "got": 2060,
+      "pass": false,
+      "note": "写死 2060；当前为 1756"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码周期扫描",
+      "name": "21天 1866 vs 当前",
+      "expected": 1562,
+      "got": 1866,
+      "pass": false,
+      "note": "写死 1866；当前为 1562"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码开盘行",
+      "name": "开盘行收益3630 vs 当前2947",
+      "expected": 2947,
+      "got": 3630,
+      "pass": false,
+      "note": "写死 3630（开盘行应与动态一致）"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码开盘行",
+      "name": "开盘行比1.91 vs 当前1.55",
+      "expected": 1.55,
+      "got": 1.91,
+      "pass": false,
+      "note": "写死 1.91；当前为 1.55"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码不对称",
+      "name": "涨10%比1.76 vs 当前",
+      "expected": 1.43,
+      "got": 1.76,
+      "pass": false,
+      "note": "写死 1.76；当前为 1.43"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码不对称",
+      "name": "涨20%比1.85 vs 当前",
+      "expected": 1.29,
+      "got": 1.85,
+      "pass": false,
+      "note": "写死 1.85；当前为 1.29"
+    },
+    {
+      "cat": "stale",
+      "group": "硬编码不对称",
+      "name": "对称最优1.91 vs 当前",
+      "expected": 1.55,
+      "got": 1.91,
+      "pass": false,
+      "note": "写死 1.91；当前为 1.55；且当前 15 仍为三者最优"
+    }
+  ],
+  "summary": {
+    "dynamic": {
+      "total": 240,
+      "pass": 240,
+      "fail": 0
+    },
+    "internal": {
+      "total": 5,
+      "pass": 5,
+      "fail": 0
+    },
+    "stale": {
+      "total": 12,
+      "pass": 0,
+      "fail": 12
+    }
+  }
+}

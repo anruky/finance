@@ -10,11 +10,11 @@ from collections import defaultdict
 from datetime import datetime
 
 DATA = "/Users/gavinz/git/finance/data"
-OUT_HTML = "/Users/gavinz/git/finance/hedge/dram_final_report.html"
+OUT_HTML = "/Users/gavinz/git/finance/hedge/dram/dram_final_report.html"
 
 # 复用 v10 的核心逻辑
 exec(open(os.path.join(os.path.dirname(__file__), "real_options_backtest_v10.py")).read().split("def pc(")[0])
-OUT_HTML = "/Users/gavinz/git/finance/hedge/dram_final_report.html"  # 覆盖 exec 引入的 v10 输出路径
+OUT_HTML = "/Users/gavinz/git/finance/hedge/dram/dram_final_report.html"  # 覆盖 exec 引入的 v10 输出路径
 
 TARGET_LABELS = {2: "最近周五(1-4天)", 7: "7天(6-11天)", 14: "14天(13-18天)", 21: "21天(20-21天)"}
 MOVES = [8, 10, 15, 20]
@@ -65,13 +65,22 @@ def main():
     up_line = last_spot * 1.15
     dn_line = last_spot * 0.85
 
+    # 韩股领先关系数据（三星/海力士 vs DRAM 半年归一化对比）
+    kr_data = json.load(open(os.path.join(os.path.dirname(__file__), "kr_dram_compare.json")))
+
     generate_html(best, results_sorted, bh, bh_ratio,
                   last_spot, latest_date, near_expiry, near_dte, near_strike, near_vw,
-                  cost_2, up_line, dn_line)
+                  cost_2, up_line, dn_line, kr_data)
 
 
 def generate_html(best, results_sorted, bh, bh_ratio, last_spot, latest_date,
-                  near_expiry, near_dte, near_strike, near_vw, cost_2, up_line, dn_line):
+                  near_expiry, near_dte, near_strike, near_vw, cost_2, up_line, dn_line, kr_data):
+    # 韩股领先关系数据
+    kr_dates = json.dumps(kr_data["dates"])
+    kr_sam = json.dumps(kr_data["samsung"])
+    kr_hyn = json.dumps(kr_data["hynix"])
+    kr_dram = json.dumps(kr_data["dram"])
+    c = kr_data["corr"]
     # 最优策略明细
     best_rounds = "\n".join(f"""<tr>
 <td>{rd['entry_date']}</td>
@@ -253,6 +262,28 @@ th:first-child, td:first-child {{ text-align:left; }}
 </div>
 
 <div class="card">
+<h2>韩股领先关系：三星 / 海力士 vs DRAM（半年归一化）</h2>
+<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">三星电子、SK海力士（韩国盘）vs DRAM ETF（美股盘），收盘价归一化，起点=100。</p>
+<div style="display:flex;flex-wrap:wrap;gap:18px;margin-bottom:10px;font-size:13px;color:var(--muted);">
+<span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;border-radius:2px;background:#4da3ff;"></span>三星电子 +44%</span>
+<span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;border-radius:2px;background:#f5a05a;"></span>SK海力士 +101%</span>
+<span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;border-radius:2px;background:#26c281;"></span>DRAM ETF +96%</span>
+</div>
+<div style="position:relative;height:340px;">
+<canvas id="krChart" role="img" aria-label="三星电子、SK海力士、DRAM ETF 半年归一化价格平滑曲线对比"></canvas>
+</div>
+<div class="tbl-scroll" style="margin-top:14px;">
+<table>
+<tr><th>领先 / 滞后关系（日涨跌幅相关系数）</th><th>三星</th><th>海力士</th></tr>
+<tr><td>韩股当天 vs DRAM 当天（韩股先动）</td><td class="c-red">0.42</td><td class="c-red">0.45</td></tr>
+<tr><td>DRAM 隔夜 vs 韩股次日（美股先动）</td><td class="c-red">0.39</td><td class="c-red">0.45</td></tr>
+<tr><td>韩股当天 vs DRAM 次日（跨天预测）</td><td class="c-green">-0.16</td><td class="c-green">-0.21</td></tr>
+</table>
+</div>
+<p class="note"><strong>结论</strong>：不是韩股单方面领先，而是<strong>双向传导</strong>——韩股当天先动、DRAM 当天跟随（0.42~0.45），美股隔夜动、韩股次日跟随（0.39~0.45），强度相当。海力士与 DRAM 高度同步（+101% vs +96%），是最佳「当天」先行指标；但韩股当天信息当天就被 DRAM 消化，无法跨天预测。对开盘价熔断策略的启示：每天收盘看海力士/三星涨跌，可提前约 8 小时预判当晚 DRAM 开盘方向。</p>
+</div>
+
+<div class="card">
 <h2>数据与结论说明</h2>
 <ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
 <li><strong>真实成交价</strong>：Put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价 + 假设 IV。</li>
@@ -266,6 +297,25 @@ th:first-child, td:first-child {{ text-align:left; }}
 </div>
 
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+new Chart(document.getElementById('krChart'), {{
+  type: 'line',
+  data: {{ labels: {kr_dates}, datasets: [
+    {{ label: '三星电子', data: {kr_sam}, borderColor: '#4da3ff', backgroundColor: '#4da3ff', borderWidth: 2, pointRadius: 0, tension: 0.4, cubicInterpolationMode: 'monotone', fill: false }},
+    {{ label: 'SK海力士', data: {kr_hyn}, borderColor: '#f5a05a', backgroundColor: '#f5a05a', borderWidth: 2, pointRadius: 0, tension: 0.4, cubicInterpolationMode: 'monotone', fill: false }},
+    {{ label: 'DRAM ETF', data: {kr_dram}, borderColor: '#26c281', backgroundColor: '#26c281', borderWidth: 2, pointRadius: 0, tension: 0.4, cubicInterpolationMode: 'monotone', fill: false, borderDash: [6,4] }}
+  ] }},
+  options: {{
+    responsive: true, maintainAspectRatio: false,
+    plugins: {{ legend: {{ display: false }} }},
+    scales: {{
+      x: {{ ticks: {{ autoSkip: true, maxTicksLimit: 10, font: {{ size: 11 }}, color: '#9aa3b2' }}, grid: {{ display: false }} }},
+      y: {{ title: {{ display: true, text: '归一化（起点=100）', font: {{ size: 11 }}, color: '#9aa3b2' }}, ticks: {{ font: {{ size: 11 }}, color: '#9aa3b2' }}, grid: {{ color: 'rgba(154,163,178,0.15)' }} }}
+    }}
+  }}
+}});
+</script>
 </body>
 </html>"""
     with open(OUT_HTML, "w") as f:

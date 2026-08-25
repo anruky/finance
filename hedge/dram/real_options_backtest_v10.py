@@ -12,7 +12,7 @@ from collections import defaultdict
 from datetime import datetime
 
 DATA = "/Users/gavinz/git/finance/data"
-OUT_HTML = "/Users/gavinz/git/finance/hedge/dram_v10_backtest_report.html"
+OUT_HTML = "/Users/gavinz/git/finance/hedge/dram/dram_v10_backtest_report.html"
 
 TARGET_LABELS = {2: "最近周五(1-4天)", 7: "7天(6-11天)", 14: "14天(13-18天)", 21: "21天(20-21天)"}
 MOVES = [8, 10, 15, 20]

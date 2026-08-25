@@ -26,7 +26,7 @@ DRAM 举例， 长期固定资金成本，一手DRAM 的价格 + 几手DRAM put 
 
 
 ## app
-cd /Users/gavinz/git/finance/hedge && python3 hedge_app.py &
+cd /Users/gavinz/git/finance/dram && python3 hedge_app.py &
 http://localhost:5567
 
 lsof -ti:5567 | xargs kill
