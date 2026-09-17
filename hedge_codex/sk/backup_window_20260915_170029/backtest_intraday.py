@@ -1,0 +1,96 @@
+# -*- coding: utf-8 -*-
+"""10:00 ET combo transactions; decisions use information available at 10:00."""
+from datetime import date
+import math
+from backtest_audited import metrics
+
+def call_ticker(pt):return pt[:-9]+'C'+pt[-8:]
+def positive(v):return isinstance(v,(int,float)) and math.isfinite(v) and v>0
+
+def opening(data,t,dt):
+ b=data['minutes'].get(t,{}).get(dt,{}).get('10:00')
+ return b['o'] if b and b.get('v',0)>0 and positive(b.get('o')) else None
+
+def choose(data,dt,min_volume=10):
+ # Rank before examining execution bars. No substitution using later-day activity.
+ for pt in data['candidates'].get(dt,[]):
+  ct=call_ticker(pt)
+  volumes=[sum(b.get('v',0) for hm,b in data['minutes'].get(t,{}).get(dt,{}).items() if '09:30'<=hm<'10:00') for t in (pt,ct)]
+  if min(volumes)>=min_volume:return pt
+ return None
+
+def run_intraday(data,strategy,initial=22852.50,slip=.02,down=15,up=8,min_volume=10):
+ assert strategy in (1,2)
+ cash=initial;pos=None;curve=[];trades=[];events=[]
+ skips=dict(no_signal=0,no_candidate=0,no_entry_minute=0,no_exit_minute=0,cash=0)
+ flags=dict(expiry_close_fallback=0,missing_eod_marks=0,execution_intrinsic_anomalies=0,eod_intrinsic_anomalies=0,entry_volume_shortfall=0)
+ def buy(p,n):return n*(100*(p+max(.01,p*slip))+.65)
+ def sell(p,n):return n*(100*max(0,p-max(.01,p*slip))-.65)
+ def close_position(dt,S,cp,pp,reason,expiry=False):
+  nonlocal cash,pos
+  if strategy==1:
+   if expiry:
+    ci=1000*cp-(10*(1+S*100*.0005) if cp else 0);pi=1000*pp-(10*(1+S*100*.0005) if pp else 0)
+   else:ci=sell(cp,10);pi=sell(pp,10)
+   si=0
+  else:
+   ci=0;pi=200*pp-(2*(1+S*100*.0005) if pp else 0) if expiry else sell(pp,2)
+   si=100*S*(1-.0005)
+  income=ci+pi+si;cash+=income
+  trades.append(dict(**pos,exit_date=dt,exit_time='16:00 settlement' if expiry else '10:00',exit_spot=S,reason=reason,mark_only=False,
+                     call_income=ci,put_income=pi,stock_income=si,income=income,pnl=income-pos['cost'],call_pnl=ci-pos['call_cost'],put_pnl=pi-pos['put_cost'],stock_pnl=si-pos['stock_cost']))
+  pos=None
+ for dt,so,sh,sl,Sclose,sv in data['stock']:
+  sm=data['stock_minutes'].get(dt,{})
+  signal=sm.get('09:59',{}).get('c');S=sm.get('10:00',{}).get('o')
+  if not positive(signal) or not positive(S):skips['no_signal']+=1
+  else:
+   if pos:
+    reason='到期日10:00滚动' if dt>=pos['expiry'] else '下跌滚动' if signal<=pos['entry_spot']*(1-down/100) else '上涨滚动' if signal>=pos['entry_spot']*(1+up/100) else None
+    if reason:
+     pp=opening(data,pos['put'],dt);cp=opening(data,pos['call'],dt) if strategy==1 else 0
+     if pp is None or cp is None:
+      skips['no_exit_minute']+=1;events.append(dict(date=dt,action='exit_deferred',reason='missing 10:00 leg',put=pos['put']))
+     else:close_position(dt,S,cp,pp,reason)
+   if pos is None:
+    pt=choose(data,dt,min_volume)
+    if pt is None:skips['no_candidate']+=1
+    else:
+     ct=call_ticker(pt);con=data['contracts'][pt];pp=opening(data,pt,dt);cp=opening(data,ct,dt) if strategy==1 else 0
+     if pp is None or cp is None:
+      skips['no_entry_minute']+=1;events.append(dict(date=dt,action='entry_skipped',reason='missing 10:00 leg',put=pt))
+     else:
+      cc=buy(cp,10) if strategy==1 else 0;pc=buy(pp,10 if strategy==1 else 2);sc=100*S*(1+.0005) if strategy==2 else 0;cost=cc+pc+sc
+      if cost>cash+1e-8:
+       skips['cash']+=1;events.append(dict(date=dt,action='entry_skipped',reason='cash',required=cost,available=cash))
+      else:
+       cash-=cost
+       flags['execution_intrinsic_anomalies']+=int(pp+.05<max(con['strike_price']-S,0))+(int(cp+.05<max(S-con['strike_price'],0)) if strategy==1 else 0)
+       qty=10 if strategy==1 else 2
+       flags['entry_volume_shortfall']+=int(data['minutes'][pt][dt]['10:00']['v']<qty)
+       if strategy==1:flags['entry_volume_shortfall']+=int(data['minutes'][ct][dt]['10:00']['v']<10)
+       pos=dict(put=pt,call=ct,strike=con['strike_price'],expiry=con['expiration_date'],entry_date=dt,entry_time='10:00',signal_date=dt,signal_price=signal,entry_spot=S,
+        call_cost=cc,put_cost=pc,stock_cost=sc,cost=cost,pairs=10 if strategy==1 else 0,put_contracts=qty,last_put=pp,last_call=cp)
+   # If any leg is unavailable at 10:00 on expiration, unavoidable settlement is disclosed.
+  if pos and dt>=pos['expiry']:
+   flags['expiry_close_fallback']+=1
+   close_position(dt,Sclose,max(Sclose-pos['strike'],0),max(pos['strike']-Sclose,0),'到期缺10:00行情／收盘结算例外',True)
+  cm=pm=stockmark=0
+  if pos:
+   stockmark=100*Sclose if strategy==2 else 0
+   for leg in (('put','call') if strategy==1 else ('put',)):
+    b=data['daily'].get(pos[leg],{}).get(dt);q=b.get('c') if b else None
+    intrinsic=max(pos['strike']-Sclose,0) if leg=='put' else max(Sclose-pos['strike'],0)
+    if not positive(q):q=max(pos['last_'+leg],intrinsic);flags['missing_eod_marks']+=1
+    else:pos['last_'+leg]=q;flags['eod_intrinsic_anomalies']+=int(q+.05<intrinsic)
+    if leg=='put':pm=q*100*pos['put_contracts']
+    else:cm=q*1000
+  curve.append(dict(date=dt,equity=cash+cm+pm+stockmark,cash=cash,call_value=cm,put_value=pm,stock_value=stockmark))
+ if pos:
+  income=cm+pm+stockmark
+  trades.append(dict(**pos,exit_date=data['stock'][-1][0],exit_time='EOD mark',exit_spot=data['stock'][-1][4],reason='期末持有／收盘市值',mark_only=True,
+    call_income=cm,put_income=pm,stock_income=stockmark,income=income,pnl=income-pos['cost'],call_pnl=cm-pos['call_cost'],put_pnl=pm-pos['put_cost'],stock_pnl=stockmark-pos['stock_cost']))
+ m=metrics(curve,initial);residual=m['pnl']-sum(t['pnl'] for t in trades)
+ assert abs(residual)<1e-6 and min(x['cash'] for x in curve)>-1e-7
+ return dict(name='策略1：10 Call＋10 Put' if strategy==1 else '策略2：100股＋2 Put',strategy=strategy,initial=initial,**m,trades=trades,curve=curve,skipped=skips,flags=flags,events=events,reconciliation=residual,
+  config=dict(down=down,up=up,slip=slip,min_morning_volume=min_volume,decision='09:59 completed minute close at 10:00',execution='10:00 minute first trade per leg',stock_bps=5,commission=.65))

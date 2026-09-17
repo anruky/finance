@@ -1,0 +1,1902 @@
+{
+  "manifest": {
+    "start": "2026-07-13",
+    "end": "2026-09-11",
+    "source": "Polygon/Massive minute aggregates",
+    "fetched_at": "2026-09-15T04:34:23.910268-04:00",
+    "timezone": "America/New_York",
+    "execution_minute": "10:00",
+    "signal_cutoff": "09:59",
+    "n_contracts": 244
+  },
+  "strategy1": {
+    "name": "策略1：10 Call＋10 Put",
+    "strategy": 1,
+    "initial": 22852.5,
+    "pnl": -17289.614999999998,
+    "return_pct": -75.65743354118804,
+    "mdd": 30971.015,
+    "mdd_pct": 84.77336117961673,
+    "pnl_mdd": -0.558251481264014,
+    "worst_day_pct": -60.43434921409385,
+    "trades": [
+      {
+        "put": "O:SKHY260717P00170000",
+        "call": "O:SKHY260717C00170000",
+        "strike": 170,
+        "expiry": "2026-07-17",
+        "entry_date": "2026-07-14",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-14",
+        "signal_price": 170.45,
+        "entry_spot": 170.455,
+        "call_cost": 8554.1,
+        "put_cost": 8064.499999999999,
+        "stock_cost": 0,
+        "cost": 16618.6,
+        "pairs": 10,
+        "put_contracts": 10,
+        "last_put": 17.8,
+        "last_call": 0.62,
+        "exit_date": "2026-07-17",
+        "exit_time": "16:00 settlement",
+        "exit_spot": 154.03,
+        "reason": "到期缺10:00行情／收盘结算例外",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 15882.984999999999,
+        "stock_income": 0,
+        "income": 15882.984999999999,
+        "pnl": -735.6149999999998,
+        "call_pnl": -8554.1,
+        "put_pnl": 7818.485,
+        "stock_pnl": 0
+      },
+      {
+        "put": "O:SKHY260724P00157500",
+        "call": "O:SKHY260724C00157500",
+        "strike": 157.5,
+        "expiry": "2026-07-24",
+        "entry_date": "2026-07-20",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-20",
+        "signal_price": 158.45,
+        "entry_spot": 158.39,
+        "call_cost": 11430.5,
+        "put_cost": 10206.499999999998,
+        "stock_cost": 0,
+        "cost": 21637.0,
+        "pairs": 10,
+        "put_contracts": 10,
+        "last_put": 0.83,
+        "last_call": 12.75,
+        "exit_date": "2026-07-24",
+        "exit_time": "10:00",
+        "exit_spot": 157.6,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 2492.4999999999995,
+        "put_income": 2590.5,
+        "stock_income": 0,
+        "income": 5083.0,
+        "pnl": -16554.0,
+        "call_pnl": -8938.0,
+        "put_pnl": -7615.999999999998,
+        "stock_pnl": 0
+      }
+    ],
+    "curve": [
+      {
+        "date": "2026-07-13",
+        "equity": 22852.5,
+        "cash": 22852.5,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-14",
+        "equity": 36533.9,
+        "cash": 6233.9000000000015,
+        "call_value": 27000,
+        "put_value": 3300.0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-15",
+        "equity": 23353.9,
+        "cash": 6233.9000000000015,
+        "call_value": 11820.0,
+        "put_value": 5300.0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-16",
+        "equity": 24653.9,
+        "cash": 6233.9000000000015,
+        "call_value": 620.0,
+        "put_value": 17800.0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-17",
+        "equity": 22116.885000000002,
+        "cash": 22116.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-20",
+        "equity": 20369.885000000002,
+        "cash": 479.88500000000204,
+        "call_value": 6700.0,
+        "put_value": 13190.0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-21",
+        "equity": 21519.885000000002,
+        "cash": 479.88500000000204,
+        "call_value": 17680.0,
+        "put_value": 3360.0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-22",
+        "equity": 15579.885000000002,
+        "cash": 479.88500000000204,
+        "call_value": 12000,
+        "put_value": 3100.0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-23",
+        "equity": 14059.885000000002,
+        "cash": 479.88500000000204,
+        "call_value": 12750.0,
+        "put_value": 830.0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-24",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-27",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-28",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-29",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-30",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-31",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-03",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-04",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-05",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-06",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-07",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-10",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-11",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-12",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-13",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-14",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-17",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-18",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-19",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-27",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-28",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-31",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-01",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-02",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-03",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-04",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-08",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-09",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-10",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-11",
+        "equity": 5562.885000000002,
+        "cash": 5562.885000000002,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      }
+    ],
+    "skipped": {
+      "no_signal": 0,
+      "no_candidate": 1,
+      "no_entry_minute": 22,
+      "no_exit_minute": 2,
+      "cash": 13
+    },
+    "flags": {
+      "expiry_close_fallback": 1,
+      "missing_eod_marks": 0,
+      "execution_intrinsic_anomalies": 0,
+      "eod_intrinsic_anomalies": 0,
+      "entry_volume_shortfall": 4
+    },
+    "events": [
+      {
+        "date": "2026-07-17",
+        "action": "exit_deferred",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260717P00170000"
+      },
+      {
+        "date": "2026-07-23",
+        "action": "exit_deferred",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260724P00157500"
+      },
+      {
+        "date": "2026-07-24",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260731P00157500"
+      },
+      {
+        "date": "2026-07-27",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 20005.0,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-07-28",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 18169.0,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-07-29",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260731P00132000"
+      },
+      {
+        "date": "2026-07-30",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260731P00142000"
+      },
+      {
+        "date": "2026-07-31",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 21606.4,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-08-03",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260807P00139000"
+      },
+      {
+        "date": "2026-08-04",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260807P00148000"
+      },
+      {
+        "date": "2026-08-05",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260807P00155000"
+      },
+      {
+        "date": "2026-08-06",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 8927.8,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-08-07",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260814P00137000"
+      },
+      {
+        "date": "2026-08-10",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260814P00136000"
+      },
+      {
+        "date": "2026-08-11",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260814P00139000"
+      },
+      {
+        "date": "2026-08-12",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 9295.0,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-08-13",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260814P00160000"
+      },
+      {
+        "date": "2026-08-14",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260821P00167500"
+      },
+      {
+        "date": "2026-08-17",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 13783.0,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-08-18",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260821P00162500"
+      },
+      {
+        "date": "2026-08-19",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 8784.999999999998,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-08-20",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260821P00162500"
+      },
+      {
+        "date": "2026-08-21",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260828P00165000"
+      },
+      {
+        "date": "2026-08-24",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260828P00152500"
+      },
+      {
+        "date": "2026-08-25",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260828P00157500"
+      },
+      {
+        "date": "2026-08-26",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260828P00160000"
+      },
+      {
+        "date": "2026-08-27",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 5878.0,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-08-28",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260904P00160000"
+      },
+      {
+        "date": "2026-08-31",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 9805.0,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-09-01",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260904P00160000"
+      },
+      {
+        "date": "2026-09-02",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260904P00160000"
+      },
+      {
+        "date": "2026-09-03",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260904P00160000"
+      },
+      {
+        "date": "2026-09-04",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 10814.8,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-09-08",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 11732.8,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-09-09",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 10396.599999999999,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-09-10",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 7000.0,
+        "available": 5562.885000000002
+      },
+      {
+        "date": "2026-09-11",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260918P00190000"
+      }
+    ],
+    "reconciliation": 0.0,
+    "config": {
+      "down": 15,
+      "up": 8,
+      "slip": 0.02,
+      "min_morning_volume": 10,
+      "decision": "09:59 completed minute close at 10:00",
+      "execution": "10:00 minute first trade per leg",
+      "stock_bps": 5,
+      "commission": 0.65
+    }
+  },
+  "strategy2": {
+    "name": "策略2：100股＋2 Put",
+    "strategy": 2,
+    "initial": 22852.5,
+    "pnl": -5423.707374999991,
+    "return_pct": -23.733540641067677,
+    "mdd": 7287.985124999992,
+    "mdd_pct": 30.068950579621124,
+    "pnl_mdd": -0.7441984693952016,
+    "worst_day_pct": -7.583313635940625,
+    "trades": [
+      {
+        "put": "O:SKHY260717P00170000",
+        "call": "O:SKHY260717C00170000",
+        "strike": 170,
+        "expiry": "2026-07-17",
+        "entry_date": "2026-07-14",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-14",
+        "signal_price": 170.45,
+        "entry_spot": 170.455,
+        "call_cost": 0,
+        "put_cost": 1612.8999999999999,
+        "stock_cost": 17054.02275,
+        "cost": 18666.92275,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 17.8,
+        "last_call": 0,
+        "exit_date": "2026-07-17",
+        "exit_time": "10:00",
+        "exit_spot": 157.05,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 2605.5,
+        "stock_income": 15697.147500000003,
+        "income": 18302.647500000003,
+        "pnl": -364.2752499999988,
+        "call_pnl": 0,
+        "put_pnl": 992.6000000000001,
+        "stock_pnl": -1356.8752499999973
+      },
+      {
+        "put": "O:SKHY260724P00155000",
+        "call": "O:SKHY260724C00155000",
+        "strike": 155,
+        "expiry": "2026-07-24",
+        "entry_date": "2026-07-17",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-17",
+        "signal_price": 157.165,
+        "entry_spot": 157.05,
+        "call_cost": 0,
+        "put_cost": 2261.6200000000003,
+        "stock_cost": 15712.8525,
+        "cost": 17974.4725,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 0.55,
+        "last_call": 0,
+        "exit_date": "2026-07-24",
+        "exit_time": "10:00",
+        "exit_spot": 157.6,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 294.65999999999997,
+        "stock_income": 15752.12,
+        "income": 16046.78,
+        "pnl": -1927.6924999999992,
+        "call_pnl": 0,
+        "put_pnl": -1966.9600000000005,
+        "stock_pnl": 39.26749999999993
+      },
+      {
+        "put": "O:SKHY260731P00150000",
+        "call": "O:SKHY260731C00150000",
+        "strike": 150,
+        "expiry": "2026-07-31",
+        "entry_date": "2026-07-27",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-27",
+        "signal_price": 149.74,
+        "entry_spot": 149.79,
+        "call_cost": 0,
+        "put_cost": 2020.9,
+        "stock_cost": 14986.4895,
+        "cost": 17007.3895,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 5.29,
+        "last_call": 0,
+        "exit_date": "2026-07-31",
+        "exit_time": "10:00",
+        "exit_spot": 150.5,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 606.3000000000001,
+        "stock_income": 15042.475,
+        "income": 15648.775,
+        "pnl": -1358.6145000000015,
+        "call_pnl": 0,
+        "put_pnl": -1414.6,
+        "stock_pnl": 55.985500000000684
+      },
+      {
+        "put": "O:SKHY260807P00150000",
+        "call": "O:SKHY260807C00150000",
+        "strike": 150,
+        "expiry": "2026-08-07",
+        "entry_date": "2026-07-31",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-31",
+        "signal_price": 150.54,
+        "entry_spot": 150.5,
+        "call_cost": 0,
+        "put_cost": 2075.98,
+        "stock_cost": 15057.525,
+        "cost": 17133.505,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 7.21,
+        "last_call": 0,
+        "exit_date": "2026-08-07",
+        "exit_time": "16:00 settlement",
+        "exit_spot": 137.91,
+        "reason": "到期缺10:00行情／收盘结算例外",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 2402.2090000000007,
+        "stock_income": 13784.104500000001,
+        "income": 16186.313500000002,
+        "pnl": -947.191499999999,
+        "call_pnl": 0,
+        "put_pnl": 326.2290000000007,
+        "stock_pnl": -1273.4204999999984
+      },
+      {
+        "put": "O:SKHY260814P00152500",
+        "call": "O:SKHY260814C00152500",
+        "strike": 152.5,
+        "expiry": "2026-08-14",
+        "entry_date": "2026-08-12",
+        "entry_time": "10:00",
+        "signal_date": "2026-08-12",
+        "signal_price": 152.8901,
+        "entry_spot": 152.935,
+        "call_cost": 0,
+        "put_cost": 878.5,
+        "stock_cost": 15301.14675,
+        "cost": 16179.64675,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 0.15,
+        "last_call": 0,
+        "exit_date": "2026-08-14",
+        "exit_time": "16:00 settlement",
+        "exit_spot": 166.33,
+        "reason": "到期缺10:00行情／收盘结算例外",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 0,
+        "stock_income": 16624.6835,
+        "income": 16624.6835,
+        "pnl": 445.0367499999993,
+        "call_pnl": 0,
+        "put_pnl": -878.5,
+        "stock_pnl": 1323.5367499999993
+      },
+      {
+        "put": "O:SKHY260821P00172500",
+        "call": "O:SKHY260821C00172500",
+        "strike": 172.5,
+        "expiry": "2026-08-21",
+        "entry_date": "2026-08-17",
+        "entry_time": "10:00",
+        "signal_date": "2026-08-17",
+        "signal_price": 173.71,
+        "entry_spot": 173.74,
+        "call_cost": 0,
+        "put_cost": 1225.3,
+        "stock_cost": 17382.686999999998,
+        "cost": 18607.986999999997,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 11,
+        "last_call": 0,
+        "exit_date": "2026-08-21",
+        "exit_time": "16:00 settlement",
+        "exit_spot": 163.41,
+        "reason": "到期缺10:00行情／收盘结算例外",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 1799.6590000000008,
+        "stock_income": 16332.829500000002,
+        "income": 18132.488500000003,
+        "pnl": -475.49849999999424,
+        "call_pnl": 0,
+        "put_pnl": 574.3590000000008,
+        "stock_pnl": -1049.8574999999964
+      },
+      {
+        "put": "O:SKHY260828P00157500",
+        "call": "O:SKHY260828C00157500",
+        "strike": 157.5,
+        "expiry": "2026-08-28",
+        "entry_date": "2026-08-25",
+        "entry_time": "10:00",
+        "signal_date": "2026-08-25",
+        "signal_price": 157.9551,
+        "entry_spot": 158.0275,
+        "call_cost": 0,
+        "put_cost": 1000.9,
+        "stock_cost": 15810.651375,
+        "cost": 16811.551375,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 0.78,
+        "last_call": 0,
+        "exit_date": "2026-08-28",
+        "exit_time": "10:00",
+        "exit_spot": 161.21,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 68.7,
+        "stock_income": 16112.9395,
+        "income": 16181.639500000001,
+        "pnl": -629.911874999998,
+        "call_pnl": 0,
+        "put_pnl": -932.1999999999999,
+        "stock_pnl": 302.28812500000095
+      },
+      {
+        "put": "O:SKHY260904P00160000",
+        "call": "O:SKHY260904C00160000",
+        "strike": 160,
+        "expiry": "2026-09-04",
+        "entry_date": "2026-08-28",
+        "entry_time": "10:00",
+        "signal_date": "2026-08-28",
+        "signal_price": 161.1,
+        "entry_spot": 161.21,
+        "call_cost": 0,
+        "put_cost": 1041.7,
+        "stock_cost": 16129.0605,
+        "cost": 17170.7605,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 0.79,
+        "last_call": 0,
+        "exit_date": "2026-09-04",
+        "exit_time": "10:00",
+        "exit_spot": 169.99,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 14.7,
+        "stock_income": 16990.500500000002,
+        "income": 17005.200500000003,
+        "pnl": -165.55999999999767,
+        "call_pnl": 0,
+        "put_pnl": -1027.0,
+        "stock_pnl": 861.4400000000023
+      }
+    ],
+    "curve": [
+      {
+        "date": "2026-07-13",
+        "equity": 22852.5,
+        "cash": 22852.5,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-14",
+        "equity": 24237.57725,
+        "cash": 4185.5772499999985,
+        "call_value": 0,
+        "put_value": 660.0,
+        "stock_value": 19392.0
+      },
+      {
+        "date": "2026-07-15",
+        "equity": 22891.57725,
+        "cash": 4185.5772499999985,
+        "call_value": 0,
+        "put_value": 1060.0,
+        "stock_value": 17646.0
+      },
+      {
+        "date": "2026-07-16",
+        "equity": 22976.57725,
+        "cash": 4185.5772499999985,
+        "call_value": 0,
+        "put_value": 3560.0,
+        "stock_value": 15231.0
+      },
+      {
+        "date": "2026-07-17",
+        "equity": 22376.75225,
+        "cash": 4513.752250000001,
+        "call_value": 0,
+        "put_value": 2460.0,
+        "stock_value": 15403.0
+      },
+      {
+        "date": "2026-07-20",
+        "equity": 21947.75225,
+        "cash": 4513.752250000001,
+        "call_value": 0,
+        "put_value": 2318.0,
+        "stock_value": 15116.0
+      },
+      {
+        "date": "2026-07-21",
+        "equity": 22283.75225,
+        "cash": 4513.752250000001,
+        "call_value": 0,
+        "put_value": 576.0,
+        "stock_value": 17194.0
+      },
+      {
+        "date": "2026-07-22",
+        "equity": 21534.75225,
+        "cash": 4513.752250000001,
+        "call_value": 0,
+        "put_value": 494.00000000000006,
+        "stock_value": 16527.0
+      },
+      {
+        "date": "2026-07-23",
+        "equity": 21573.75225,
+        "cash": 4513.752250000001,
+        "call_value": 0,
+        "put_value": 110.00000000000001,
+        "stock_value": 16950.0
+      },
+      {
+        "date": "2026-07-24",
+        "equity": 20560.532250000004,
+        "cash": 20560.532250000004,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-07-27",
+        "equity": 20587.142750000006,
+        "cash": 3553.1427500000027,
+        "call_value": 0,
+        "put_value": 2732.0,
+        "stock_value": 14302.000000000002
+      },
+      {
+        "date": "2026-07-28",
+        "equity": 21044.14275,
+        "cash": 3553.1427500000027,
+        "call_value": 0,
+        "put_value": 4474.0,
+        "stock_value": 13016.999999999998
+      },
+      {
+        "date": "2026-07-29",
+        "equity": 21112.142750000003,
+        "cash": 3553.1427500000027,
+        "call_value": 0,
+        "put_value": 4880.0,
+        "stock_value": 12679.0
+      },
+      {
+        "date": "2026-07-30",
+        "equity": 19511.142750000003,
+        "cash": 3553.1427500000027,
+        "call_value": 0,
+        "put_value": 1058.0,
+        "stock_value": 14900
+      },
+      {
+        "date": "2026-07-31",
+        "equity": 19111.412749999996,
+        "cash": 2068.4127499999995,
+        "call_value": 0,
+        "put_value": 2670.0,
+        "stock_value": 14372.999999999998
+      },
+      {
+        "date": "2026-08-03",
+        "equity": 18940.41275,
+        "cash": 2068.4127499999995,
+        "call_value": 0,
+        "put_value": 2600,
+        "stock_value": 14272.0
+      },
+      {
+        "date": "2026-08-04",
+        "equity": 18766.41275,
+        "cash": 2068.4127499999995,
+        "call_value": 0,
+        "put_value": 1260.0,
+        "stock_value": 15438.0
+      },
+      {
+        "date": "2026-08-05",
+        "equity": 18251.41275,
+        "cash": 2068.4127499999995,
+        "call_value": 0,
+        "put_value": 1080.0,
+        "stock_value": 15103.0
+      },
+      {
+        "date": "2026-08-06",
+        "equity": 17863.41275,
+        "cash": 2068.4127499999995,
+        "call_value": 0,
+        "put_value": 1442.0,
+        "stock_value": 14353.0
+      },
+      {
+        "date": "2026-08-07",
+        "equity": 18254.72625,
+        "cash": 18254.72625,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-10",
+        "equity": 18254.72625,
+        "cash": 18254.72625,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-11",
+        "equity": 18254.72625,
+        "cash": 18254.72625,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-12",
+        "equity": 18136.0795,
+        "cash": 2075.0795,
+        "call_value": 0,
+        "put_value": 620.0,
+        "stock_value": 15441.0
+      },
+      {
+        "date": "2026-08-13",
+        "equity": 18672.0795,
+        "cash": 2075.0795,
+        "call_value": 0,
+        "put_value": 30.0,
+        "stock_value": 16567.0
+      },
+      {
+        "date": "2026-08-14",
+        "equity": 18699.763,
+        "cash": 18699.763,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-17",
+        "equity": 18629.776,
+        "cash": 91.77600000000166,
+        "call_value": 0,
+        "put_value": 1400,
+        "stock_value": 17138.0
+      },
+      {
+        "date": "2026-08-18",
+        "equity": 19053.776,
+        "cash": 91.77600000000166,
+        "call_value": 0,
+        "put_value": 3400,
+        "stock_value": 15562.0
+      },
+      {
+        "date": "2026-08-19",
+        "equity": 18587.776,
+        "cash": 91.77600000000166,
+        "call_value": 0,
+        "put_value": 2880.0,
+        "stock_value": 15616.0
+      },
+      {
+        "date": "2026-08-20",
+        "equity": 18599.776000000005,
+        "cash": 91.77600000000166,
+        "call_value": 0,
+        "put_value": 2200,
+        "stock_value": 16308.000000000002
+      },
+      {
+        "date": "2026-08-21",
+        "equity": 18224.264500000005,
+        "cash": 18224.264500000005,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "equity": 18224.264500000005,
+        "cash": 18224.264500000005,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "equity": 18083.713125000006,
+        "cash": 1412.7131250000057,
+        "call_value": 0,
+        "put_value": 718.0,
+        "stock_value": 15953.0
+      },
+      {
+        "date": "2026-08-26",
+        "equity": 17954.71312500001,
+        "cash": 1412.7131250000057,
+        "call_value": 0,
+        "put_value": 740.0,
+        "stock_value": 15802.000000000002
+      },
+      {
+        "date": "2026-08-27",
+        "equity": 17729.71312500001,
+        "cash": 1412.7131250000057,
+        "call_value": 0,
+        "put_value": 156.0,
+        "stock_value": 16161.000000000002
+      },
+      {
+        "date": "2026-08-28",
+        "equity": 17455.592125000006,
+        "cash": 423.5921250000065,
+        "call_value": 0,
+        "put_value": 927.9999999999999,
+        "stock_value": 16104.0
+      },
+      {
+        "date": "2026-08-31",
+        "equity": 17411.592125000006,
+        "cash": 423.5921250000065,
+        "call_value": 0,
+        "put_value": 530.0,
+        "stock_value": 16458.0
+      },
+      {
+        "date": "2026-09-01",
+        "equity": 17191.592125000006,
+        "cash": 423.5921250000065,
+        "call_value": 0,
+        "put_value": 690.0,
+        "stock_value": 16078.0
+      },
+      {
+        "date": "2026-09-02",
+        "equity": 17179.592125000006,
+        "cash": 423.5921250000065,
+        "call_value": 0,
+        "put_value": 258.0,
+        "stock_value": 16498.0
+      },
+      {
+        "date": "2026-09-03",
+        "equity": 16949.592125000006,
+        "cash": 423.5921250000065,
+        "call_value": 0,
+        "put_value": 158.0,
+        "stock_value": 16368.0
+      },
+      {
+        "date": "2026-09-04",
+        "equity": 17428.79262500001,
+        "cash": 17428.79262500001,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-08",
+        "equity": 17428.79262500001,
+        "cash": 17428.79262500001,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-09",
+        "equity": 17428.79262500001,
+        "cash": 17428.79262500001,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-10",
+        "equity": 17428.79262500001,
+        "cash": 17428.79262500001,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      },
+      {
+        "date": "2026-09-11",
+        "equity": 17428.79262500001,
+        "cash": 17428.79262500001,
+        "call_value": 0,
+        "put_value": 0,
+        "stock_value": 0
+      }
+    ],
+    "skipped": {
+      "no_signal": 0,
+      "no_candidate": 1,
+      "no_entry_minute": 5,
+      "no_exit_minute": 4,
+      "cash": 4
+    },
+    "flags": {
+      "expiry_close_fallback": 3,
+      "missing_eod_marks": 0,
+      "execution_intrinsic_anomalies": 0,
+      "eod_intrinsic_anomalies": 1,
+      "entry_volume_shortfall": 3
+    },
+    "events": [
+      {
+        "date": "2026-07-23",
+        "action": "exit_deferred",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260724P00155000"
+      },
+      {
+        "date": "2026-07-24",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260731P00157500"
+      },
+      {
+        "date": "2026-08-07",
+        "action": "exit_deferred",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260807P00150000"
+      },
+      {
+        "date": "2026-08-10",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260814P00136000"
+      },
+      {
+        "date": "2026-08-11",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260814P00139000"
+      },
+      {
+        "date": "2026-08-14",
+        "action": "exit_deferred",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260814P00152500"
+      },
+      {
+        "date": "2026-08-21",
+        "action": "exit_deferred",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260821P00172500"
+      },
+      {
+        "date": "2026-08-24",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260828P00152500"
+      },
+      {
+        "date": "2026-09-04",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 18100.1995,
+        "available": 17428.79262500001
+      },
+      {
+        "date": "2026-09-08",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 19928.8675,
+        "available": 17428.79262500001
+      },
+      {
+        "date": "2026-09-09",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 20546.6155,
+        "available": 17428.79262500001
+      },
+      {
+        "date": "2026-09-10",
+        "action": "entry_skipped",
+        "reason": "cash",
+        "required": 19441.083505000002,
+        "available": 17428.79262500001
+      },
+      {
+        "date": "2026-09-11",
+        "action": "entry_skipped",
+        "reason": "missing 10:00 leg",
+        "put": "O:SKHY260918P00190000"
+      }
+    ],
+    "reconciliation": -1.8189894035458565e-12,
+    "config": {
+      "down": 15,
+      "up": 8,
+      "slip": 0.02,
+      "min_morning_volume": 10,
+      "decision": "09:59 completed minute close at 10:00",
+      "execution": "10:00 minute first trade per leg",
+      "stock_bps": 5,
+      "commission": 0.65
+    }
+  },
+  "rounds": [
+    {
+      "entry": "2026-07-14",
+      "exit": "2026-07-17",
+      "put": "O:SKHY260717P00170000",
+      "strike": 170,
+      "expiry": "2026-07-17",
+      "matched": false,
+      "strategy1": null,
+      "strategy2": {
+        "put": "O:SKHY260717P00170000",
+        "call": "O:SKHY260717C00170000",
+        "strike": 170,
+        "expiry": "2026-07-17",
+        "entry_date": "2026-07-14",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-14",
+        "signal_price": 170.45,
+        "entry_spot": 170.455,
+        "call_cost": 0,
+        "put_cost": 1612.8999999999999,
+        "stock_cost": 17054.02275,
+        "cost": 18666.92275,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 17.8,
+        "last_call": 0,
+        "exit_date": "2026-07-17",
+        "exit_time": "10:00",
+        "exit_spot": 157.05,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 2605.5,
+        "stock_income": 15697.147500000003,
+        "income": 18302.647500000003,
+        "pnl": -364.2752499999988,
+        "call_pnl": 0,
+        "put_pnl": 992.6000000000001,
+        "stock_pnl": -1356.8752499999973
+      },
+      "s1_unit_cost": null,
+      "s1_unit_pnl": null,
+      "difference": null
+    },
+    {
+      "entry": "2026-07-14",
+      "exit": "2026-07-17",
+      "put": "O:SKHY260717P00170000",
+      "strike": 170,
+      "expiry": "2026-07-17",
+      "matched": false,
+      "strategy1": {
+        "put": "O:SKHY260717P00170000",
+        "call": "O:SKHY260717C00170000",
+        "strike": 170,
+        "expiry": "2026-07-17",
+        "entry_date": "2026-07-14",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-14",
+        "signal_price": 170.45,
+        "entry_spot": 170.455,
+        "call_cost": 8554.1,
+        "put_cost": 8064.499999999999,
+        "stock_cost": 0,
+        "cost": 16618.6,
+        "pairs": 10,
+        "put_contracts": 10,
+        "last_put": 17.8,
+        "last_call": 0.62,
+        "exit_date": "2026-07-17",
+        "exit_time": "16:00 settlement",
+        "exit_spot": 154.03,
+        "reason": "到期缺10:00行情／收盘结算例外",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 15882.984999999999,
+        "stock_income": 0,
+        "income": 15882.984999999999,
+        "pnl": -735.6149999999998,
+        "call_pnl": -8554.1,
+        "put_pnl": 7818.485,
+        "stock_pnl": 0
+      },
+      "strategy2": null,
+      "s1_unit_cost": 1661.86,
+      "s1_unit_pnl": -73.56149999999998,
+      "difference": null
+    },
+    {
+      "entry": "2026-07-17",
+      "exit": "2026-07-24",
+      "put": "O:SKHY260724P00155000",
+      "strike": 155,
+      "expiry": "2026-07-24",
+      "matched": false,
+      "strategy1": null,
+      "strategy2": {
+        "put": "O:SKHY260724P00155000",
+        "call": "O:SKHY260724C00155000",
+        "strike": 155,
+        "expiry": "2026-07-24",
+        "entry_date": "2026-07-17",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-17",
+        "signal_price": 157.165,
+        "entry_spot": 157.05,
+        "call_cost": 0,
+        "put_cost": 2261.6200000000003,
+        "stock_cost": 15712.8525,
+        "cost": 17974.4725,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 0.55,
+        "last_call": 0,
+        "exit_date": "2026-07-24",
+        "exit_time": "10:00",
+        "exit_spot": 157.6,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 294.65999999999997,
+        "stock_income": 15752.12,
+        "income": 16046.78,
+        "pnl": -1927.6924999999992,
+        "call_pnl": 0,
+        "put_pnl": -1966.9600000000005,
+        "stock_pnl": 39.26749999999993
+      },
+      "s1_unit_cost": null,
+      "s1_unit_pnl": null,
+      "difference": null
+    },
+    {
+      "entry": "2026-07-20",
+      "exit": "2026-07-24",
+      "put": "O:SKHY260724P00157500",
+      "strike": 157.5,
+      "expiry": "2026-07-24",
+      "matched": false,
+      "strategy1": {
+        "put": "O:SKHY260724P00157500",
+        "call": "O:SKHY260724C00157500",
+        "strike": 157.5,
+        "expiry": "2026-07-24",
+        "entry_date": "2026-07-20",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-20",
+        "signal_price": 158.45,
+        "entry_spot": 158.39,
+        "call_cost": 11430.5,
+        "put_cost": 10206.499999999998,
+        "stock_cost": 0,
+        "cost": 21637.0,
+        "pairs": 10,
+        "put_contracts": 10,
+        "last_put": 0.83,
+        "last_call": 12.75,
+        "exit_date": "2026-07-24",
+        "exit_time": "10:00",
+        "exit_spot": 157.6,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 2492.4999999999995,
+        "put_income": 2590.5,
+        "stock_income": 0,
+        "income": 5083.0,
+        "pnl": -16554.0,
+        "call_pnl": -8938.0,
+        "put_pnl": -7615.999999999998,
+        "stock_pnl": 0
+      },
+      "strategy2": null,
+      "s1_unit_cost": 2163.7,
+      "s1_unit_pnl": -1655.4,
+      "difference": null
+    },
+    {
+      "entry": "2026-07-27",
+      "exit": "2026-07-31",
+      "put": "O:SKHY260731P00150000",
+      "strike": 150,
+      "expiry": "2026-07-31",
+      "matched": false,
+      "strategy1": null,
+      "strategy2": {
+        "put": "O:SKHY260731P00150000",
+        "call": "O:SKHY260731C00150000",
+        "strike": 150,
+        "expiry": "2026-07-31",
+        "entry_date": "2026-07-27",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-27",
+        "signal_price": 149.74,
+        "entry_spot": 149.79,
+        "call_cost": 0,
+        "put_cost": 2020.9,
+        "stock_cost": 14986.4895,
+        "cost": 17007.3895,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 5.29,
+        "last_call": 0,
+        "exit_date": "2026-07-31",
+        "exit_time": "10:00",
+        "exit_spot": 150.5,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 606.3000000000001,
+        "stock_income": 15042.475,
+        "income": 15648.775,
+        "pnl": -1358.6145000000015,
+        "call_pnl": 0,
+        "put_pnl": -1414.6,
+        "stock_pnl": 55.985500000000684
+      },
+      "s1_unit_cost": null,
+      "s1_unit_pnl": null,
+      "difference": null
+    },
+    {
+      "entry": "2026-07-31",
+      "exit": "2026-08-07",
+      "put": "O:SKHY260807P00150000",
+      "strike": 150,
+      "expiry": "2026-08-07",
+      "matched": false,
+      "strategy1": null,
+      "strategy2": {
+        "put": "O:SKHY260807P00150000",
+        "call": "O:SKHY260807C00150000",
+        "strike": 150,
+        "expiry": "2026-08-07",
+        "entry_date": "2026-07-31",
+        "entry_time": "10:00",
+        "signal_date": "2026-07-31",
+        "signal_price": 150.54,
+        "entry_spot": 150.5,
+        "call_cost": 0,
+        "put_cost": 2075.98,
+        "stock_cost": 15057.525,
+        "cost": 17133.505,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 7.21,
+        "last_call": 0,
+        "exit_date": "2026-08-07",
+        "exit_time": "16:00 settlement",
+        "exit_spot": 137.91,
+        "reason": "到期缺10:00行情／收盘结算例外",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 2402.2090000000007,
+        "stock_income": 13784.104500000001,
+        "income": 16186.313500000002,
+        "pnl": -947.191499999999,
+        "call_pnl": 0,
+        "put_pnl": 326.2290000000007,
+        "stock_pnl": -1273.4204999999984
+      },
+      "s1_unit_cost": null,
+      "s1_unit_pnl": null,
+      "difference": null
+    },
+    {
+      "entry": "2026-08-12",
+      "exit": "2026-08-14",
+      "put": "O:SKHY260814P00152500",
+      "strike": 152.5,
+      "expiry": "2026-08-14",
+      "matched": false,
+      "strategy1": null,
+      "strategy2": {
+        "put": "O:SKHY260814P00152500",
+        "call": "O:SKHY260814C00152500",
+        "strike": 152.5,
+        "expiry": "2026-08-14",
+        "entry_date": "2026-08-12",
+        "entry_time": "10:00",
+        "signal_date": "2026-08-12",
+        "signal_price": 152.8901,
+        "entry_spot": 152.935,
+        "call_cost": 0,
+        "put_cost": 878.5,
+        "stock_cost": 15301.14675,
+        "cost": 16179.64675,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 0.15,
+        "last_call": 0,
+        "exit_date": "2026-08-14",
+        "exit_time": "16:00 settlement",
+        "exit_spot": 166.33,
+        "reason": "到期缺10:00行情／收盘结算例外",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 0,
+        "stock_income": 16624.6835,
+        "income": 16624.6835,
+        "pnl": 445.0367499999993,
+        "call_pnl": 0,
+        "put_pnl": -878.5,
+        "stock_pnl": 1323.5367499999993
+      },
+      "s1_unit_cost": null,
+      "s1_unit_pnl": null,
+      "difference": null
+    },
+    {
+      "entry": "2026-08-17",
+      "exit": "2026-08-21",
+      "put": "O:SKHY260821P00172500",
+      "strike": 172.5,
+      "expiry": "2026-08-21",
+      "matched": false,
+      "strategy1": null,
+      "strategy2": {
+        "put": "O:SKHY260821P00172500",
+        "call": "O:SKHY260821C00172500",
+        "strike": 172.5,
+        "expiry": "2026-08-21",
+        "entry_date": "2026-08-17",
+        "entry_time": "10:00",
+        "signal_date": "2026-08-17",
+        "signal_price": 173.71,
+        "entry_spot": 173.74,
+        "call_cost": 0,
+        "put_cost": 1225.3,
+        "stock_cost": 17382.686999999998,
+        "cost": 18607.986999999997,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 11,
+        "last_call": 0,
+        "exit_date": "2026-08-21",
+        "exit_time": "16:00 settlement",
+        "exit_spot": 163.41,
+        "reason": "到期缺10:00行情／收盘结算例外",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 1799.6590000000008,
+        "stock_income": 16332.829500000002,
+        "income": 18132.488500000003,
+        "pnl": -475.49849999999424,
+        "call_pnl": 0,
+        "put_pnl": 574.3590000000008,
+        "stock_pnl": -1049.8574999999964
+      },
+      "s1_unit_cost": null,
+      "s1_unit_pnl": null,
+      "difference": null
+    },
+    {
+      "entry": "2026-08-25",
+      "exit": "2026-08-28",
+      "put": "O:SKHY260828P00157500",
+      "strike": 157.5,
+      "expiry": "2026-08-28",
+      "matched": false,
+      "strategy1": null,
+      "strategy2": {
+        "put": "O:SKHY260828P00157500",
+        "call": "O:SKHY260828C00157500",
+        "strike": 157.5,
+        "expiry": "2026-08-28",
+        "entry_date": "2026-08-25",
+        "entry_time": "10:00",
+        "signal_date": "2026-08-25",
+        "signal_price": 157.9551,
+        "entry_spot": 158.0275,
+        "call_cost": 0,
+        "put_cost": 1000.9,
+        "stock_cost": 15810.651375,
+        "cost": 16811.551375,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 0.78,
+        "last_call": 0,
+        "exit_date": "2026-08-28",
+        "exit_time": "10:00",
+        "exit_spot": 161.21,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 68.7,
+        "stock_income": 16112.9395,
+        "income": 16181.639500000001,
+        "pnl": -629.911874999998,
+        "call_pnl": 0,
+        "put_pnl": -932.1999999999999,
+        "stock_pnl": 302.28812500000095
+      },
+      "s1_unit_cost": null,
+      "s1_unit_pnl": null,
+      "difference": null
+    },
+    {
+      "entry": "2026-08-28",
+      "exit": "2026-09-04",
+      "put": "O:SKHY260904P00160000",
+      "strike": 160,
+      "expiry": "2026-09-04",
+      "matched": false,
+      "strategy1": null,
+      "strategy2": {
+        "put": "O:SKHY260904P00160000",
+        "call": "O:SKHY260904C00160000",
+        "strike": 160,
+        "expiry": "2026-09-04",
+        "entry_date": "2026-08-28",
+        "entry_time": "10:00",
+        "signal_date": "2026-08-28",
+        "signal_price": 161.1,
+        "entry_spot": 161.21,
+        "call_cost": 0,
+        "put_cost": 1041.7,
+        "stock_cost": 16129.0605,
+        "cost": 17170.7605,
+        "pairs": 0,
+        "put_contracts": 2,
+        "last_put": 0.79,
+        "last_call": 0,
+        "exit_date": "2026-09-04",
+        "exit_time": "10:00",
+        "exit_spot": 169.99,
+        "reason": "到期日10:00滚动",
+        "mark_only": false,
+        "call_income": 0,
+        "put_income": 14.7,
+        "stock_income": 16990.500500000002,
+        "income": 17005.200500000003,
+        "pnl": -165.55999999999767,
+        "call_pnl": 0,
+        "put_pnl": -1027.0,
+        "stock_pnl": 861.4400000000023
+      },
+      "s1_unit_cost": null,
+      "s1_unit_pnl": null,
+      "difference": null
+    }
+  ],
+  "slippage": [
+    {
+      "slip": 0,
+      "s1": -21329.535000000007,
+      "s2": -5136.667374999979,
+      "s1_mdd": 95.86594552043326,
+      "s2_mdd": 28.971417040273945
+    },
+    {
+      "slip": 0.02,
+      "s1": -17289.614999999998,
+      "s2": -5423.707374999991,
+      "s1_mdd": 84.77336117961673,
+      "s2_mdd": 30.068950579621124
+    },
+    {
+      "slip": 0.05,
+      "s1": -21306.82,
+      "s2": -6296.747874999986,
+      "s1_mdd": 95.7118641716719,
+      "s2_mdd": 31.560021433906556
+    }
+  ]
+}

@@ -126,11 +126,8 @@ def run_v10(day_map, closes, bars, stock, stock_entry, stock_exit, move_pct, tar
 
         if date >= pos["expiry"]:
             if dn_hit or up_hit:
-                vw_hit = find_put_price(day, pos["expiry"], pos["strike"])
-                if vw_hit is not None:
-                    payoff = vw_hit * 100 * num_puts
-                else:
-                    payoff = max(pos["strike"] - o, 0.0) * 100 * num_puts if dn_hit else 0.0
+                # 熔断平仓：put 按内在价值结算（涨熔断时虚值 put 归零），消除全天 vw 的前视偏差
+                payoff = max(pos["strike"] - o, 0.0) * 100 * num_puts
                 put_net += payoff - pos["cost"]
                 cashflow[date] += payoff
                 kind = "下跌止盈" if dn_hit else "上涨再平衡"
@@ -190,8 +187,8 @@ def run_v10(day_map, closes, bars, stock, stock_entry, stock_exit, move_pct, tar
             continue
 
         if up_hit:
-            vw_hit = find_put_price(day, pos["expiry"], pos["strike"])
-            payoff = vw_hit * 100 * num_puts if vw_hit is not None else 0.0
+            # 熔断平仓：涨熔断时 put 深度虚值（触发价 > 行权价），内在价值归零
+            payoff = max(pos["strike"] - o, 0.0) * 100 * num_puts
             put_net += payoff - pos["cost"]
             cashflow[date] += payoff
             rounds.append(dict(kind="上涨再平衡", entry_date=pos["entry_date"], exit_date=date,
@@ -208,6 +205,21 @@ def run_v10(day_map, closes, bars, stock, stock_entry, stock_exit, move_pct, tar
                                entry_spot=o, cost=cost, entry_date=date)
                     cashflow[date] -= cost
             continue
+
+    # 数据末尾仍有未平仓持仓时，按最后交易日 mark-to-market 记入明细
+    # （否则这笔"持有中"的仓会丢失，导致它 entry_date 所在的那一周在逐轮明细里空白）
+    if pos is not None:
+        last_date = stock[-1][0]
+        S_last = closes[last_date]
+        # mark-to-market 也按内在价值估值（与熔断/到期结算口径一致，消除 vw 口径的"刚买入仓恒为0"失真）
+        payoff = max(pos["strike"] - S_last, 0.0) * 100 * num_puts
+        put_net += payoff - pos["cost"]
+        cashflow[last_date] += payoff
+        rounds.append(dict(kind="持有中", entry_date=pos["entry_date"], exit_date=last_date,
+                           expiry=pos["expiry"],
+                           strike=pos["strike"], entry_spot=pos["entry_spot"], exit_spot=S_last,
+                           pnl=payoff - pos["cost"], stock_pnl=(S_last - pos["entry_spot"]) * 100,
+                           put_cost=pos["cost"], put_income=payoff))
 
     total = stock_pnl + put_net
     md = compute_mdd(stock, closes, stock_entry, cashflow)

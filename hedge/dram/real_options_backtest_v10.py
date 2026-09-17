@@ -209,6 +209,24 @@ def run_v10(day_map, closes, bars, stock, stock_entry, stock_exit, move_pct, tar
                     cashflow[date] -= cost
             continue
 
+    # 数据末尾仍有未平仓持仓时，按最后交易日 mark-to-market 记入明细
+    # （否则这笔"持有中"的仓会丢失，导致它 entry_date 所在的那一周在逐轮明细里空白）
+    if pos is not None:
+        last_date = stock[-1][0]
+        S_last = closes[last_date]
+        day = day_map.get(last_date)
+        mtm = find_put_price(day, pos["expiry"], pos["strike"]) if day is not None else None
+        if mtm is None:
+            mtm = max(pos["strike"] - S_last, 0.0)
+        payoff = mtm * 100 * num_puts
+        put_net += payoff - pos["cost"]
+        cashflow[last_date] += payoff
+        rounds.append(dict(kind="持有中", entry_date=pos["entry_date"], exit_date=last_date,
+                           expiry=pos["expiry"],
+                           strike=pos["strike"], entry_spot=pos["entry_spot"], exit_spot=S_last,
+                           pnl=payoff - pos["cost"], stock_pnl=(S_last - pos["entry_spot"]) * 100,
+                           put_cost=pos["cost"], put_income=payoff))
+
     total = stock_pnl + put_net
     md = compute_mdd(stock, closes, stock_entry, cashflow)
     return dict(total=total, stock_pnl=stock_pnl, put_net=put_net, down_hits=down_hits,

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>SKHY 跨式 vs 2put 逐轮对比（内在价值结算）</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1360px; margin:0 auto; }
+h1 { font-size:24px; margin-bottom:6px; }
+h2 { font-size:18px; margin:30px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+h3 { font-size:15px; margin:18px 0 8px; }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:18px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:13px; font-weight:600; }
+.kpi .value { font-size:22px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:3px; margin-bottom:0; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+.grp-2put { background:rgba(255,82,82,.10); color:var(--red); }
+.grp-strad { background:rgba(38,194,129,.10); color:var(--green); }
+.grp-up { background:rgba(245,195,68,.10); color:var(--gold); }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:12px 16px; margin:12px 0; font-size:13px; line-height:1.9; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+code { background:#20242d; border:1px solid var(--border); border-radius:4px; padding:1px 6px;
+  font-family:"SF Mono",Menlo,Consolas,monospace; font-size:12px; color:var(--gold); }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>SKHY 逐轮对比：跨式(1 call + 1 put) vs 旧策略(100股 + 2 put)</h1>
+<p class="sub">对齐参数：最近周五 + 跌15%/涨8% · 结算口径：熔断平仓按内在价值（已修正前视偏差）· 数据 2026-07-13 ~ 2026-09-11（44 交易日） · 生成于 2026-09-15 04:14（美东 ET）</p>
+
+<div class="kpis">
+<div class="kpi"><div class="label">2put 总利润(逐轮和)</div><div class="value"><span class="c-red">$+2,108</span></div><div class="sub">回撤 29.9% · 比 0.61</div></div>
+<div class="kpi"><div class="label">跨式 总利润(逐轮和)</div><div class="value"><span class="c-red">$+2,812</span></div><div class="sub">回撤 $2,207 · 比 1.27</div></div>
+<div class="kpi"><div class="label">总差距(2put−跨式)</div><div class="value"><span class="c-green">$-705</span></div><div class="sub">正=2put多赚</div></div>
+<div class="kpi"><div class="label">平均每轮差距</div><div class="value"><span class="c-green">$-50</span></div><div class="sub">共 14 轮对齐</div></div>
+<div class="kpi"><div class="label">胜场 2put : 跨式</div><div class="value"><span class="c-red">8</span> : <span class="c-green">6</span></div><div class="sub">平 0 轮</div></div>
+<div class="kpi"><div class="label">最大单轮差距</div><div class="value"><span class="c-red">$+858</span></div><div class="sub">2026-07-14 · 2put赢</div></div>
+</div>
+
+<div class="callout">
+<strong>核心结论（修正口径后）：</strong>两个策略轮次完全对齐（相同入场日、行权价、熔断/到期触发），唯一区别在「结构」：
+<strong>2put = 股票端(100股) + 2张put</strong>；<strong>跨式 = 1 call + 1 put（无股票）</strong>。
+<strong>8</strong> 轮 2put 多赚、<strong>6</strong> 轮跨式多赚、0 轮打平，14 轮求和差距仅 <strong>$-705</strong>。
+修正前视偏差后，两者仍然五五开——慢牛里 2put 靠「股票腿」吃肉，跨式靠「波动放大轮次」追回，谁也没明显跑赢谁。
+</div>
+
+<div class="callout" style="background:rgba(245,195,68,.07);border-color:rgba(245,195,68,.3);"><strong>示例：07-14 这轮 2put 总利润 $+303 是怎么来的？（修正后口径）</strong><br>入场 spot $168.11（07-14 开盘）→ 出场 spot $181.81（07-15 开盘，涨 8.1% 触发涨熔断）：<br>① 股票端 <strong><span class="c-red">$+1,370</span></strong> = (181.81 − 168.11) × 100 股；<br>② put 端 <strong><span class="c-green">$-1,067</span></strong> = put 收入 $0 − put 成本 $1,067（2 张权利金）。涨熔断时股价 181.8 已高于行权价 170，put 深度虚值、内在价值归零 → put 收入 = $0，只亏掉买入时的 2 张权利金 $1,067。<br>合计 +1,370 + -1,067 = <strong class="c-gold">$+303</strong>。（旧口径曾把全天 vw 的盘中急跌算成 put 收入 $1115，导致虚增到 $1418，已修正。）</div>
+
+<div class="card">
+<h2 style="margin-top:0;">涨熔断轮次专项：收入几乎一样，差异全在成本</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">
+涨熔断时，两策略都在「吃上涨」：<strong>2put 靠股票腿</strong>（收入 = 出场spot − 入场spot），<strong>跨式靠 call 腿</strong>（收入 = 出场spot − 行权价）。
+两者收入差 = 行权价档位偏差（入场spot 与 ATM 行权价之间那几块钱），因此<strong>收入几乎一样</strong>，真正的差异在<strong>成本</strong>：
+2put 付出 <strong>2×put 权利金</strong>，跨式付出 <strong>call + put 权利金</strong>。
+</p>
+<div class="tbl-scroll">
+<table>
+<tr>
+<th rowspan="2">入场日</th><th rowspan="2">出场spot</th><th rowspan="2">行权价</th>
+<th colspan="3" class="grp-up" style="text-align:center;">收入（吃上涨）</th>
+<th colspan="3" class="grp-up" style="text-align:center;">成本（权利金）</th>
+<th colspan="2" class="grp-up" style="text-align:center;">净利</th>
+</tr>
+<tr>
+<th>2put(股票端)</th><th>跨式(call端)</th><th>收入差</th>
+<th>2put(2×put)</th><th>跨式(call+put)</th><th>成本差</th>
+<th>2put</th><th>跨式</th>
+</tr>
+<tr><td>2026-07-14</td><td>$181.8</td><td>$170</td><td class="c-red">$+1,370</td><td class="c-red">$+1,181</td><td class="c-green">$-189</td><td class="c-green">$1,067</td><td class="c-green">$1,736</td><td class="c-red">$+669</td><td class="c-red">$+303</td><td class="c-green">$-555</td></tr>
+<tr><td>2026-07-17</td><td>$170.7</td><td>$152.5</td><td class="c-red">$+1,860</td><td class="c-red">$+1,822</td><td class="c-green">$-39</td><td class="c-green">$2,086</td><td class="c-green">$2,302</td><td class="c-red">$+216</td><td class="c-green">$-226</td><td class="c-green">$-480</td></tr>
+<tr><td>2026-07-29</td><td>$159.9</td><td>$130</td><td class="c-red">$+2,993</td><td class="c-red">$+2,988</td><td class="c-green">$-5</td><td class="c-green">$1,115</td><td class="c-green">$1,165</td><td class="c-red">$+50</td><td class="c-red">$+1,877</td><td class="c-red">$+1,823</td></tr>
+<tr><td>2026-08-07</td><td>$150.7</td><td>$140</td><td class="c-red">$+1,279</td><td class="c-red">$+1,070</td><td class="c-green">$-209</td><td class="c-green">$1,661</td><td class="c-green">$1,381</td><td class="c-green">$-281</td><td class="c-green">$-382</td><td class="c-green">$-311</td></tr>
+<tr><td>2026-08-12</td><td>$169.3</td><td>$150</td><td class="c-red">$+1,862</td><td class="c-red">$+1,931</td><td class="c-red">$+70</td><td class="c-green">$887</td><td class="c-green">$1,053</td><td class="c-red">$+166</td><td class="c-red">$+974</td><td class="c-red">$+879</td></tr>
+<tr><td>2026-09-04</td><td>$192.9</td><td>$175</td><td class="c-red">$+1,594</td><td class="c-red">$+1,794</td><td class="c-red">$+200</td><td class="c-green">$1,664</td><td class="c-green">$1,140</td><td class="c-green">$-523</td><td class="c-green">$-70</td><td class="c-red">$+654</td></tr>
+</table>
+</div>
+<p class="note">「收入差」= 2put收入 − 跨式收入（正值=2put多赚这段，即行权价档位偏差）；「成本差」= 2put成本 − 跨式成本（负值=跨式成本更高）。涨熔断轮次合计：2put 收入 $+10,958 / 跨式收入 $+10,786；2put 成本 $8,481 / 跨式成本 $8,777。</p>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">逐轮完整对照（含成本 / 收入 / 利润）</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">
+「2put」= 100 股 + 2 张 ATM put（put成本为 2 张权利金）；「跨式」= 1 张 ATM call + 1 张 ATM put（同行权价同到期日）。
+绿色 = 成本（支出），红色 = 收入（流入）。「2put总利润」= put净 + 股票端；「跨式净利」= 期权收入 − (call+put 成本)；「差距」= 2put总利润 − 跨式净利（正=2put多赚，负=跨式多赚）。
+</p>
+<div class="tbl-scroll">
+<table>
+<tr>
+<th rowspan="2">入场日</th><th rowspan="2">出场日</th><th rowspan="2">方式</th>
+<th rowspan="2">入场spot</th><th rowspan="2">出场spot</th><th rowspan="2">行权价</th>
+<th colspan="4" class="grp-2put" style="text-align:center;">2put（100股 + 2 put）</th>
+<th colspan="4" class="grp-strad" style="text-align:center;">跨式（1 call + 1 put）</th>
+<th rowspan="2">差距</th><th rowspan="2">本轮胜者</th>
+</tr>
+<tr>
+<th>put成本</th><th>put收入</th><th>股票端</th><th>总利润</th>
+<th>call成本</th><th>put成本</th><th>期权收入</th><th>净利</th>
+</tr>
+<tr><td>2026-07-14</td><td>2026-07-15</td><td>上涨再平衡</td><td>$168.1</td><td>$181.8</td><td>$170</td><td class="c-green">-$1,067</td><td class="c-red">$+0</td><td class="c-red">$+1,370</td><td class="c-red">$+303</td><td class="c-green">-$1,203</td><td class="c-green">-$533</td><td class="c-red">$+1,181</td><td class="c-green">$-555</td><td class="c-red">$+858</td><td><span class='c-red'>2put</span></td></tr>
+<tr><td>2026-07-15</td><td>2026-07-17</td><td>下跌止盈</td><td>$181.8</td><td>$152.1</td><td>$180</td><td class="c-green">-$1,911</td><td class="c-red">$+5,578</td><td class="c-green">$-2,970</td><td class="c-red">$+697</td><td class="c-green">-$696</td><td class="c-green">-$956</td><td class="c-red">$+2,789</td><td class="c-red">$+1,137</td><td class="c-green">$-440</td><td><span class='c-green'>跨式</span></td></tr>
+<tr><td>2026-07-17</td><td>2026-07-23</td><td>上涨再平衡</td><td>$152.1</td><td>$170.7</td><td>$152.5</td><td class="c-green">-$2,086</td><td class="c-red">$+0</td><td class="c-red">$+1,860</td><td class="c-green">$-226</td><td class="c-green">-$1,259</td><td class="c-green">-$1,043</td><td class="c-red">$+1,822</td><td class="c-green">$-480</td><td class="c-red">$+255</td><td><span class='c-red'>2put</span></td></tr>
+<tr><td>2026-07-23</td><td>2026-07-24</td><td>到期</td><td>$170.7</td><td>$154.6</td><td>$170</td><td class="c-green">-$849</td><td class="c-red">$+3,086</td><td class="c-green">$-1,615</td><td class="c-red">$+622</td><td class="c-green">-$636</td><td class="c-green">-$425</td><td class="c-red">$+1,543</td><td class="c-red">$+482</td><td class="c-red">$+140</td><td><span class='c-red'>2put</span></td></tr>
+<tr><td>2026-07-24</td><td>2026-07-29</td><td>下跌止盈</td><td>$154.6</td><td>$129.9</td><td>$155</td><td class="c-green">-$2,147</td><td class="c-red">$+5,010</td><td class="c-green">$-2,462</td><td class="c-red">$+401</td><td class="c-green">-$1,111</td><td class="c-green">-$1,073</td><td class="c-red">$+2,505</td><td class="c-red">$+321</td><td class="c-red">$+81</td><td><span class='c-red'>2put</span></td></tr>
+<tr><td>2026-07-29</td><td>2026-07-31</td><td>上涨再平衡</td><td>$129.9</td><td>$159.9</td><td>$130</td><td class="c-green">-$1,115</td><td class="c-red">$+0</td><td class="c-red">$+2,993</td><td class="c-red">$+1,877</td><td class="c-green">-$607</td><td class="c-green">-$558</td><td class="c-red">$+2,988</td><td class="c-red">$+1,823</td><td class="c-red">$+55</td><td><span class='c-red'>2put</span></td></tr>
+<tr><td>2026-07-31</td><td>2026-08-07</td><td>到期</td><td>$159.9</td><td>$137.9</td><td>$160</td><td class="c-green">-$2,634</td><td class="c-red">$+4,418</td><td class="c-green">$-2,197</td><td class="c-green">$-413</td><td class="c-green">-$661</td><td class="c-green">-$1,317</td><td class="c-red">$+2,209</td><td class="c-red">$+231</td><td class="c-green">$-644</td><td><span class='c-green'>跨式</span></td></tr>
+<tr><td>2026-08-07</td><td>2026-08-12</td><td>上涨再平衡</td><td>$137.9</td><td>$150.7</td><td>$140</td><td class="c-green">-$1,661</td><td class="c-red">$+0</td><td class="c-red">$+1,279</td><td class="c-green">$-382</td><td class="c-green">-$550</td><td class="c-green">-$831</td><td class="c-red">$+1,070</td><td class="c-green">$-311</td><td class="c-green">$-72</td><td><span class='c-green'>跨式</span></td></tr>
+<tr><td>2026-08-12</td><td>2026-08-14</td><td>上涨再平衡</td><td>$150.7</td><td>$169.3</td><td>$150</td><td class="c-green">-$887</td><td class="c-red">$+0</td><td class="c-red">$+1,862</td><td class="c-red">$+974</td><td class="c-green">-$609</td><td class="c-green">-$444</td><td class="c-red">$+1,931</td><td class="c-red">$+879</td><td class="c-red">$+96</td><td><span class='c-red'>2put</span></td></tr>
+<tr><td>2026-08-14</td><td>2026-08-21</td><td>到期</td><td>$169.3</td><td>$163.4</td><td>$170</td><td class="c-green">-$1,751</td><td class="c-red">$+1,318</td><td class="c-green">$-591</td><td class="c-green">$-1,024</td><td class="c-green">-$583</td><td class="c-green">-$876</td><td class="c-red">$+659</td><td class="c-green">$-800</td><td class="c-green">$-224</td><td><span class='c-green'>跨式</span></td></tr>
+<tr><td>2026-08-21</td><td>2026-08-28</td><td>到期</td><td>$163.4</td><td>$161.0</td><td>$162.5</td><td class="c-green">-$1,084</td><td class="c-red">$+292</td><td class="c-green">$-237</td><td class="c-green">$-1,029</td><td class="c-green">-$745</td><td class="c-green">-$542</td><td class="c-red">$+146</td><td class="c-green">$-1,141</td><td class="c-red">$+112</td><td><span class='c-red'>2put</span></td></tr>
+<tr><td>2026-08-28</td><td>2026-09-04</td><td>到期</td><td>$161.0</td><td>$177.0</td><td>$160</td><td class="c-green">-$933</td><td class="c-red">$+0</td><td class="c-red">$+1,596</td><td class="c-red">$+663</td><td class="c-green">-$659</td><td class="c-green">-$466</td><td class="c-red">$+1,700</td><td class="c-red">$+574</td><td class="c-red">$+89</td><td><span class='c-red'>2put</span></td></tr>
+<tr><td>2026-09-04</td><td>2026-09-11</td><td>上涨再平衡</td><td>$177.0</td><td>$192.9</td><td>$175</td><td class="c-green">-$1,664</td><td class="c-red">$+0</td><td class="c-red">$+1,594</td><td class="c-green">$-70</td><td class="c-green">-$309</td><td class="c-green">-$832</td><td class="c-red">$+1,794</td><td class="c-red">$+654</td><td class="c-green">$-723</td><td><span class='c-green'>跨式</span></td></tr>
+<tr><td>2026-09-11</td><td>2026-09-18 到期</td><td>持有中</td><td>$192.9</td><td>$190.1</td><td>$195</td><td class="c-green">-$1,863</td><td class="c-red">$+1,863</td><td class="c-green">$-287</td><td class="c-green">$-287</td><td class="c-green">-$442</td><td class="c-green">-$931</td><td class="c-red">$+1,374</td><td class="c-gray">$+0</td><td class="c-green">$-287</td><td><span class='c-green'>跨式</span></td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>结算口径（2026-09-15 修正）</strong>：熔断平仓一律按<strong>内在价值</strong>结算，不再用全天成交量加权价 vw。旧口径在「开盘触发熔断、但全天 vw 含盘中反向波动」的日子会产生前视偏差（如 07-15 开盘 181.81 触发涨熔断卖出，put 却按全天 vw（含盘中暴跌到 166 的成交）结算出 $1115 虚增收入）。修正后：涨熔断时 put 深度虚值→内在价值归零；跌熔断时 put 实值→内在价值 = 行权价 − 触发价。</li>
+<li><strong>对齐口径</strong>：两策略都用相同参数（最近周五 + 跌15%/涨8%），且都用「最近周五的 ATM 行权价」，因此每一轮的入场日、出场日、行权价、触发方式完全一致，可逐轮直接对比。</li>
+<li><strong>2put 每轮总利润</strong> = 股票端涨跌(stock_pnl) + put 净(pnl)。其中 put 净 = put 收入 − put 成本（2 张权利金）。</li>
+<li><strong>跨式每轮净利</strong> = (call 收入 + put 收入) − (call 成本 + put 成本)。无股票本金，回撤为纯现金绝对金额。</li>
+<li><strong>涨熔断时收入为何几乎一样</strong>：2put 股票端收入 = (出场spot − 入场spot)×100；跨式 call 端收入 = (出场spot − 行权价)×100。入场spot 与 ATM 行权价只差一个档位（≤$2.5），所以两者收入几乎相等，差异集中在成本端。</li>
+<li><strong>口径说明</strong>：顶部「总利润(逐轮和)」= 14 轮逐轮净现金流之和（从首日开盘价起算），与逐轮明细严格自洽。run_v10 报告的官方 total（$3,684）额外包含「首日收盘价→首日开盘价」这段股票基准差，故两者不同——本对比统一用逐轮口径。</li>
+<li><strong>回撤口径不同</strong>：2put 为「相对股票市值百分比」，跨式为「现金净值绝对金额」，两者回撤数字不可直接比；但「收益/回撤比」均按 总收益÷最大回撤(绝对金额) 计算，可对比。</li>
+<li><strong>本程序为临时对比</strong>（<code>skhy_straddle_vs_2put.py</code>），不改动 final 报告；但本次已同步修正核心回测 <code>real_options_backtest_v10.py</code> / <code>rescan_skhy_straddle.py</code> 的熔断结算口径（这是对所有标的都生效的 bug 修复）。</li>
+<li><strong>过拟合警示</strong>：SKHY 仅 44 个交易日，样本短、波动大，仅供研究，不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

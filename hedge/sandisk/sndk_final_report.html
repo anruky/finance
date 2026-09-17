@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNDK 对冲策略最终报告（涨/跌熔断不对称优化）</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1080px; margin:0 auto; }
+h1 { font-size:26px; margin-bottom:6px; }
+h2 { font-size:19px; margin:32px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:12px; }
+.kpi .value { font-size:22px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:2px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.callout-gold { background:rgba(245,195,68,.08); border:1px solid rgba(245,195,68,.35); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.callout-warn { background:rgba(245,195,68,.06); border:1px solid rgba(245,195,68,.3); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>SNDK 对冲策略最终报告 <span style="color:var(--muted);font-size:15px;">（涨熔断 × 跌熔断 不对称优化 · 开盘价熔断）</span></h1>
+<p class="sub">数据源：SNDK_stock.json（65 交易日）+ SNDK_options_3fri.json（真实 3 周五到期日期权链） · 生成于 2026-08-27 11:38</p>
+
+<div class="card">
+<h2 style="margin-top:0;">行情与技术指标</h2>
+<div style="margin-bottom:12px;"><svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img">
+<line x1="54" y1="210.0" x2="668" y2="210.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="47" y="214.0" fill="#9aa3b2" font-size="10" text-anchor="end">$917</text>
+<line x1="54" y1="162.0" x2="668" y2="162.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="47" y="166.0" fill="#9aa3b2" font-size="10" text-anchor="end">$1,297</text>
+<line x1="54" y1="114.0" x2="668" y2="114.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="47" y="118.0" fill="#9aa3b2" font-size="10" text-anchor="end">$1,676</text>
+<line x1="54" y1="66.0" x2="668" y2="66.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="47" y="70.0" fill="#9aa3b2" font-size="10" text-anchor="end">$2,056</text>
+<line x1="54" y1="18.0" x2="668" y2="18.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="47" y="22.0" fill="#9aa3b2" font-size="10" text-anchor="end">$2,436</text>
+<line x1="58.7" y1="118.4" x2="58.7" y2="133.8" stroke="#E24B4A" stroke-width="1"/>
+<rect x="53.7" y="125.0" width="10" height="6.9" fill="#E24B4A"/>
+<line x1="68.2" y1="116.2" x2="68.2" y2="132.7" stroke="#26c281" stroke-width="1"/>
+<rect x="63.2" y="117.8" width="10" height="7.1" fill="#26c281"/>
+<line x1="77.6" y1="111.3" x2="77.6" y2="128.7" stroke="#E24B4A" stroke-width="1"/>
+<rect x="72.6" y="118.4" width="10" height="5.7" fill="#E24B4A"/>
+<line x1="87.1" y1="109.9" x2="87.1" y2="118.5" stroke="#E24B4A" stroke-width="1"/>
+<rect x="82.1" y="111.6" width="10" height="1.6" fill="#E24B4A"/>
+<line x1="96.5" y1="97.9" x2="96.5" y2="112.8" stroke="#E24B4A" stroke-width="1"/>
+<rect x="91.5" y="103.2" width="10" height="3.8" fill="#E24B4A"/>
+<line x1="106.0" y1="101.9" x2="106.0" y2="109.9" stroke="#26c281" stroke-width="1"/>
+<rect x="101.0" y="104.7" width="10" height="4.3" fill="#26c281"/>
+<line x1="115.4" y1="90.7" x2="115.4" y2="109.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="110.4" y="94.4" width="10" height="12.1" fill="#E24B4A"/>
+<line x1="124.8" y1="95.1" x2="124.8" y2="107.8" stroke="#E24B4A" stroke-width="1"/>
+<rect x="119.8" y="103.5" width="10" height="2.3" fill="#E24B4A"/>
+<line x1="134.3" y1="113.3" x2="134.3" y2="134.5" stroke="#26c281" stroke-width="1"/>
+<rect x="129.3" y="113.7" width="10" height="15.1" fill="#26c281"/>
+<line x1="143.7" y1="111.6" x2="143.7" y2="123.4" stroke="#E24B4A" stroke-width="1"/>
+<rect x="138.7" y="118.3" width="10" height="1.2" fill="#E24B4A"/>
+<line x1="153.2" y1="98.0" x2="153.2" y2="131.7" stroke="#26c281" stroke-width="1"/>
+<rect x="148.2" y="110.9" width="10" height="6.8" fill="#26c281"/>
+<line x1="162.6" y1="102.8" x2="162.6" y2="124.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="157.6" y="118.2" width="10" height="2.4" fill="#E24B4A"/>
+<line x1="172.1" y1="86.4" x2="172.1" y2="115.4" stroke="#E24B4A" stroke-width="1"/>
+<rect x="167.1" y="88.1" width="10" height="26.4" fill="#E24B4A"/>
+<line x1="181.5" y1="70.3" x2="181.5" y2="90.1" stroke="#E24B4A" stroke-width="1"/>
+<rect x="176.5" y="75.6" width="10" height="11.3" fill="#E24B4A"/>
+<line x1="191.0" y1="57.9" x2="191.0" y2="70.4" stroke="#E24B4A" stroke-width="1"/>
+<rect x="186.0" y="59.4" width="10" height="1.2" fill="#E24B4A"/>
+<line x1="200.4" y1="51.9" x2="200.4" y2="75.6" stroke="#26c281" stroke-width="1"/>
+<rect x="195.4" y="56.1" width="10" height="18.0" fill="#26c281"/>
+<line x1="209.9" y1="63.7" x2="209.9" y2="80.9" stroke="#26c281" stroke-width="1"/>
+<rect x="204.9" y="63.7" width="10" height="14.6" fill="#26c281"/>
+<line x1="219.3" y1="48.9" x2="219.3" y2="69.4" stroke="#E24B4A" stroke-width="1"/>
+<rect x="214.3" y="49.7" width="10" height="17.7" fill="#E24B4A"/>
+<line x1="228.8" y1="28.3" x2="228.8" y2="41.3" stroke="#26c281" stroke-width="1"/>
+<rect x="223.8" y="36.0" width="10" height="2.5" fill="#26c281"/>
+<line x1="238.2" y1="65.5" x2="238.2" y2="79.4" stroke="#26c281" stroke-width="1"/>
+<rect x="233.2" y="72.1" width="10" height="5.6" fill="#26c281"/>
+<line x1="247.6" y1="70.4" x2="247.6" y2="90.7" stroke="#26c281" stroke-width="1"/>
+<rect x="242.6" y="74.7" width="10" height="9.2" fill="#26c281"/>
+<line x1="257.1" y1="29.1" x2="257.1" y2="61.4" stroke="#E24B4A" stroke-width="1"/>
+<rect x="252.1" y="30.7" width="10" height="12.2" fill="#E24B4A"/>
+<line x1="266.5" y1="40.7" x2="266.5" y2="65.1" stroke="#26c281" stroke-width="1"/>
+<rect x="261.5" y="51.6" width="10" height="10.0" fill="#26c281"/>
+<line x1="276.0" y1="61.6" x2="276.0" y2="86.4" stroke="#26c281" stroke-width="1"/>
+<rect x="271.0" y="61.6" width="10" height="5.1" fill="#26c281"/>
+<line x1="285.4" y1="37.6" x2="285.4" y2="64.2" stroke="#E24B4A" stroke-width="1"/>
+<rect x="280.4" y="38.5" width="10" height="20.7" fill="#E24B4A"/>
+<line x1="294.9" y1="56.7" x2="294.9" y2="72.8" stroke="#26c281" stroke-width="1"/>
+<rect x="289.9" y="62.3" width="10" height="6.7" fill="#26c281"/>
+<line x1="304.3" y1="66.4" x2="304.3" y2="111.9" stroke="#26c281" stroke-width="1"/>
+<rect x="299.3" y="67.5" width="10" height="37.8" fill="#26c281"/>
+<line x1="313.8" y1="93.6" x2="313.8" y2="109.3" stroke="#26c281" stroke-width="1"/>
+<rect x="308.8" y="94.7" width="10" height="10.6" fill="#26c281"/>
+<line x1="323.2" y1="118.7" x2="323.2" y2="138.2" stroke="#26c281" stroke-width="1"/>
+<rect x="318.2" y="121.2" width="10" height="1.2" fill="#26c281"/>
+<line x1="332.7" y1="106.6" x2="332.7" y2="124.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="327.7" y="107.6" width="10" height="17.1" fill="#E24B4A"/>
+<line x1="342.1" y1="79.1" x2="342.1" y2="98.2" stroke="#E24B4A" stroke-width="1"/>
+<rect x="337.1" y="91.0" width="10" height="2.9" fill="#E24B4A"/>
+<line x1="351.6" y1="79.8" x2="351.6" y2="101.8" stroke="#E24B4A" stroke-width="1"/>
+<rect x="346.6" y="83.7" width="10" height="17.3" fill="#E24B4A"/>
+<line x1="361.0" y1="98.4" x2="361.0" y2="117.8" stroke="#26c281" stroke-width="1"/>
+<rect x="356.0" y="99.3" width="10" height="15.0" fill="#26c281"/>
+<line x1="370.4" y1="96.8" x2="370.4" y2="109.6" stroke="#26c281" stroke-width="1"/>
+<rect x="365.4" y="97.5" width="10" height="6.2" fill="#26c281"/>
+<line x1="379.9" y1="107.3" x2="379.9" y2="139.0" stroke="#26c281" stroke-width="1"/>
+<rect x="374.9" y="108.8" width="10" height="12.9" fill="#26c281"/>
+<line x1="389.3" y1="129.8" x2="389.3" y2="150.2" stroke="#26c281" stroke-width="1"/>
+<rect x="384.3" y="132.8" width="10" height="14.7" fill="#26c281"/>
+<line x1="398.8" y1="136.1" x2="398.8" y2="158.4" stroke="#26c281" stroke-width="1"/>
+<rect x="393.8" y="153.3" width="10" height="1.3" fill="#26c281"/>
+<line x1="408.2" y1="142.0" x2="408.2" y2="152.0" stroke="#26c281" stroke-width="1"/>
+<rect x="403.2" y="147.8" width="10" height="2.3" fill="#26c281"/>
+<line x1="417.7" y1="124.2" x2="417.7" y2="137.6" stroke="#E24B4A" stroke-width="1"/>
+<rect x="412.7" y="125.0" width="10" height="9.8" fill="#E24B4A"/>
+<line x1="427.1" y1="120.1" x2="427.1" y2="134.3" stroke="#E24B4A" stroke-width="1"/>
+<rect x="422.1" y="123.7" width="10" height="9.3" fill="#E24B4A"/>
+<line x1="436.6" y1="111.5" x2="436.6" y2="128.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="431.6" y="122.3" width="10" height="5.4" fill="#E24B4A"/>
+<line x1="446.0" y1="127.0" x2="446.0" y2="147.5" stroke="#26c281" stroke-width="1"/>
+<rect x="441.0" y="129.8" width="10" height="14.5" fill="#26c281"/>
+<line x1="455.5" y1="141.0" x2="455.5" y2="171.4" stroke="#26c281" stroke-width="1"/>
+<rect x="450.5" y="141.0" width="10" height="23.4" fill="#26c281"/>
+<line x1="464.9" y1="175.7" x2="464.9" y2="193.1" stroke="#26c281" stroke-width="1"/>
+<rect x="459.9" y="177.5" width="10" height="9.8" fill="#26c281"/>
+<line x1="474.4" y1="183.7" x2="474.4" y2="199.7" stroke="#26c281" stroke-width="1"/>
+<rect x="469.4" y="184.4" width="10" height="13.1" fill="#26c281"/>
+<line x1="483.8" y1="163.4" x2="483.8" y2="183.8" stroke="#E24B4A" stroke-width="1"/>
+<rect x="478.8" y="164.1" width="10" height="18.3" fill="#E24B4A"/>
+<line x1="493.2" y1="148.3" x2="493.2" y2="175.8" stroke="#26c281" stroke-width="1"/>
+<rect x="488.2" y="151.0" width="10" height="21.3" fill="#26c281"/>
+<line x1="502.7" y1="159.5" x2="502.7" y2="184.2" stroke="#E24B4A" stroke-width="1"/>
+<rect x="497.7" y="163.1" width="10" height="16.2" fill="#E24B4A"/>
+<line x1="512.1" y1="143.0" x2="512.1" y2="156.5" stroke="#E24B4A" stroke-width="1"/>
+<rect x="507.1" y="145.4" width="10" height="8.8" fill="#E24B4A"/>
+<line x1="521.6" y1="143.6" x2="521.6" y2="155.9" stroke="#26c281" stroke-width="1"/>
+<rect x="516.6" y="149.1" width="10" height="6.1" fill="#26c281"/>
+<line x1="531.0" y1="158.5" x2="531.0" y2="178.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="526.0" y="166.8" width="10" height="10.8" fill="#E24B4A"/>
+<line x1="540.5" y1="160.4" x2="540.5" y2="176.2" stroke="#26c281" stroke-width="1"/>
+<rect x="535.5" y="160.4" width="10" height="12.3" fill="#26c281"/>
+<line x1="549.9" y1="164.2" x2="549.9" y2="175.0" stroke="#E24B4A" stroke-width="1"/>
+<rect x="544.9" y="169.4" width="10" height="4.4" fill="#E24B4A"/>
+<line x1="559.4" y1="163.2" x2="559.4" y2="168.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="554.4" y="165.2" width="10" height="1.3" fill="#E24B4A"/>
+<line x1="568.8" y1="150.3" x2="568.8" y2="160.5" stroke="#26c281" stroke-width="1"/>
+<rect x="563.8" y="154.2" width="10" height="1.8" fill="#26c281"/>
+<line x1="578.3" y1="126.1" x2="578.3" y2="157.6" stroke="#E24B4A" stroke-width="1"/>
+<rect x="573.3" y="132.7" width="10" height="23.8" fill="#E24B4A"/>
+<line x1="587.7" y1="115.2" x2="587.7" y2="128.1" stroke="#26c281" stroke-width="1"/>
+<rect x="582.7" y="117.7" width="10" height="1.2" fill="#26c281"/>
+<line x1="597.2" y1="94.8" x2="597.2" y2="111.3" stroke="#E24B4A" stroke-width="1"/>
+<rect x="592.2" y="100.0" width="10" height="10.9" fill="#E24B4A"/>
+<line x1="606.6" y1="107.8" x2="606.6" y2="123.6" stroke="#26c281" stroke-width="1"/>
+<rect x="601.6" y="113.8" width="10" height="6.5" fill="#26c281"/>
+<line x1="616.0" y1="111.1" x2="616.0" y2="131.0" stroke="#26c281" stroke-width="1"/>
+<rect x="611.0" y="113.2" width="10" height="14.4" fill="#26c281"/>
+<line x1="625.5" y1="119.7" x2="625.5" y2="129.5" stroke="#E24B4A" stroke-width="1"/>
+<rect x="620.5" y="123.6" width="10" height="4.0" fill="#E24B4A"/>
+<line x1="634.9" y1="121.9" x2="634.9" y2="127.4" stroke="#26c281" stroke-width="1"/>
+<rect x="629.9" y="123.0" width="10" height="1.2" fill="#26c281"/>
+<line x1="644.4" y1="134.1" x2="644.4" y2="146.8" stroke="#26c281" stroke-width="1"/>
+<rect x="639.4" y="137.0" width="10" height="1.2" fill="#26c281"/>
+<line x1="653.8" y1="128.1" x2="653.8" y2="140.5" stroke="#26c281" stroke-width="1"/>
+<rect x="648.8" y="132.0" width="10" height="6.7" fill="#26c281"/>
+<line x1="663.3" y1="134.8" x2="663.3" y2="142.6" stroke="#E24B4A" stroke-width="1"/>
+<rect x="658.3" y="136.4" width="10" height="5.5" fill="#E24B4A"/>
+<polyline points="238.2,95.7 247.6,93.7 257.1,89.0 266.5,86.1 276.0,83.9 285.4,80.6 294.9,78.6 304.3,79.2 313.8,79.3 323.2,78.9 332.7,78.4 342.1,77.0 351.6,75.3 361.0,76.6 370.4,78.0 379.9,81.1 389.3,84.8 398.8,88.6 408.2,93.6 417.7,98.0 427.1,100.3 436.6,102.2 446.0,107.9 455.5,113.0 464.9,119.0 474.4,127.0 483.8,131.7 493.2,135.1 502.7,138.0 512.1,139.2 521.6,141.6 531.0,145.4 540.5,149.8 549.9,152.6 559.4,155.6 568.8,157.3 578.3,156.6 587.7,154.8 597.2,152.3 606.6,152.1 616.0,152.3 625.5,152.3 634.9,151.3 644.4,150.0 653.8,147.5 663.3,144.5" fill="none" stroke="#c792ea" stroke-width="1.6"/>
+<text x="54" y="32" fill="#e6e8ec" font-size="12" font-weight="600">SNDK · K线 + 均线(MA20)</text>
+<circle cx="668" cy="28" r="3" fill="#c792ea"/><text x="674" y="32" fill="#9aa3b2" font-size="10">MA20</text>
+<text x="58.7" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">05-26</text>
+<text x="153.2" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">06-09</text>
+<text x="247.6" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">06-24</text>
+<text x="342.1" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">07-09</text>
+<text x="436.6" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">07-23</text>
+<text x="531.0" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">08-06</text>
+<text x="625.5" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">08-20</text>
+</svg></div>
+<div class="tbl-scroll">
+<table>
+<tr><th>指标</th><th>最新值</th><th>信号解读</th></tr>
+<tr><td>现价</td><td class="c-red">$1499.37</td><td>站上 MA20（1435.28）</td></tr>
+<tr><td>均线 MA20</td><td class="c-red">1435.28</td><td>多头（现价站上均线）</td></tr>
+<tr><td>买入 ATM Put（现价档）</td><td>$45.98/股</td><td>行权价 $1500 · 到期 2026-08-28</td></tr>
+<tr><td>Put 成本比例（2张）</td><td class="c-green">6.1%</td><td>2 张共 $9,196，占 100 股市值 $149,937</td></tr>
+</table>
+</div>
+<p class="note">说明：SNDK 回测仅覆盖近 3 个月 65 个交易日，MA20 样本偏短、信号仅供参考。现价跌破 MA20 说明短期偏弱。</p>
+</div>
+
+<div class="card">
+<h2>策略模型</h2>
+<div class="callout">
+<strong>股票：2026-05-26 买入 100 股 @ $1589.55，持有到 2026-08-26 @ $1499.37，中间不卖出。</strong><br>
+<strong>Put：每次买入「最近周五(1-4天)」的 ATM put 2 张，真实成交价 vw。</strong><br>
+<strong>熔断（不对称）</strong>：开盘价相对入场价 <strong class="c-green">跌 20%</strong> 或 <strong class="c-red">涨 15%</strong> 就开盘平仓 + 重买；盘中不触发。没触发就持有到期，再滚动下一轮。<br>
+<strong>2:1 过度对冲</strong>：2 张 put 覆盖 200 股 vs 持有 100 股，下跌时 put 赔付是股票亏损的 2 倍。<br>
+<strong>基准 = B&H</strong>：收益 <span class="c-red">$-9,018</span>，最大回撤 <span class="c-green">$131,911（56.5%）</span>，收益/回撤比 -0.07。
+</div>
+</div>
+
+<div class="card">
+<h2>核心结论</h2>
+<div class="callout-gold">
+<strong>最优组合：最近周五(1-4天) put + 跌 20% / 涨 15% 熔断（不对称）——「不盯盘」前提下的最优策略。</strong><br>
+收益 <span class="c-red">$+54,319</span>（比 B&H 多赚 <span class="c-red">$+63,337</span>），
+回撤从 56.5% 降到 <span class="c-green">23.9%</span>（降了 <span class="c-red">32.6 个百分点</span>）。
+收益/回撤比 <strong class="c-gold">0.98</strong>（B&H 为负值 -0.07，策略显著更优）。
+</div>
+<div class="kpis">
+<div class="kpi"><div class="label">B&H 收益</div><div class="value c-red">$-9,018</div><div class="sub">回撤 56.5% · 比 -0.07</div></div>
+<div class="kpi"><div class="label">策略收益</div><div class="value c-red">$+54,319</div><div class="sub">最近周五(1-4天) · 跌20%/涨15%</div></div>
+<div class="kpi"><div class="label">策略回撤比例</div><div class="value c-red">23.9%</div><div class="sub">回撤 $55,272</div></div>
+<div class="kpi"><div class="label">回撤比例降幅</div><div class="value c-red">+32.6%</div><div class="sub">56.5% → 23.9%</div></div>
+<div class="kpi"><div class="label">收益/回撤比</div><div class="value c-gold">0.98</div><div class="sub">B&H 为 -0.07</div></div>
+<div class="kpi"><div class="label">股票收益</div><div class="value c-red">$-9,018</div><div class="sub">put 净 <span class="c-red">$+63,337</span></div></div>
+</div>
+<p class="note">回撤比例 = 最大回撤 ÷ 峰值净值。收益/回撤比 = 总收益 ÷ 最大回撤，越高越好。</p>
+</div>
+
+<div class="card">
+<h2>涨熔断 × 跌熔断 不对称扫描（总收益）</h2>
+<p style="font-size:13px;color:var(--muted);margin-bottom:8px;">周期 = 最近周五(1-4天)（先由对称扫描确定）。★ = 全局最优（收益/回撤比）。行 = 跌熔断，列 = 涨熔断。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>跌\涨</th><th>8%</th><th>10%</th><th>12%</th><th>15%</th><th>18%</th><th>20%</th><th>25%</th></tr>
+<tr><td>8%</td><td class="c-red">$+2,948</td><td class="c-red">$+8,899</td><td class="c-red">$+2,264</td><td class="c-red">$+3,059</td><td class="c-green">$-14,401</td><td class="c-green">$-14,401</td><td class="c-green">$-20,456</td></tr><tr><td>10%</td><td class="c-green">$-37,806</td><td class="c-green">$-31,855</td><td class="c-green">$-14,021</td><td class="c-green">$-13,226</td><td class="c-green">$-40,150</td><td class="c-green">$-40,150</td><td class="c-green">$-46,205</td></tr><tr><td>12%</td><td class="c-green">$-7,576</td><td class="c-green">$-1,624</td><td class="c-red">$+5,523</td><td class="c-red">$+37,561</td><td class="c-green">$-9,071</td><td class="c-green">$-9,071</td><td class="c-green">$-15,126</td></tr><tr><td>15%</td><td class="c-red">$+6,577</td><td class="c-red">$+12,529</td><td class="c-red">$+16,937</td><td class="c-red">$+48,976</td><td class="c-green">$-9,071</td><td class="c-green">$-9,071</td><td class="c-green">$-15,126</td></tr><tr><td>18%</td><td class="c-green">$-5,137</td><td class="c-red">$+815</td><td class="c-red">$+5,223</td><td class="c-red">$+37,262</td><td class="c-green">$-9,071</td><td class="c-green">$-9,071</td><td class="c-green">$-15,126</td></tr><tr><td>20%</td><td class="c-red">$+11,920</td><td class="c-red">$+17,871</td><td class="c-red">$+22,280</td><td class="c-gold">$+54,319 ★</td><td class="c-red">$+34,610</td><td class="c-red">$+34,610</td><td class="c-red">$+1,931</td></tr><tr><td>25%</td><td class="c-red">$+18,645</td><td class="c-red">$+24,596</td><td class="c-red">$+44,336</td><td class="c-red">$+45,131</td><td class="c-red">$+21,505</td><td class="c-red">$+21,505</td><td class="c-red">$+15,450</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>收益/回撤比 矩阵</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>跌\涨</th><th>8%</th><th>10%</th><th>12%</th><th>15%</th><th>18%</th><th>20%</th><th>25%</th></tr>
+<tr><td>8%</td><td class="">0.05</td><td class="">0.14</td><td class="">0.04</td><td class="">0.04</td><td class="">-0.18</td><td class="">-0.18</td><td class="">-0.26</td></tr><tr><td>10%</td><td class="">-0.51</td><td class="">-0.43</td><td class="">-0.21</td><td class="">-0.18</td><td class="">-0.52</td><td class="">-0.52</td><td class="">-0.59</td></tr><tr><td>12%</td><td class="">-0.12</td><td class="">-0.03</td><td class="">0.08</td><td class="">0.68</td><td class="">-0.14</td><td class="">-0.14</td><td class="">-0.23</td></tr><tr><td>15%</td><td class="">0.11</td><td class="">0.21</td><td class="">0.24</td><td class="">0.89</td><td class="">-0.14</td><td class="">-0.14</td><td class="">-0.23</td></tr><tr><td>18%</td><td class="">-0.08</td><td class="">0.01</td><td class="">0.08</td><td class="">0.67</td><td class="">-0.14</td><td class="">-0.14</td><td class="">-0.23</td></tr><tr><td>20%</td><td class="">0.20</td><td class="">0.29</td><td class="">0.32</td><td class="c-gold">0.98 ★</td><td class="">0.48</td><td class="">0.48</td><td class="">0.03</td></tr><tr><td>25%</td><td class="">0.23</td><td class="">0.30</td><td class="">0.50</td><td class="">0.57</td><td class="">0.27</td><td class="">0.27</td><td class="">0.19</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>轮空策略 不对称扫描（总收益，成本 &gt;11% 跳过该轮）</h2>
+<p style="font-size:13px;color:var(--muted);margin-bottom:8px;">口径 = 普通总收益 − 被跳过轮次（成本占比 &gt;11%）的周期总利润。★ = 轮空策略下的最优（总收益最高）。行 = 跌熔断，列 = 涨熔断。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>跌\涨</th><th>8%</th><th>10%</th><th>12%</th><th>15%</th><th>18%</th><th>20%</th><th>25%</th></tr>
+<tr><td>8%</td><td class="c-red">$+78,099</td><td class="c-red">$+73,965</td><td class="c-red">$+62,628</td><td class="c-red">$+77,293</td><td class="c-gold">$+84,929 ★</td><td class="c-red">$+84,929</td><td class="c-red">$+69,962</td></tr><tr><td>10%</td><td class="c-red">$+26,516</td><td class="c-red">$+22,382</td><td class="c-red">$+41,968</td><td class="c-red">$+56,633</td><td class="c-red">$+54,805</td><td class="c-red">$+54,805</td><td class="c-red">$+39,838</td></tr><tr><td>12%</td><td class="c-red">$+26,516</td><td class="c-red">$+22,382</td><td class="c-red">$+33,203</td><td class="c-red">$+63,238</td><td class="c-red">$+54,805</td><td class="c-red">$+54,805</td><td class="c-red">$+39,838</td></tr><tr><td>15%</td><td class="c-red">$+38,357</td><td class="c-red">$+34,223</td><td class="c-red">$+31,374</td><td class="c-red">$+61,409</td><td class="c-red">$+54,805</td><td class="c-red">$+54,805</td><td class="c-red">$+39,838</td></tr><tr><td>18%</td><td class="c-red">$+38,357</td><td class="c-red">$+34,223</td><td class="c-red">$+31,374</td><td class="c-red">$+61,409</td><td class="c-red">$+54,805</td><td class="c-red">$+54,805</td><td class="c-red">$+39,838</td></tr><tr><td>20%</td><td class="c-red">$+38,357</td><td class="c-red">$+34,223</td><td class="c-red">$+31,374</td><td class="c-red">$+61,409</td><td class="c-red">$+54,805</td><td class="c-red">$+54,805</td><td class="c-red">$+39,838</td></tr><tr><td>25%</td><td class="c-red">$+38,357</td><td class="c-red">$+34,223</td><td class="c-red">$+40,140</td><td class="c-red">$+54,805</td><td class="c-red">$+54,805</td><td class="c-red">$+54,805</td><td class="c-red">$+39,838</td></tr>
+</table>
+</div>
+<p class="note">轮空策略最优 = <strong class="c-gold">跌 8% / 涨 18%</strong>，收益 <strong class="c-gold">$+84,929</strong>（普通策略同参数收益 $-14,401，轮空多赚 $+99,330）。轮空不改变最优熔断线，但普遍提升收益。</p>
+</div>
+
+<div class="card">
+<h2>为什么是「跌 20% + 涨 15%」</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>涨熔断 15%、跌熔断 20% 是这段数据下独立扫描出来的最优组合</strong>，不是对称的固定值。涨跌分开扫，是因为标的的上涨节奏和下跌节奏往往不对称。</li>
+<li><strong>涨熔断</strong>：涨到 15% 就追高重新对齐行权价，捕捉「涨了又回调」的波动。太灵敏会在单边慢涨里反复亏权利金；太迟钝会让 put 停留在旧行权价、回调时保护不足。</li>
+<li><strong>跌熔断</strong>：跌到 20% 才止盈落袋，只捕捉真正的趋势下跌，避免小波动反复付权利金。</li>
+<li><strong>不能跨标的通用</strong>：DRAM、SKHY、SNDK 各自扫描出的最优涨/跌熔断都不同，因为它们的波动节奏不一样。这个「涨跌分开扫」的框架是通用的，但具体数值要每个标的自己扫。</li>
+</ul>
+<div class="callout-warn">
+<strong>⚠️ 过拟合警示</strong>：SNDK 仅 65 个交易日、16 轮交易。最优参数高度依赖这段行情的具体节奏，若未来波动节奏改变（如变成单边慢涨），追高会频繁亏权利金。这个参数是短数据下的拟合结果，稳定性有限，仅供研究。
+</div>
+</div>
+
+<div class="card">
+<h2>最优策略逐轮明细：跌 20% / 涨 15% 熔断</h2>
+<p style="font-size:14px;margin-bottom:10px;">共 16 轮（跌熔断 2 次 / 涨熔断 4 次 / 到期 10 次）。股票 <span class="c-green">$-9,018</span>；put 净 <span class="c-red">$+63,337</span>；<strong>总收益 <span class="c-red">$+54,319</span></strong>。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>波动比例</th><th>行权价</th><th>入场vsMA20</th><th>股票涨跌</th><th>put成本</th><th>成本占比</th><th>put收入</th><th>周期总利润(&lt;11)</th><th>周期总利润(all)</th></tr>
+<tr>
+<td>2026-08-14</td>
+<td>2026-08-21</td>
+<td>到期</td>
+<td>$1646.9</td>
+<td>$1596.1</td>
+<td class="c-green">-3.1%</td>
+<td>$1650</td>
+<td class="c-red">+21.2%</td>
+<td class="c-green">$-5,085</td>
+<td class="c-green">-$18,898</td>
+<td class="c-green">11.5%</td>
+<td class="c-red">$+10,784</td>
+<td class="c-gray">$+0</td>
+<td class="c-green">$-13,200</td>
+</tr>
+<tr>
+<td>2026-08-07</td>
+<td>2026-08-14</td>
+<td>上涨再平衡</td>
+<td>$1212.2</td>
+<td>$1646.9</td>
+<td class="c-red">+35.9%</td>
+<td>$1210</td>
+<td class="c-green">-13.0%</td>
+<td class="c-red">$+43,472</td>
+<td class="c-green">-$12,709</td>
+<td class="c-green">10.5%</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+30,763</td>
+<td class="c-red">$+30,763</td>
+</tr>
+<tr>
+<td>2026-07-31</td>
+<td>2026-08-07</td>
+<td>到期</td>
+<td>$1383.7</td>
+<td>$1212.2</td>
+<td class="c-green">-12.4%</td>
+<td>$1385</td>
+<td class="c-green">-19.5%</td>
+<td class="c-green">$-17,147</td>
+<td class="c-green">-$29,437</td>
+<td class="c-green">21.3%</td>
+<td class="c-red">$+34,558</td>
+<td class="c-gray">$+0</td>
+<td class="c-green">$-12,026</td>
+</tr>
+<tr>
+<td>2026-07-29</td>
+<td>2026-07-31</td>
+<td>上涨再平衡</td>
+<td>$1119.3</td>
+<td>$1383.7</td>
+<td class="c-red">+23.6%</td>
+<td>$1120</td>
+<td class="c-green">-35.4%</td>
+<td class="c-red">$+26,436</td>
+<td class="c-green">-$16,512</td>
+<td class="c-green">14.8%</td>
+<td class="c-red">$+0</td>
+<td class="c-gray">$+0</td>
+<td class="c-red">$+9,924</td>
+</tr>
+<tr>
+<td>2026-07-24</td>
+<td>2026-07-29</td>
+<td>下跌止盈</td>
+<td>$1436.6</td>
+<td>$1119.3</td>
+<td class="c-green">-22.1%</td>
+<td>$1435</td>
+<td class="c-green">-16.7%</td>
+<td class="c-green">$-31,723</td>
+<td class="c-green">-$20,200</td>
+<td class="c-green">14.1%</td>
+<td class="c-red">$+63,134</td>
+<td class="c-gray">$+0</td>
+<td class="c-red">$+11,211</td>
+</tr>
+<tr>
+<td>2026-07-23</td>
+<td>2026-07-24</td>
+<td>到期</td>
+<td>$1567.6</td>
+<td>$1436.6</td>
+<td class="c-green">-8.4%</td>
+<td>$1570</td>
+<td class="c-green">-9.0%</td>
+<td class="c-green">$-13,104</td>
+<td class="c-green">-$6,980</td>
+<td class="c-green">4.5%</td>
+<td class="c-red">$+26,688</td>
+<td class="c-red">$+6,604</td>
+<td class="c-red">$+6,604</td>
+</tr>
+<tr>
+<td>2026-07-17</td>
+<td>2026-07-23</td>
+<td>上涨再平衡</td>
+<td>$1354.8</td>
+<td>$1567.6</td>
+<td class="c-red">+15.7%</td>
+<td>$1355</td>
+<td class="c-green">-27.8%</td>
+<td class="c-red">$+21,278</td>
+<td class="c-green">-$21,311</td>
+<td class="c-green">15.7%</td>
+<td class="c-red">$+0</td>
+<td class="c-gray">$+0</td>
+<td class="c-green">$-33</td>
+</tr>
+<tr>
+<td>2026-07-16</td>
+<td>2026-07-17</td>
+<td>到期</td>
+<td>$1527.5</td>
+<td>$1354.8</td>
+<td class="c-green">-11.3%</td>
+<td>$1530</td>
+<td class="c-green">-26.0%</td>
+<td class="c-green">$-17,267</td>
+<td class="c-green">-$17,483</td>
+<td class="c-green">11.4%</td>
+<td class="c-red">$+35,036</td>
+<td class="c-gray">$+0</td>
+<td class="c-red">$+286</td>
+</tr>
+<tr>
+<td>2026-07-10</td>
+<td>2026-07-16</td>
+<td>下跌止盈</td>
+<td>$1915.9</td>
+<td>$1527.5</td>
+<td class="c-green">-20.3%</td>
+<td>$1915</td>
+<td class="c-green">-3.4%</td>
+<td class="c-green">$-38,843</td>
+<td class="c-green">-$25,034</td>
+<td class="c-green">13.1%</td>
+<td class="c-red">$+77,502</td>
+<td class="c-gray">$+0</td>
+<td class="c-red">$+13,625</td>
+</tr>
+<tr>
+<td>2026-07-02</td>
+<td>2026-07-10</td>
+<td>到期</td>
+<td>$1745.0</td>
+<td>$1915.9</td>
+<td class="c-red">+9.8%</td>
+<td>$1740</td>
+<td class="c-green">-10.6%</td>
+<td class="c-red">$+17,092</td>
+<td class="c-green">-$22,923</td>
+<td class="c-green">13.1%</td>
+<td class="c-red">$+0</td>
+<td class="c-gray">$+0</td>
+<td class="c-green">$-5,831</td>
+</tr>
+<tr>
+<td>2026-06-26</td>
+<td>2026-07-02</td>
+<td>到期</td>
+<td>$2090.7</td>
+<td>$1745.0</td>
+<td class="c-green">-16.5%</td>
+<td>$2090</td>
+<td class="c-red">+10.2%</td>
+<td class="c-green">$-34,571</td>
+<td class="c-green">-$17,251</td>
+<td class="c-green">8.3%</td>
+<td class="c-red">$+69,000</td>
+<td class="c-red">$+17,178</td>
+<td class="c-red">$+17,178</td>
+</tr>
+<tr>
+<td>2026-06-18</td>
+<td>2026-06-26</td>
+<td>到期</td>
+<td>$2184.8</td>
+<td>$2090.7</td>
+<td class="c-green">-4.3%</td>
+<td>$2180</td>
+<td class="c-gray">-</td>
+<td class="c-green">$-9,404</td>
+<td class="c-green">-$27,636</td>
+<td class="c-green">12.6%</td>
+<td class="c-red">$+17,858</td>
+<td class="c-gray">$+0</td>
+<td class="c-green">$-19,182</td>
+</tr>
+<tr>
+<td>2026-06-12</td>
+<td>2026-06-18</td>
+<td>到期</td>
+<td>$1891.0</td>
+<td>$2184.8</td>
+<td class="c-red">+15.5%</td>
+<td>$1890</td>
+<td class="c-gray">-</td>
+<td class="c-red">$+29,377</td>
+<td class="c-green">-$15,135</td>
+<td class="c-green">8.0%</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+14,242</td>
+<td class="c-red">$+14,242</td>
+</tr>
+<tr>
+<td>2026-06-05</td>
+<td>2026-06-12</td>
+<td>上涨再平衡</td>
+<td>$1559.3</td>
+<td>$1891.0</td>
+<td class="c-red">+21.3%</td>
+<td>$1560</td>
+<td class="c-gray">-</td>
+<td class="c-red">$+33,166</td>
+<td class="c-green">-$17,435</td>
+<td class="c-green">11.2%</td>
+<td class="c-red">$+0</td>
+<td class="c-gray">$+0</td>
+<td class="c-red">$+15,731</td>
+</tr>
+<tr>
+<td>2026-05-29</td>
+<td>2026-06-05</td>
+<td>到期</td>
+<td>$1695.0</td>
+<td>$1559.3</td>
+<td class="c-green">-8.0%</td>
+<td>$1690</td>
+<td class="c-gray">-</td>
+<td class="c-green">$-13,566</td>
+<td class="c-green">-$20,166</td>
+<td class="c-green">11.9%</td>
+<td class="c-red">$+26,136</td>
+<td class="c-gray">$+0</td>
+<td class="c-green">$-7,596</td>
+</tr>
+<tr>
+<td>2026-05-26</td>
+<td>2026-05-29</td>
+<td>到期</td>
+<td>$1535.2</td>
+<td>$1695.0</td>
+<td class="c-red">+10.4%</td>
+<td>$1535</td>
+<td class="c-gray">-</td>
+<td class="c-red">$+15,977</td>
+<td class="c-green">-$8,251</td>
+<td class="c-green">5.4%</td>
+<td class="c-red">$+0</td>
+<td class="c-red">$+7,726</td>
+<td class="c-red">$+7,726</td>
+</tr>
+</table>
+</div>
+<p class="note">周期总利润 = 股票涨跌 + put收入 − put成本。倒序排列（最近的交易在最上）。<strong>「周期总利润(all)」= 原本的周期总利润；「周期总利润(&lt;11)」= 若采用"成本占比 &gt;11% 轮空"规则，该轮收益记 0（成本 ≤11% 的轮次两列相同）</strong>。「入场vsMA20」是每轮入场当日现价相对 MA20 的偏离，"-"表示数据不足。</p>
+<div class="callout" style="margin-top:10px;">
+<strong>对账说明</strong>：各轮「周期总利润(all)」加总 = <span class="c-red">$+69,424</span>，而顶部总收益是 <span class="c-red">$+54,319</span>，差 <span class="c-red">$-15,105</span>。<br>
+差额是<strong>空档期股票涨跌</strong>——股票全程持有（首日 2026-05-26 买入、末日 2026-08-26 卖出），但 put 是周期滚动的，轮次之间裸持期的股票涨跌只计入"股票全程涨跌"、不计入任何一轮：<br>
+① 开头空档：数据首日 2026-05-26 无期权数据，股票从 $1589.55 裸涨到第一轮入场 $1535.21，计 <span class="c-green">$-5,434</span>；<br>
+② 结尾空档：最后一轮 2026-08-21 到期后，股票从 $1596.08 持有到末日 $1499.37，计 <span class="c-green">$-9,671</span>。<br>
+合计：<span class="c-red">$+69,424</span> + <span class="c-green">$-5,434</span> + <span class="c-green">$-9,671</span> = <span class="c-red">$+54,319</span> ✓
+</div>
+</div>
+
+<div class="card">
+<h2>轮空规则验证（成本 &gt;11% 跳过该轮）</h2>
+<div class="callout-gold">
+<strong>✅ 结论：轮空（跳过成本 &gt;11% 的轮次）收益更高。</strong>对比明细表两列总和：不轮空的「周期总利润(all)」合计 <span class="c-red">$+69,424</span>，轮空的「周期总利润(&lt;11)」合计 <span class="c-red">$+76,514</span>，轮空<strong class="c-gold">多赚 <span class="c-red">$+7,090</span></strong>。
+</div>
+<p style="font-size:13px;color:var(--text);line-height:1.9;">原因：成本 &gt;11% 的 11 个轮次合计净亏 <span class="c-green">$-7,090</span>（-7,596, +15,731, -19,182, -5,831, +13,625, +286, -33, +11,211, +9,924, -12,026, -13,200），跳过它们就把这部分亏损避开了。注意：这里是"事后跳过"的对比口径（其他轮次不受影响），实盘若轮空导致重新进场的时点错位，收益会有差异。SNDK 仅 65 个交易日，样本小，仅供参考。</p>
+</div>
+
+<div class="card">
+<h2>亏损轮的特征分析</h2>
+<div class="callout-warn">
+<strong>结论：亏损 / 小赚的轮次，几乎全是「波动不够大」的轮次。</strong>买 put 赚的是"波动"的钱——只有实际涨跌幅超过权利金成本，put 的赔付才能覆盖保费。波动小的轮次（无论涨还是跌），权利金白付，就是亏损轮。
+</div>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>亏损轮只有两类</strong>：①「上涨再平衡」轮（涨了触发追高，但追高后没继续涨，put 变虚值 + 重新付保费）；②「到期」小跌轮（跌了但跌得不够狠，put 赔付 &lt; 保费，股票又小亏）。</li>
+<li><strong>大赚轮只有两类</strong>：①「下跌止盈」轮（跌穿熔断线 20%，2:1 对冲下 put 赔付是股票亏损的 2 倍）；②「极端大涨」轮（股票涨 + 追高前 put 也涨，双击）。</li>
+<li><strong>关键变量是 put 成本占比</strong>：成本占比越高的轮次越难回本——高成本意味着市场 IV 高、权利金贵，后续需要更大的波动才能覆盖保费。对应报告里的「成本 &gt;11% 轮空」规则。</li>
+</ul>
+<p class="note">注意：SNDK 仅 65 个交易日、共 16 轮，样本量很小，上述特征是"这一段行情"的观察，统计意义有限，仅供参考，不可外推为普适规律。</p>
+</div>
+
+<div class="card">
+<h2>现在如何买（基于最新期权数据 2026-08-26）</h2>
+<div class="callout-gold">
+最新 SNDK 现价 <strong class="c-gold">$1499.37</strong>，最近到期日 <strong>2026-08-28</strong>（dte 2 天）。
+按最优策略 <strong class="c-gold">最近周五(1-4天) + 跌 20% / 涨 15%</strong>，现在应这样操作：
+</div>
+<ol style="font-size:14px;padding-left:22px;line-height:2.0;">
+<li><strong>持有 100 股 SNDK</strong>（市值 $149,937），一直持有不动。</li>
+<li><strong>买入 2 张行权价 $1500 的 Put</strong>（现价 $1499.37 最接近的平值档），到期日 2026-08-28。</li>
+<li>该档 Put 成交量加权价 <strong>$45.98/股</strong>，每张 $4,598.00，2 张共 <strong class="c-green">-$9,196</strong>（占持仓 6.1%）。</li>
+<li><strong>熔断线（不对称）</strong>：开盘价涨到 <strong class="c-red">$1724.28</strong>（涨 15%）或跌到 <strong class="c-green">$1199.50</strong>（跌 20%）就开盘平仓 put + 重买（盘中不盯盘）。</li>
+<li>没触发熔断就持有到 2026-08-28 到期，再滚动下一轮 最近周五(1-4天) put。</li>
+</ol>
+<div class="tbl-scroll">
+<table>
+<tr><th>到期日 spot</th><th>涨跌</th><th>股票 P&L</th><th>Put 赔付</th><th>净 P&L</th><th>净收益率</th></tr>
+<tr>
+<td>1124.53</td>
+<td>-25%</td>
+<td class="c-green">-37,484</td>
+<td class="c-red">+75,095</td>
+<td class="c-red">+28,414</td>
+<td class="c-red">+19.0%</td>
+</tr>
+<tr>
+<td>1199.50</td>
+<td>-20%</td>
+<td class="c-green">-29,987</td>
+<td class="c-red">+60,101</td>
+<td class="c-red">+20,917</td>
+<td class="c-red">+14.0%</td>
+</tr>
+<tr>
+<td>1274.46</td>
+<td>-15%</td>
+<td class="c-green">-22,491</td>
+<td class="c-red">+45,107</td>
+<td class="c-red">+13,421</td>
+<td class="c-red">+9.0%</td>
+</tr>
+<tr>
+<td>1349.43</td>
+<td>-10%</td>
+<td class="c-green">-14,994</td>
+<td class="c-red">+30,113</td>
+<td class="c-red">+5,924</td>
+<td class="c-red">+4.0%</td>
+</tr>
+<tr>
+<td>1424.40</td>
+<td>-5%</td>
+<td class="c-green">-7,497</td>
+<td class="c-red">+15,120</td>
+<td class="c-green">-1,573</td>
+<td class="c-green">-1.0%</td>
+</tr>
+<tr>
+<td>1499.37</td>
+<td>+0%</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+126</td>
+<td class="c-green">-9,070</td>
+<td class="c-green">-6.0%</td>
+</tr>
+<tr>
+<td>1574.34</td>
+<td>+5%</td>
+<td class="c-red">+7,497</td>
+<td class="c-gray">+0</td>
+<td class="c-green">-1,699</td>
+<td class="c-green">-1.1%</td>
+</tr>
+<tr>
+<td>1649.31</td>
+<td>+10%</td>
+<td class="c-red">+14,994</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+5,798</td>
+<td class="c-red">+3.9%</td>
+</tr>
+<tr>
+<td>1724.28</td>
+<td>+15%</td>
+<td class="c-red">+22,491</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+13,295</td>
+<td class="c-red">+8.9%</td>
+</tr>
+<tr>
+<td>1799.24</td>
+<td>+20%</td>
+<td class="c-red">+29,987</td>
+<td class="c-gray">+0</td>
+<td class="c-red">+20,791</td>
+<td class="c-red">+13.9%</td>
+</tr>
+</table>
+</div>
+<p class="note">净 P&L = 股票 P&L + Put 赔付 − 保费（2 张 $9,196）。这是「微笑曲线」：<strong>大涨赚（股票）、大跌也赚（2:1 过度对冲）、只有横盘小波动亏保费</strong>。注意：实际涨跌 15%/20% 会触发熔断提前平仓，不会真的持有到期。</p>
+</div>
+
+<div class="card">
+<h2>与 DRAM 同期对比（2026-05-26 ~ 2026-08-26，63 交易日）</h2>
+<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">同一时间窗口（SNDK 近 3 个月数据期）。SNDK 用其最优参数；DRAM 用原报告策略（7天+15% 对称）<strong>延续滚动</strong>（从 4 月建仓滚到现在，不重新建仓）。资金收益率 = 策略净值变化 ÷ 期初市值（100 股 × 首日收盘价）。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>指标</th><th>SNDK（最优：最近周五(1-4天) 跌20%/涨15%）</th><th>DRAM（7天+15% 对称，延续滚动）</th></tr>
+<tr><td>B&H 资金收益率</td><td class="c-green">-5.7%</td><td class="c-green">-10.3%</td></tr>
+<tr><td>B&H 回撤比例</td><td class="c-green">56.5%</td><td class="c-green">44.4%</td></tr>
+<tr><td><strong>策略资金收益率</strong></td><td class="c-red"><strong>+34.2%</strong></td><td class="c-red">+6.3%</td></tr>
+<tr><td><strong>策略回撤比例</strong></td><td class="c-green"><strong>23.9%</strong></td><td class="c-green">28.5%</td></tr>
+<tr><td><strong>收益/回撤比</strong></td><td class="c-red"><strong>0.98</strong></td><td class="c-red">0.20</td></tr>
+</table>
+</div>
+<div class="callout">
+<strong>同期对比结论</strong>：同样这 63 个交易日里，<strong>DRAM 涨跌 -10.3%，SNDK 涨跌 -5.7%</strong>。买 put 对冲在两者身上的效果：
+<ul style="font-size:13px;padding-left:20px;line-height:1.9;">
+<li><strong>SNDK 买 put</strong>：策略收益率 +34.2%（B&H -5.7%），回撤从 56.5% 变到 23.9%。</li>
+<li><strong>DRAM 同期买 put</strong>：策略收益率 +6.3%（B&H -10.3%），回撤从 44.4% 变到 28.5%。</li>
+<li><strong>核心规律</strong>：买 put 对冲的收益，取决于「实际波动 vs 隐含波动」的差。实际波动越远超 IV 定价，买 put 越正期望；波动温和则 put 赔付勉强覆盖保费，只起"保险"作用。</li>
+</ul>
+</div>
+</div>
+
+<div class="card">
+<h2>数据与结论说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>⚠️ 数据长度限制</strong>：本回测用 SNDK（SanDisk，NAND 闪存/存储公司，Nasdaq 上市）近 3 个月数据，仅 65 个交易日、16 轮交易。样本偏少，参数结论可靠性低于更长周期的回测，仅供研究参考。</li>
+<li><strong>真实成交价</strong>：Put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价 + 假设 IV。</li>
+<li><strong>多到期日数据</strong>：SNDK_options_3fri.json 每天含 3 个周五到期日（dte 1-4 / 6-11 / 13-21 天），可真实对比不同周期，无需 BS 外推。</li>
+<li><strong>开盘价熔断</strong>：只在美国开盘瞬间判断一次，盘中 low/high 不触发——符合「不盯盘」的实盘操作。</li>
+<li><strong>回撤口径</strong>：逐日净值 = 股票市值 + 累计 Put 现金流，MDD = 峰值到谷底最大回撤。</li>
+<li><strong>不对称扫描</strong>：涨熔断与跌熔断独立扫描（7×7 组合），发现 SNDK 最优是「跌 20% + 涨 15%」，与 DRAM 的对称 15% 不同——两标的最优参数不能通用。</li>
+<li><strong>未计交易摩擦</strong>：实盘佣金 + bid-ask 价差会吃掉部分优势，周期越短越明显。</li>
+<li><strong>结果依赖这段行情</strong>：SNDK 这 3 个月从 $1589.55 波动到最高 ~$2335、最低 ~$1015.89，高波动是策略赚钱的前提。仅供研究，不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

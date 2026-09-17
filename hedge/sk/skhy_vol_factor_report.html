@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKHY 对冲策略 —— 波动相关性因子分析</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1080px; margin:0 auto; }
+h1 { font-size:24px; margin-bottom:6px; }
+h2 { font-size:19px; margin:32px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+h3 { font-size:15px; margin:18px 0 8px; color:var(--text); }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gold { color:var(--gold); font-weight:700; }
+.c-gray { color:var(--muted); }
+.callout-gold { background:rgba(245,195,68,.08); border:1px solid rgba(245,195,68,.35); border-radius:10px; padding:14px 16px; margin:12px 0; font-size:14px; }
+.callout-red { background:rgba(255,82,82,.08); border:1px solid rgba(255,82,82,.35); border-radius:10px; padding:14px 16px; margin:12px 0; font-size:14px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+.tbl-scroll { overflow-x:auto; }
+code { background:#1d212a; color:var(--gold); padding:1px 6px; border-radius:4px; font-size:12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>SKHY 对冲策略 —— 波动相关性因子分析</h1>
+<p class="sub">固定策略：100股 + 2张put（1:2）· 最近周五 · 跌15%/涨8% · 数据 2026-07-14 ~ 2026-09-11 · 生成于 2026-09-14 01:55（美东 ET）</p>
+
+<div class="card">
+<h2 style="margin-top:0;">核心结论</h2>
+<div class="callout-gold">
+<p><strong>1. 「波动大 → 盈利」只对「上涨」成立</strong>：期间<strong>涨幅</strong>与盈利强正相关（全窗口 r=+0.63、30天 r=+0.66），
+慢牛里股票端赚得多。但期间<strong>跌幅</strong>与盈利是<strong>负相关</strong>（全窗口 r=-0.16、30天 r=-0.54）——
+跌越深反而越容易亏，put 2:1 的赔付并未兑现「跌深多赚」。</p>
+<p style="margin-top:8px;"><strong>2. 能稳健预示「下一轮跌幅」的入场前因子（两个窗口方向一致）</strong>：
+<span class="c-gold">前5日振幅</span>（vs 跌幅 +0.56 / +0.89）、<span class="c-gold">前5日均量</span>（+0.57 / +0.76）、
+<span class="c-gold">put成本占比</span>（+0.51 / +0.74）。放量 + 振幅放大 + 权利金变贵 → 下一轮跌幅大概率更大。</p>
+<p style="margin-top:8px;"><strong>3. 但这些因子预示的是「风险」，不是「收益」</strong>：既然跌幅与盈利负相关，它们的正确用法是
+<strong>风险预警（减仓 / 加大对冲）</strong>，而不是「波动大就加仓」。</p>
+</div>
+<div class="callout-red">
+<p><strong>⚠️ 样本量警示</strong>：SKHY 上市至今仅 14 轮交易（30天窗口仅 8 轮），Pearson 相关系数在
+小样本下极不稳定，以下结论是<strong>探索性</strong>的，不能当作可靠的预测规律。相关系数 |r|&lt;0.5 基本无统计意义。</p>
+<p style="margin-top:8px;"><strong>⚠️ 「跌越深赚越多」在本数据上不成立的原因</strong>：①大跌常用<strong>开盘价</strong>判断熔断，盘中跌穿 15% 但开盘未跌够就不触发，
+只能持有到期；②put 权利金贵（成本占比 5~13%）；③到期日股价若反弹，put 内在价值缩水。三者叠加 → 跌 16.3% 的一轮（07-31）反而净亏 -$413。</p>
+</div>
+</div>
+
+<div class="card">
+<h2>① 验证「波动大 → 盈利」</h2>
+<p class="note" style="margin-bottom:10px;">散点 = 每轮交易（x 轴为期间波动幅度，y 轴为该轮周期总利润）。红点=盈利，绿点=亏损。</p>
+<h3>跌幅与盈利</h3>
+<svg viewBox="0 0 620 320" style="width:100%;max-width:640px;"><line x1="52.0" y1="20" x2="52.0" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="276.0" x2="602" y2="276.0" stroke="#262b36" stroke-width="1"/><line x1="189.50000000000003" y1="20" x2="189.50000000000003" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="212.0" x2="602" y2="212.0" stroke="#262b36" stroke-width="1"/><line x1="327.0" y1="20" x2="327.0" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="148.0" x2="602" y2="148.0" stroke="#262b36" stroke-width="1"/><line x1="464.5" y1="20" x2="464.5" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="84.00000000000001" x2="602" y2="84.00000000000001" stroke="#262b36" stroke-width="1"/><line x1="602.0" y1="20" x2="602.0" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="20.0" x2="602" y2="20.0" stroke="#262b36" stroke-width="1"/><line x1="52" y1="178.11770722170834" x2="602" y2="178.11770722170834" stroke="#3a4150" stroke-width="1" stroke-dasharray="4 3"/><circle cx="89.93103448275863" cy="77.3849003066533" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-14 上涨再平衡 盈利$+1,418</title></circle><circle cx="564.0689655172414" cy="128.61710616733308" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-15 下跌止盈 盈利$+697</title></circle><circle cx="160.7900598591896" cy="188.6706950035248" r="5" fill="var(--green)" opacity="0.85"><title>2026-07-17 上涨再平衡 盈利$-149</title></circle><circle cx="316.0524310470165" cy="133.9284026158739" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-23 到期 盈利$+622</title></circle><circle cx="546.7076259468656" cy="149.6094407264501" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-24 下跌止盈 盈利$+401</title></circle><circle cx="152.11051558592538" cy="44.774193548387096" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-29 上涨再平衡 盈利$+1,877</title></circle><circle cx="470.6042422480332" cy="207.43282484902622" r="5" fill="var(--green)" opacity="0.85"><title>2026-07-31 到期 盈利$-413</title></circle><circle cx="126.75868721870944" cy="192.57994555885642" r="5" fill="var(--green)" opacity="0.85"><title>2026-08-07 上涨再平衡 盈利$-204</title></circle><circle cx="108.75851824153816" cy="108.9288021350304" r="5" fill="var(--red)" opacity="0.85"><title>2026-08-12 上涨再平衡 盈利$+974</title></circle><circle cx="275.1352819259973" cy="250.84084754881684" r="5" fill="var(--green)" opacity="0.85"><title>2026-08-14 到期 盈利$-1,024</title></circle><circle cx="237.8933128433768" cy="251.2258064516129" r="5" fill="var(--green)" opacity="0.85"><title>2026-08-21 到期 盈利$-1,029</title></circle><circle cx="102.90216970475817" cy="131.0035672621574" r="5" fill="var(--red)" opacity="0.85"><title>2026-08-28 到期 盈利$+663</title></circle><circle cx="230.45334224678376" cy="183.06677296835642" r="5" fill="var(--green)" opacity="0.85"><title>2026-09-04 上涨再平衡 盈利$-70</title></circle><circle cx="129.29889252594808" cy="198.502062406668" r="5" fill="var(--green)" opacity="0.85"><title>2026-09-11 持有中 盈利$-287</title></circle><text x="310.0" y="310" fill="var(--muted)" font-size="12" text-anchor="middle">期间最大跌幅 %</text><text x="16" y="160.0" fill="var(--muted)" font-size="12" text-anchor="middle" transform="rotate(-90 16 160.0)">周期总利润 $</text></svg>
+<h3>涨幅与盈利</h3>
+<svg viewBox="0 0 620 320" style="width:100%;max-width:640px;"><line x1="52.0" y1="20" x2="52.0" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="276.0" x2="602" y2="276.0" stroke="#262b36" stroke-width="1"/><line x1="189.50000000000003" y1="20" x2="189.50000000000003" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="212.0" x2="602" y2="212.0" stroke="#262b36" stroke-width="1"/><line x1="327.0" y1="20" x2="327.0" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="148.0" x2="602" y2="148.0" stroke="#262b36" stroke-width="1"/><line x1="464.5" y1="20" x2="464.5" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="84.00000000000001" x2="602" y2="84.00000000000001" stroke="#262b36" stroke-width="1"/><line x1="602.0" y1="20" x2="602.0" y2="276" stroke="#262b36" stroke-width="1"/><line x1="52" y1="20.0" x2="602" y2="20.0" stroke="#262b36" stroke-width="1"/><line x1="52" y1="178.11770722170834" x2="602" y2="178.11770722170834" stroke="#3a4150" stroke-width="1" stroke-dasharray="4 3"/><line x1="89.93103448275862" y1="20" x2="89.93103448275862" y2="276" stroke="#3a4150" stroke-width="1" stroke-dasharray="4 3"/><circle cx="389.0805177996887" cy="77.3849003066533" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-14 上涨再平衡 盈利$+1,418</title></circle><circle cx="153.56320867416474" cy="128.61710616733308" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-15 下跌止盈 盈利$+697</title></circle><circle cx="409.7702437226069" cy="188.6706950035248" r="5" fill="var(--green)" opacity="0.85"><title>2026-07-17 上涨再平衡 盈利$-149</title></circle><circle cx="169.56491597026604" cy="133.9284026158739" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-23 到期 盈利$+622</title></circle><circle cx="207.3219018862974" cy="149.6094407264501" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-24 下跌止盈 盈利$+401</title></circle><circle cx="564.0689655172414" cy="44.774193548387096" r="5" fill="var(--red)" opacity="0.85"><title>2026-07-29 上涨再平衡 盈利$+1,877</title></circle><circle cx="122.63614804056185" cy="207.43282484902622" r="5" fill="var(--green)" opacity="0.85"><title>2026-07-31 到期 盈利$-413</title></circle><circle cx="325.5448062748529" cy="192.57994555885642" r="5" fill="var(--green)" opacity="0.85"><title>2026-08-07 上涨再平衡 盈利$-204</title></circle><circle cx="350.9971297080986" cy="108.9288021350304" r="5" fill="var(--red)" opacity="0.85"><title>2026-08-12 上涨再平衡 盈利$+974</title></circle><circle cx="191.36758440490698" cy="250.84084754881684" r="5" fill="var(--green)" opacity="0.85"><title>2026-08-14 到期 盈利$-1,024</title></circle><circle cx="136.63025425707937" cy="251.2258064516129" r="5" fill="var(--green)" opacity="0.85"><title>2026-08-21 到期 盈利$-1,029</title></circle><circle cx="284.85797206346837" cy="131.0035672621574" r="5" fill="var(--red)" opacity="0.85"><title>2026-08-28 到期 盈利$+663</title></circle><circle cx="333.33697358222355" cy="183.06677296835642" r="5" fill="var(--green)" opacity="0.85"><title>2026-09-04 上涨再平衡 盈利$-70</title></circle><circle cx="89.93103448275862" cy="198.502062406668" r="5" fill="var(--green)" opacity="0.85"><title>2026-09-11 持有中 盈利$-287</title></circle><text x="310.0" y="310" fill="var(--muted)" font-size="12" text-anchor="middle">期间最大涨幅 %</text><text x="16" y="160.0" fill="var(--muted)" font-size="12" text-anchor="middle" transform="rotate(-90 16 160.0)">周期总利润 $</text></svg>
+<div class="tbl-scroll" style="margin-top:12px;">
+<table>
+<tr><th>波动度量</th><th>全窗口(44天) r</th><th>30天窗口 r</th></tr>
+<tr><td style="color:var(--text);">期间最大跌幅 vs 盈利</td><td style="color:var(--muted);font-weight:600;">-0.16</td><td style="color:var(--green);font-weight:600;">-0.54</td></tr>
+<tr><td style="color:var(--text);">期间最大涨幅 vs 盈利</td><td style="color:var(--red);font-weight:600;">+0.63</td><td style="color:var(--red);font-weight:600;">+0.66</td></tr>
+<tr><td style="color:var(--text);">期间已实现波动RV vs 盈利</td><td style="color:var(--red);font-weight:600;">+0.64</td><td style="color:var(--muted);font-weight:600;">+0.10</td></tr>
+</table>
+</div>
+<p class="note">解读：<strong>涨幅 r≈+0.63</strong> 说明涨得越多越赚（慢牛里股票端赚钱）；<strong>跌幅 r≈-0.16（30天 -0.54）</strong> 说明跌得越多反而越容易亏——
+与「put 2:1 跌深多赚」的直觉相反，原因见上方警示框（开盘价熔断错位 + 保费贵 + 到期日反弹）。RV 与盈利的 +0.64 主要也是被「上涨」贡献的。</p>
+</div>
+
+<div class="card">
+<h2>② 因子与「未来波动/盈利」的相关性（全窗口 44 天）</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场前因子</th><th>期间已实现波动RV</th><th>期间最大跌幅</th><th>期间最大涨幅</th><th>周期总利润</th></tr>
+<tr><td style="color:var(--text);">前5日均量</td><td style="color:var(--red);font-weight:600;">+0.45</td><td style="color:var(--red);font-weight:600;">+0.57</td><td style="color:var(--muted);font-weight:600;">-0.02</td><td style="color:var(--muted);font-weight:600;">+0.15</td></tr>
+<tr><td style="color:var(--text);">前10日均量</td><td style="color:var(--red);font-weight:600;">+0.49</td><td style="color:var(--red);font-weight:600;">+0.51</td><td style="color:var(--muted);font-weight:600;">+0.14</td><td style="color:var(--red);font-weight:600;">+0.33</td></tr>
+<tr><td style="color:var(--text);">量比(5/10)</td><td style="color:var(--muted);font-weight:600;">+0.09</td><td style="color:var(--muted);font-weight:600;">+0.05</td><td style="color:var(--green);font-weight:600;">-0.51</td><td style="color:var(--green);font-weight:600;">-0.43</td></tr>
+<tr><td style="color:var(--text);">量比(10/20)</td><td style="color:var(--red);font-weight:600;">+0.49</td><td style="color:var(--red);font-weight:600;">+0.46</td><td style="color:var(--muted);font-weight:600;">+0.04</td><td style="color:var(--red);font-weight:600;">+0.43</td></tr>
+<tr><td style="color:var(--text);">前5日振幅</td><td style="color:var(--red);font-weight:600;">+0.47</td><td style="color:var(--red);font-weight:600;">+0.56</td><td style="color:var(--muted);font-weight:600;">+0.00</td><td style="color:var(--muted);font-weight:600;">+0.16</td></tr>
+<tr><td style="color:var(--text);">前10日振幅</td><td style="color:var(--red);font-weight:600;">+0.50</td><td style="color:var(--red);font-weight:600;">+0.49</td><td style="color:var(--muted);font-weight:600;">+0.16</td><td style="color:var(--red);font-weight:600;">+0.32</td></tr>
+<tr><td style="color:var(--text);">前5日HV</td><td style="color:var(--muted);font-weight:600;">+0.15</td><td style="color:var(--muted);font-weight:600;">+0.18</td><td style="color:var(--muted);font-weight:600;">+0.08</td><td style="color:var(--muted);font-weight:600;">-0.16</td></tr>
+<tr><td style="color:var(--text);">前10日HV</td><td style="color:var(--muted);font-weight:600;">+0.20</td><td style="color:var(--red);font-weight:600;">+0.25</td><td style="color:var(--red);font-weight:600;">+0.20</td><td style="color:var(--muted);font-weight:600;">+0.11</td></tr>
+<tr><td style="color:var(--text);">put成本占比</td><td style="color:var(--muted);font-weight:600;">+0.02</td><td style="color:var(--red);font-weight:600;">+0.51</td><td style="color:var(--muted);font-weight:600;">-0.15</td><td style="color:var(--green);font-weight:600;">-0.38</td></tr>
+</table>
+</div>
+<p class="note">列含义：期间已实现波动RV / 期间最大跌幅 / 期间最大涨幅 / 周期总利润。正相关=因子越高、下一轮该指标越高。</p>
+<h3>各因子 vs 期间已实现波动 RV</h3>
+<svg viewBox="0 0 620 310" style="width:100%;max-width:640px;"><text x="112" y="32" fill="var(--text)" font-size="12" text-anchor="end">前5日均量</text><rect x="340.0" y="26" width="99.64619056328051" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="38" fill="var(--muted)" font-size="11" text-anchor="start">+0.45</text><text x="112" y="62" fill="var(--text)" font-size="12" text-anchor="end">前10日均量</text><rect x="340.0" y="56" width="108.41076337820027" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="68" fill="var(--muted)" font-size="11" text-anchor="start">+0.49</text><text x="112" y="92" fill="var(--text)" font-size="12" text-anchor="end">量比(5/10)</text><rect x="340.0" y="86" width="19.187917501734894" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="98" fill="var(--muted)" font-size="11" text-anchor="start">+0.09</text><text x="112" y="122" fill="var(--text)" font-size="12" text-anchor="end">量比(10/20)</text><rect x="340.0" y="116" width="107.24962933966617" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="128" fill="var(--muted)" font-size="11" text-anchor="start">+0.49</text><text x="112" y="152" fill="var(--text)" font-size="12" text-anchor="end">前5日振幅</text><rect x="340.0" y="146" width="102.47109150999316" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="158" fill="var(--muted)" font-size="11" text-anchor="start">+0.47</text><text x="112" y="182" fill="var(--text)" font-size="12" text-anchor="end">前10日振幅</text><rect x="340.0" y="176" width="110.93081382304022" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="188" fill="var(--muted)" font-size="11" text-anchor="start">+0.50</text><text x="112" y="212" fill="var(--text)" font-size="12" text-anchor="end">前5日HV</text><rect x="340.0" y="206" width="33.101223050677454" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="218" fill="var(--muted)" font-size="11" text-anchor="start">+0.15</text><text x="112" y="242" fill="var(--text)" font-size="12" text-anchor="end">前10日HV</text><rect x="340.0" y="236" width="43.850297610906416" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="248" fill="var(--muted)" font-size="11" text-anchor="start">+0.20</text><text x="112" y="272" fill="var(--text)" font-size="12" text-anchor="end">put成本占比</text><rect x="340.0" y="266" width="3.8570215925534503" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="278" fill="var(--muted)" font-size="11" text-anchor="start">+0.02</text><line x1="340.0" y1="14" x2="340.0" y2="294" stroke="#3a4150" stroke-width="1"/><text x="334.0" y="304" fill="var(--muted)" font-size="11" text-anchor="end">负相关</text><text x="346.0" y="304" fill="var(--muted)" font-size="11" text-anchor="start">正相关</text></svg>
+<h3>各因子 vs 周期总利润</h3>
+<svg viewBox="0 0 620 310" style="width:100%;max-width:640px;"><text x="112" y="32" fill="var(--text)" font-size="12" text-anchor="end">前5日均量</text><rect x="340.0" y="26" width="33.32958289096332" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="38" fill="var(--muted)" font-size="11" text-anchor="start">+0.15</text><text x="112" y="62" fill="var(--text)" font-size="12" text-anchor="end">前10日均量</text><rect x="340.0" y="56" width="72.64272593943438" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="68" fill="var(--muted)" font-size="11" text-anchor="start">+0.33</text><text x="112" y="92" fill="var(--text)" font-size="12" text-anchor="end">量比(5/10)</text><rect x="246.21375917789186" y="86" width="93.78624082210814" height="14" rx="3" fill="var(--green)" opacity="0.8"/><text x="334.0" y="98" fill="var(--muted)" font-size="11" text-anchor="end">-0.43</text><text x="112" y="122" fill="var(--text)" font-size="12" text-anchor="end">量比(10/20)</text><rect x="340.0" y="116" width="95.6350327835959" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="128" fill="var(--muted)" font-size="11" text-anchor="start">+0.43</text><text x="112" y="152" fill="var(--text)" font-size="12" text-anchor="end">前5日振幅</text><rect x="340.0" y="146" width="34.465705181698375" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="158" fill="var(--muted)" font-size="11" text-anchor="start">+0.16</text><text x="112" y="182" fill="var(--text)" font-size="12" text-anchor="end">前10日振幅</text><rect x="340.0" y="176" width="69.62498716942154" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="188" fill="var(--muted)" font-size="11" text-anchor="start">+0.32</text><text x="112" y="212" fill="var(--text)" font-size="12" text-anchor="end">前5日HV</text><rect x="305.5276908689303" y="206" width="34.47230913106971" height="14" rx="3" fill="var(--green)" opacity="0.8"/><text x="334.0" y="218" fill="var(--muted)" font-size="11" text-anchor="end">-0.16</text><text x="112" y="242" fill="var(--text)" font-size="12" text-anchor="end">前10日HV</text><rect x="340.0" y="236" width="24.80115743238219" height="14" rx="3" fill="var(--red)" opacity="0.8"/><text x="346.0" y="248" fill="var(--muted)" font-size="11" text-anchor="start">+0.11</text><text x="112" y="272" fill="var(--text)" font-size="12" text-anchor="end">put成本占比</text><rect x="256.5271626829492" y="266" width="83.4728373170508" height="14" rx="3" fill="var(--green)" opacity="0.8"/><text x="334.0" y="278" fill="var(--muted)" font-size="11" text-anchor="end">-0.38</text><line x1="340.0" y1="14" x2="340.0" y2="294" stroke="#3a4150" stroke-width="1"/><text x="334.0" y="304" fill="var(--muted)" font-size="11" text-anchor="end">负相关</text><text x="346.0" y="304" fill="var(--muted)" font-size="11" text-anchor="start">正相关</text></svg>
+</div>
+
+<div class="card">
+<h2>③ 因子相关性（30 天窗口，剔除上市初期）</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场前因子</th><th>期间已实现波动RV</th><th>期间最大跌幅</th><th>期间最大涨幅</th><th>周期总利润</th></tr>
+<tr><td style="color:var(--text);">前5日均量</td><td style="color:var(--muted);font-weight:600;">+0.10</td><td style="color:var(--muted);font-weight:600;">+0.05</td><td style="color:var(--green);font-weight:600;">-0.25</td><td style="color:var(--green);font-weight:600;">-0.44</td></tr>
+<tr><td style="color:var(--text);">前10日均量</td><td style="color:var(--muted);font-weight:600;">+0.07</td><td style="color:var(--muted);font-weight:600;">-0.02</td><td style="color:var(--muted);font-weight:600;">+0.12</td><td style="color:var(--muted);font-weight:600;">-0.15</td></tr>
+<tr><td style="color:var(--text);">量比(5/10)</td><td style="color:var(--muted);font-weight:600;">+0.15</td><td style="color:var(--muted);font-weight:600;">-0.08</td><td style="color:var(--green);font-weight:600;">-0.68</td><td style="color:var(--green);font-weight:600;">-0.32</td></tr>
+<tr><td style="color:var(--text);">量比(10/20)</td><td style="color:var(--muted);font-weight:600;">+0.05</td><td style="color:var(--muted);font-weight:600;">-0.05</td><td style="color:var(--muted);font-weight:600;">-0.13</td><td style="color:var(--muted);font-weight:600;">-0.19</td></tr>
+<tr><td style="color:var(--text);">前5日振幅</td><td style="color:var(--red);font-weight:600;">+0.35</td><td style="color:var(--muted);font-weight:600;">+0.02</td><td style="color:var(--muted);font-weight:600;">-0.04</td><td style="color:var(--green);font-weight:600;">-0.38</td></tr>
+<tr><td style="color:var(--text);">前10日振幅</td><td style="color:var(--red);font-weight:600;">+0.28</td><td style="color:var(--muted);font-weight:600;">-0.02</td><td style="color:var(--muted);font-weight:600;">+0.17</td><td style="color:var(--muted);font-weight:600;">-0.15</td></tr>
+<tr><td style="color:var(--text);">前5日HV</td><td style="color:var(--green);font-weight:600;">-0.35</td><td style="color:var(--muted);font-weight:600;">-0.05</td><td style="color:var(--green);font-weight:600;">-0.67</td><td style="color:var(--green);font-weight:600;">-0.49</td></tr>
+<tr><td style="color:var(--text);">前10日HV</td><td style="color:var(--muted);font-weight:600;">-0.19</td><td style="color:var(--muted);font-weight:600;">+0.01</td><td style="color:var(--green);font-weight:600;">-0.28</td><td style="color:var(--green);font-weight:600;">-0.36</td></tr>
+<tr><td style="color:var(--text);">put成本占比</td><td style="color:var(--red);font-weight:600;">+0.60</td><td style="color:var(--red);font-weight:600;">+0.74</td><td style="color:var(--green);font-weight:600;">-0.35</td><td style="color:var(--green);font-weight:600;">-0.41</td></tr>
+</table>
+</div>
+<p class="note">30天窗口（2026-07-31 ~ 2026-09-11）剔除上市初期暴涨暴跌段，观察结论是否稳健。</p>
+</div>
+
+<div class="card">
+<h2>④ 因子定义</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>因子</th><th>定义</th></tr>
+<tr><td style="color:var(--text);">前5日均量</td><td style="color:var(--muted);">入场前5个交易日成交量均值</td></tr>
+<tr><td style="color:var(--text);">前10日均量</td><td style="color:var(--muted);">入场前10个交易日成交量均值</td></tr>
+<tr><td style="color:var(--text);">量比(5/10)</td><td style="color:var(--muted);">前5日均量 ÷ 再前5日均量（放量信号）</td></tr>
+<tr><td style="color:var(--text);">量比(10/20)</td><td style="color:var(--muted);">前10日均量 ÷ 再前10日均量</td></tr>
+<tr><td style="color:var(--text);">前5日振幅</td><td style="color:var(--muted);">入场前5个交易日日均 (高-低)/收盘</td></tr>
+<tr><td style="color:var(--text);">前10日振幅</td><td style="color:var(--muted);">入场前10个交易日日均 (高-低)/收盘</td></tr>
+<tr><td style="color:var(--text);">前5日HV</td><td style="color:var(--muted);">入场前5个交易日年化历史波动率</td></tr>
+<tr><td style="color:var(--text);">前10日HV</td><td style="color:var(--muted);">入场前10个交易日年化历史波动率</td></tr>
+<tr><td style="color:var(--text);">put成本占比</td><td style="color:var(--muted);">入场时2张put权利金 ÷ 100股市值（隐含波动代理）</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>⑤ 逐轮明细（含波动与因子，供人工检验）</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场</th><th>出场</th><th>方式</th><th>期间跌幅</th><th>期间涨幅</th><th>期间RV</th><th>前5日均量</th><th>量比5</th><th>前5日HV</th><th>put成本%</th><th>总利润</th></tr>
+<tr><td>2026-09-11</td><td>2026-09-11</td><td>持有中</td><td>3.1%</td><td>0.0%</td><td>—%</td><td>22255387</td><td>1.87</td><td>96.7%</td><td>9.7%</td><td class="c-green">$-287</td></tr>
+<tr><td>2026-09-04</td><td>2026-09-11</td><td>上涨再平衡</td><td>7.0%</td><td>12.9%</td><td>85.2%</td><td>12158115</td><td>0.89</td><td>37.6%</td><td>9.4%</td><td class="c-green">$-70</td></tr>
+<tr><td>2026-08-28</td><td>2026-09-04</td><td>到期</td><td>2.1%</td><td>10.3%</td><td>63.7%</td><td>13639087</td><td>0.55</td><td>55.9%</td><td>5.8%</td><td class="c-red">$+663</td></tr>
+<tr><td>2026-08-21</td><td>2026-08-28</td><td>到期</td><td>7.3%</td><td>2.5%</td><td>48.4%</td><td>24680622</td><td>0.97</td><td>97.5%</td><td>6.6%</td><td class="c-green">$-1,029</td></tr>
+<tr><td>2026-08-14</td><td>2026-08-21</td><td>到期</td><td>8.7%</td><td>5.4%</td><td>84.5%</td><td>25445609</td><td>0.84</td><td>76.0%</td><td>10.3%</td><td class="c-green">$-1,024</td></tr>
+<tr><td>2026-08-12</td><td>2026-08-14</td><td>上涨再平衡</td><td>2.3%</td><td>13.9%</td><td>77.4%</td><td>22237820</td><td>0.49</td><td>68.9%</td><td>5.9%</td><td class="c-red">$+974</td></tr>
+<tr><td>2026-08-07</td><td>2026-08-12</td><td>上涨再平衡</td><td>3.0%</td><td>12.5%</td><td>87.2%</td><td>30457728</td><td>0.62</td><td>90.1%</td><td>12.0%</td><td class="c-green">$-204</td></tr>
+<tr><td>2026-07-31</td><td>2026-08-07</td><td>到期</td><td>16.3%</td><td>1.7%</td><td>83.0%</td><td>49356493</td><td>1.15</td><td>194.3%</td><td>16.5%</td><td class="c-green">$-413</td></tr>
+<tr><td>2026-07-29</td><td>2026-07-31</td><td>上涨再平衡</td><td>4.0%</td><td>25.2%</td><td>236.3%</td><td>38289765</td><td>0.68</td><td>87.8%</td><td>8.6%</td><td class="c-red">$+1,877</td></tr>
+<tr><td>2026-07-24</td><td>2026-07-29</td><td>下跌止盈</td><td>19.3%</td><td>6.2%</td><td>53.0%</td><td>42815801</td><td>0.64</td><td>125.0%</td><td>13.9%</td><td class="c-red">$+401</td></tr>
+<tr><td>2026-07-23</td><td>2026-07-24</td><td>到期</td><td>10.3%</td><td>4.2%</td><td>—%</td><td>46818935</td><td>0.70</td><td>125.6%</td><td>5.0%</td><td class="c-red">$+622</td></tr>
+<tr><td>2026-07-17</td><td>2026-07-23</td><td>上涨再平衡</td><td>4.3%</td><td>17.0%</td><td>125.0%</td><td>65256094</td><td>1.00</td><td>356.0%</td><td>13.7%</td><td class="c-green">$-149</td></tr>
+<tr><td>2026-07-15</td><td>2026-07-17</td><td>下跌止盈</td><td>19.9%</td><td>3.4%</td><td>166.3%</td><td>64233092</td><td>1.00</td><td>—%</td><td>10.5%</td><td class="c-red">$+697</td></tr>
+<tr><td>2026-07-14</td><td>2026-07-15</td><td>上涨再平衡</td><td>1.6%</td><td>15.9%</td><td>—%</td><td>—</td><td>—</td><td>—%</td><td>6.3%</td><td class="c-red">$+1,418</td></tr>
+</table>
+</div>
+<p class="note">「持有中」= 数据截止未平仓，按现价 mark-to-market。量比5 = 前5日均量 ÷ 再前5日均量。</p>
+</div>
+
+<div class="card">
+<h2>说明与免责</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>为什么「波动大就赚」</strong>：大涨时股票端赚、put 只是保费；大跌时 put 2:1 过度对冲，赔付 &gt; 股票亏损；唯独横盘两头都不赚、纯烧保费。</li>
+<li><strong>交易量（量比）的直觉</strong>：放量常伴随趋势启动/情绪释放，理论上是波动的前兆。但 SKHY 样本太短，量比与波动的相关性在本数据上未被稳定证实。</li>
+<li><strong>put 成本占比</strong> 是期权隐含波动率的代理——它本身已把市场对「未来波动」的定价包含在权利金里，是唯一「前瞻」的因子。</li>
+<li><strong>样本量</strong>：14 轮（30天 8 轮）不足以得出统计可靠结论，仅供探索与假设生成。</li>
+<li><strong>未计交易摩擦</strong>，仅供研究，不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>SKHY 全参数重扫报告</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1180px; margin:0 auto; }
+h1 { font-size:24px; margin-bottom:6px; }
+h2 { font-size:18px; margin:30px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+h3 { font-size:15px; margin:18px 0 8px; }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-bottom:18px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:13px; font-weight:600; }
+.kpi .value { font-size:24px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:3px; margin-bottom:0; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:12px 16px; margin:12px 0; font-size:13px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+code { background:#20242d; border:1px solid var(--border); border-radius:4px; padding:1px 6px;
+  font-family:"SF Mono",Menlo,Consolas,monospace; font-size:12px; color:var(--gold); }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>SKHY（SK海力士 ADR）对冲策略 —— 全参数重扫</h1>
+<p class="sub">临时报告 · 数据 2026-07-13 ~ 2026-09-11（44 交易日） · 生成于 2026-09-13 23:48（美东 ET）</p>
+
+<div class="kpis">
+<div class="kpi"><div class="label">数据跨度</div><div class="value">44 天</div><div class="sub">2026-07-13 ~ 2026-09-11</div></div>
+<div class="kpi"><div class="label">B&H 基准收益</div><div class="value"><span class="c-red">$+3,772</span></div><div class="sub">回撤 33.8% · 比 0.56</div></div>
+<div class="kpi"><div class="label">新最优总收益</div><div class="value"><span class="c-red">$+5,696</span></div><div class="sub">最近周五(1-4天) · 跌15%/涨8% · 1:3</div></div>
+<div class="kpi"><div class="label">新最优回撤</div><div class="value">22.1%</div><div class="sub">收益/回撤比 1.06</div></div>
+<div class="kpi"><div class="label">总收益最高组合</div><div class="value"><span class="c-red">$+6,338</span></div><div class="sub">跌15%/涨8% · 1:4 · 回撤24.3%</div></div>
+</div>
+
+<div class="callout">
+<strong>结论：</strong>在最新 44 个交易日数据上，重新扫描 784 组参数后，<strong class="c-gold">最优（收益/回撤比）组合</strong>为：
+周期 <strong>最近周五(1-4天)</strong>、跌熔断 <strong>15%</strong>、涨熔断 <strong>8%</strong>、对冲比例 <strong>1:3</strong>，
+总收益 <strong class="c-red">$+5,696</strong>、回撤 <strong>22.1%</strong>、收益/回撤比 <strong class="c-gold">1.06</strong>。
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">旧参数 vs 新最优</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>参数集</th><th>周期</th><th>跌熔断</th><th>涨熔断</th><th>对冲比例</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th></tr>
+<tr><td style="color:var(--muted);">旧参数（final 报告）</td><td>最近周五</td><td>15%</td><td>8%</td><td>1:2</td><td class="c-red">$+5,055</td><td>22.9%</td><td>1.02</td><td>14</td></tr><tr><td style="color:var(--gold);font-weight:700;">新最优（本次重扫）</td><td>最近周五(1-4天)</td><td>15%</td><td>8%</td><td>1:3</td><td class="c-red">$+5,696</td><td>22.1%</td><td class="c-gold">1.06</td><td>14</td></tr>
+</table>
+</div>
+<p class="note">旧参数 = 现有 final 报告（<code>skhy_final_report.html</code>）里的最优：最近周五 + 跌15%/涨8% + 1:2。</p>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">Top 10 参数组合（按收益/回撤比排序）</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>#</th><th>周期</th><th>跌熔断</th><th>涨熔断</th><th>对冲比例</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th><th>跌触发</th><th>涨触发</th><th>到期</th></tr>
+<tr><td>1</td><td>最近周五(1-4天)</td><td>15%</td><td>8%</td><td>1:3</td><td class="c-red">$+5,696 <span class="c-gold">★最优</span></td><td>22.1%</td><td class="c-gold">1.06</td><td>14</td><td>2</td><td>6</td><td>5</td></tr>
+<tr><td>2</td><td>最近周五(1-4天)</td><td>15%</td><td>8%</td><td>1:2</td><td class="c-red">$+5,055</td><td>22.9%</td><td class="c-gold">1.02</td><td>14</td><td>2</td><td>6</td><td>5</td></tr>
+<tr><td>3</td><td>最近周五(1-4天)</td><td>15%</td><td>8%</td><td>1:4</td><td class="c-red">$+6,338</td><td>24.3%</td><td class="c-gold">0.97</td><td>14</td><td>2</td><td>6</td><td>5</td></tr>
+<tr><td>4</td><td>最近周五(1-4天)</td><td>15%</td><td>8%</td><td>1:1</td><td class="c-red">$+4,413</td><td>24.1%</td><td class="c-gold">0.89</td><td>14</td><td>2</td><td>6</td><td>5</td></tr>
+<tr><td>5</td><td>最近周五(1-4天)</td><td>15%</td><td>10%</td><td>1:3</td><td class="c-red">$+3,691</td><td>21.7%</td><td class="c-gold">0.76</td><td>13</td><td>1</td><td>3</td><td>8</td></tr>
+<tr><td>6</td><td>最近周五(1-4天)</td><td>15%</td><td>10%</td><td>1:2</td><td class="c-red">$+3,718</td><td>25.5%</td><td class="c-gold">0.71</td><td>13</td><td>1</td><td>3</td><td>8</td></tr>
+<tr><td>7</td><td>最近周五(1-4天)</td><td>15%</td><td>10%</td><td>1:1</td><td class="c-red">$+3,745</td><td>29.2%</td><td class="c-gold">0.65</td><td>13</td><td>1</td><td>3</td><td>8</td></tr>
+<tr><td>8</td><td>最近周五(1-4天)</td><td>10%</td><td>8%</td><td>1:1</td><td class="c-red">$+2,748</td><td>24.2%</td><td class="c-gold">0.60</td><td>15</td><td>3</td><td>6</td><td>5</td></tr>
+<tr><td>9</td><td>最近周五(1-4天)</td><td>12%</td><td>8%</td><td>1:1</td><td class="c-red">$+2,748</td><td>24.2%</td><td class="c-gold">0.60</td><td>15</td><td>3</td><td>6</td><td>5</td></tr>
+<tr><td>10</td><td>最近周五(1-4天)</td><td>15%</td><td>5%</td><td>1:1</td><td class="c-red">$+3,348</td><td>29.9%</td><td class="c-gold">0.58</td><td>16</td><td>2</td><td>7</td><td>6</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">对冲比例（股票:put）敏感性</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">固定最优周期 最近周五(1-4天) + 跌15%/涨8%，只改 put 手数。put 净 = put 收入 − put 成本（对冲部分的净贡献）。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>股票:put</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th><th>put 净</th></tr>
+<tr><td>1:1</td><td class="c-red">$+4,413</td><td>24.1%</td><td class="c-gold">0.89</td><td>14</td><td>$+641</td></tr>
+<tr><td>1:2</td><td class="c-red">$+5,055</td><td>22.9%</td><td class="c-gold">1.02</td><td>14</td><td>$+1,283</td></tr>
+<tr><td>1:3</td><td class="c-red">$+5,696 <span class="c-gold">★</span></td><td>22.1%</td><td class="c-gold">1.06</td><td>14</td><td>$+1,924</td></tr>
+<tr><td>1:4</td><td class="c-red">$+6,338</td><td>24.3%</td><td class="c-gold">0.97</td><td>14</td><td>$+2,566</td></tr>
+</table>
+</div>
+<p class="note">1:1 = 100 股配 1 手 put（完全对冲）；1:2 = 配 2 手（2 倍过度对冲，旧默认）；1:3 / 1:4 为更高倍数过度对冲。比例越高，下行保护越强但保费成本也越贵。</p>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">熔断比例扫描（不对称矩阵）</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">固定最优周期 最近周五(1-4天) + 最优对冲比例 1:3，扫描跌熔断 × 涨熔断。★ 单元格为全局最优（回撤比口径）。</p>
+<div style="margin-top:6px;"><h3 style="font-size:15px;color:var(--text);margin:18px 0 8px;">熔断矩阵 —— 总收益（固定最优周期 & put 比例）</h3><table><tr><th>跌\涨</th><th>涨5%</th><th>涨8%</th><th>涨10%</th><th>涨12%</th><th>涨15%</th><th>涨20%</th><th>涨25%</th></tr><tr><td>跌5%</td><td style="background:rgba(38,194,129,0.32985455663720836);">$-4,216</td><td style="background:rgba(38,194,129,0.27156857011781677);">$-1,904</td><td style="background:rgba(38,194,129,0.23706068290322097);">$-535</td><td style="background:rgba(38,194,129,0.22462792210083743);">$-41</td><td style="background:rgba(38,194,129,0.31211853255965205);">$-3,512</td><td style="background:rgba(38,194,129,0.35467394975776256);">$-5,201</td><td style="background:rgba(38,194,129,0.3614994530119633);">$-5,471</td></tr><tr><td>跌8%</td><td style="background:rgba(38,194,129,0.2947054078715864);">$-2,822</td><td style="background:rgba(38,194,129,0.27156857011781677);">$-1,904</td><td style="background:rgba(38,194,129,0.23706068290322097);">$-535</td><td style="background:rgba(38,194,129,0.22462792210083743);">$-41</td><td style="background:rgba(38,194,129,0.31211853255965205);">$-3,512</td><td style="background:rgba(38,194,129,0.35467394975776256);">$-5,201</td><td style="background:rgba(38,194,129,0.3614994530119633);">$-5,471</td></tr><tr><td>跌10%</td><td style="background:rgba(38,194,129,0.22903735146880155);">$-216</td><td style="background:rgba(255,82,82,0.25409948628496803);">$+701</td><td style="background:rgba(38,194,129,0.2564399397052818);">$-1,304</td><td style="background:rgba(38,194,129,0.3306190795476888);">$-4,246</td><td style="background:rgba(38,194,129,0.3306190795476888);">$-4,246</td><td style="background:rgba(38,194,129,0.3731744967457993);">$-5,935</td><td style="background:rgba(38,194,129,0.38);">$-6,205</td></tr><tr><td>跌12%</td><td style="background:rgba(38,194,129,0.22903735146880155);">$-216</td><td style="background:rgba(255,82,82,0.25409948628496803);">$+701</td><td style="background:rgba(38,194,129,0.2564399397052818);">$-1,304</td><td style="background:rgba(38,194,129,0.3306190795476888);">$-4,246</td><td style="background:rgba(38,194,129,0.3306190795476888);">$-4,246</td><td style="background:rgba(38,194,129,0.3731744967457993);">$-5,935</td><td style="background:rgba(38,194,129,0.38);">$-6,205</td></tr><tr><td>跌15%</td><td style="background:rgba(255,82,82,0.2994316869917674);">$+2,500</td><td style="background:rgba(255,82,82,0.38);">$+5,696</td><td style="background:rgba(255,82,82,0.32946057400975015);">$+3,691</td><td style="background:rgba(255,82,82,0.25528143416734317);">$+748</td><td style="background:rgba(255,82,82,0.25528143416734317);">$+748</td><td style="background:rgba(255,82,82,0.25528143416734317);">$+748</td><td style="background:rgba(38,194,129,0.29828225590973934);">$-2,963</td></tr><tr><td>跌20%</td><td style="background:rgba(38,194,129,0.3217132572759491);">$-3,893</td><td style="background:rgba(38,194,129,0.24816025489138377);">$-975</td><td style="background:rgba(38,194,129,0.2793204240795728);">$-2,211</td><td style="background:rgba(38,194,129,0.3534995639219798);">$-5,154</td><td style="background:rgba(38,194,129,0.3534995639219798);">$-5,154</td><td style="background:rgba(38,194,129,0.3534995639219798);">$-5,154</td><td style="background:rgba(38,194,129,0.36032506717618057);">$-5,425</td></tr><tr><td>跌25%</td><td style="background:rgba(38,194,129,0.3217132572759491);">$-3,893</td><td style="background:rgba(38,194,129,0.24816025489138377);">$-975</td><td style="background:rgba(38,194,129,0.2793204240795728);">$-2,211</td><td style="background:rgba(38,194,129,0.3534995639219798);">$-5,154</td><td style="background:rgba(38,194,129,0.3534995639219798);">$-5,154</td><td style="background:rgba(38,194,129,0.3534995639219798);">$-5,154</td><td style="background:rgba(38,194,129,0.36032506717618057);">$-5,425</td></tr></table></div>
+<div style="margin-top:6px;"><h3 style="font-size:15px;color:var(--text);margin:18px 0 8px;">熔断矩阵 —— 收益/回撤比（固定最优周期 & put 比例）</h3><table><tr><th>跌\涨</th><th>涨5%</th><th>涨8%</th><th>涨10%</th><th>涨12%</th><th>涨15%</th><th>涨20%</th><th>涨25%</th></tr><tr><td>跌5%</td><td style="background:rgba(245,195,68,0.07188186768667887);">-0.55</td><td style="background:rgba(245,195,68,0.11692498963177309);">-0.30</td><td style="background:rgba(245,195,68,0.15366984172314718);">-0.09</td><td style="background:rgba(245,195,68,0.16866199565097076);">-0.01</td><td style="background:rgba(245,195,68,0.08546976144593912);">-0.47</td><td style="background:rgba(245,195,68,0.06803943147438896);">-0.57</td><td style="background:rgba(245,195,68,0.06582797409793732);">-0.58</td></tr><tr><td>跌8%</td><td style="background:rgba(245,195,68,0.10099941142905772);">-0.39</td><td style="background:rgba(245,195,68,0.11692498963177309);">-0.30</td><td style="background:rgba(245,195,68,0.15366984172314718);">-0.09</td><td style="background:rgba(245,195,68,0.16866199565097076);">-0.01</td><td style="background:rgba(245,195,68,0.08546976144593912);">-0.47</td><td style="background:rgba(245,195,68,0.06803943147438896);">-0.57</td><td style="background:rgba(245,195,68,0.06582797409793732);">-0.58</td></tr><tr><td>跌10%</td><td style="background:rgba(245,195,68,0.16283353775871767);">-0.04</td><td style="background:rgba(245,195,68,0.18962555834813252);">0.11</td><td style="background:rgba(245,195,68,0.13011811386751518);">-0.22</td><td style="background:rgba(245,195,68,0.07655206160952827);">-0.52</td><td style="background:rgba(245,195,68,0.07655206160952827);">-0.52</td><td style="background:rgba(245,195,68,0.0618936577863533);">-0.61</td><td style="background:rgba(245,195,68,0.06);">-0.62</td></tr><tr><td>跌12%</td><td style="background:rgba(245,195,68,0.16283353775871767);">-0.04</td><td style="background:rgba(245,195,68,0.18962555834813252);">0.11</td><td style="background:rgba(245,195,68,0.13011811386751518);">-0.22</td><td style="background:rgba(245,195,68,0.07655206160952827);">-0.52</td><td style="background:rgba(245,195,68,0.07655206160952827);">-0.52</td><td style="background:rgba(245,195,68,0.0618936577863533);">-0.61</td><td style="background:rgba(245,195,68,0.06);">-0.62</td></tr><tr><td>跌15%</td><td style="background:rgba(245,195,68,0.2534135028029746);">0.47</td><td style="background:rgba(245,195,68,0.36);">1.06</td><td style="background:rgba(245,195,68,0.3053747044205083);">0.76</td><td style="background:rgba(245,195,68,0.18656610648723213);">0.09</td><td style="background:rgba(245,195,68,0.18656610648723213);">0.09</td><td style="background:rgba(245,195,68,0.18656610648723213);">0.09</td><td style="background:rgba(245,195,68,0.1046475246800898);">-0.37</td></tr><tr><td>跌20%</td><td style="background:rgba(245,195,68,0.07541695164328494);">-0.53</td><td style="background:rgba(245,195,68,0.14013987823759513);">-0.17</td><td style="background:rgba(245,195,68,0.10505195866799244);">-0.36</td><td style="background:rgba(245,195,68,0.06798861404725377);">-0.57</td><td style="background:rgba(245,195,68,0.06798861404725377);">-0.57</td><td style="background:rgba(245,195,68,0.06798861404725377);">-0.57</td><td style="background:rgba(245,195,68,0.06575815117761748);">-0.58</td></tr><tr><td>跌25%</td><td style="background:rgba(245,195,68,0.07541695164328494);">-0.53</td><td style="background:rgba(245,195,68,0.14013987823759513);">-0.17</td><td style="background:rgba(245,195,68,0.10505195866799244);">-0.36</td><td style="background:rgba(245,195,68,0.06798861404725377);">-0.57</td><td style="background:rgba(245,195,68,0.06798861404725377);">-0.57</td><td style="background:rgba(245,195,68,0.06798861404725377);">-0.57</td><td style="background:rgba(245,195,68,0.06575815117761748);">-0.58</td></tr></table></div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">周期敏感性</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">固定最优熔断跌15%/涨8% + 最优对冲比例 1:3，只改周期。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>周期</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th></tr>
+<tr><td>最近周五(1-4天)</td><td class="c-red">$+5,696 <span class="c-gold">★</span></td><td>22.1%</td><td class="c-gold">1.06</td><td>14</td></tr>
+<tr><td>7天(6-11天)</td><td class="c-green">$-1,516</td><td>55.0%</td><td class="c-gold">-0.14</td><td>11</td></tr>
+<tr><td>14天(13-18天)</td><td class="c-green">$-1,551</td><td>59.5%</td><td class="c-gold">-0.13</td><td>8</td></tr>
+<tr><td>21天(20-21天)</td><td class="c-green">$-5,173</td><td>61.7%</td><td class="c-gold">-0.43</td><td>8</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">新最优组合逐轮明细</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">周期 最近周五(1-4天) + 跌15%/涨8% + 1:3。方式：到期 / 上涨再平衡 / 下跌止盈 / 持有中（数据截止未平仓，按现价估值）。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>行权价</th><th>股票涨跌</th><th>put成本</th><th>put收入</th><th>周期总利润</th><th>成本占比</th></tr>
+<tr><td>2026-09-11</td><td>2026-09-18 到期</td><td>持有中</td><td>$192.9</td><td>$190.1</td><td>$195</td><td class="c-green">$-287</td><td class="c-green">-$2,794</td><td class="c-red">$+2,794</td><td class="c-green">$-287</td><td class="c-green">14.5%</td></tr>
+<tr><td>2026-09-04</td><td>2026-09-11</td><td>上涨再平衡</td><td>$177.0</td><td>$192.9</td><td>$175</td><td class="c-red">$+1,594</td><td class="c-green">-$2,496</td><td class="c-red">$+0</td><td class="c-green">$-902</td><td class="c-green">14.1%</td></tr>
+<tr><td>2026-08-28</td><td>2026-09-04</td><td>到期</td><td>$161.0</td><td>$177.0</td><td>$160</td><td class="c-red">$+1,596</td><td class="c-green">-$1,399</td><td class="c-red">$+0</td><td class="c-red">$+197</td><td class="c-green">8.7%</td></tr>
+<tr><td>2026-08-21</td><td>2026-08-28</td><td>到期</td><td>$163.4</td><td>$161.0</td><td>$162.5</td><td class="c-green">$-237</td><td class="c-green">-$1,626</td><td class="c-red">$+438</td><td class="c-green">$-1,425</td><td class="c-green">10.0%</td></tr>
+<tr><td>2026-08-14</td><td>2026-08-21</td><td>到期</td><td>$169.3</td><td>$163.4</td><td>$170</td><td class="c-green">$-591</td><td class="c-green">-$2,627</td><td class="c-red">$+1,977</td><td class="c-green">$-1,241</td><td class="c-green">15.5%</td></tr>
+<tr><td>2026-08-12</td><td>2026-08-14</td><td>上涨再平衡</td><td>$150.7</td><td>$169.3</td><td>$150</td><td class="c-red">$+1,862</td><td class="c-green">-$1,331</td><td class="c-red">$+0</td><td class="c-red">$+530</td><td class="c-green">8.8%</td></tr>
+<tr><td>2026-08-07</td><td>2026-08-12</td><td>上涨再平衡</td><td>$137.9</td><td>$150.7</td><td>$140</td><td class="c-red">$+1,279</td><td class="c-green">-$2,492</td><td class="c-red">$+268</td><td class="c-green">$-945</td><td class="c-green">18.1%</td></tr>
+<tr><td>2026-07-31</td><td>2026-08-07</td><td>到期</td><td>$159.9</td><td>$137.9</td><td>$160</td><td class="c-green">$-2,197</td><td class="c-green">-$3,951</td><td class="c-red">$+6,627</td><td class="c-red">$+479</td><td class="c-green">24.7%</td></tr>
+<tr><td>2026-07-29</td><td>2026-07-31</td><td>上涨再平衡</td><td>$129.9</td><td>$159.9</td><td>$130</td><td class="c-red">$+2,993</td><td class="c-green">-$1,673</td><td class="c-red">$+0</td><td class="c-red">$+1,320</td><td class="c-green">12.9%</td></tr>
+<tr><td>2026-07-24</td><td>2026-07-29</td><td>下跌止盈</td><td>$154.6</td><td>$129.9</td><td>$155</td><td class="c-green">$-2,462</td><td class="c-green">-$3,220</td><td class="c-red">$+7,515</td><td class="c-red">$+1,833</td><td class="c-green">20.8%</td></tr>
+<tr><td>2026-07-23</td><td>2026-07-24</td><td>到期</td><td>$170.7</td><td>$154.6</td><td>$170</td><td class="c-green">$-1,615</td><td class="c-green">-$1,274</td><td class="c-red">$+4,629</td><td class="c-red">$+1,740</td><td class="c-green">7.5%</td></tr>
+<tr><td>2026-07-17</td><td>2026-07-23</td><td>上涨再平衡</td><td>$152.1</td><td>$170.7</td><td>$152.5</td><td class="c-red">$+1,860</td><td class="c-green">-$3,130</td><td class="c-red">$+116</td><td class="c-green">$-1,153</td><td class="c-green">20.6%</td></tr>
+<tr><td>2026-07-15</td><td>2026-07-17</td><td>下跌止盈</td><td>$181.8</td><td>$152.1</td><td>$180</td><td class="c-green">$-2,970</td><td class="c-green">-$2,867</td><td class="c-red">$+8,367</td><td class="c-red">$+2,530</td><td class="c-green">15.8%</td></tr>
+<tr><td>2026-07-14</td><td>2026-07-15</td><td>上涨再平衡</td><td>$168.1</td><td>$181.8</td><td>$170</td><td class="c-red">$+1,370</td><td class="c-green">-$1,600</td><td class="c-red">$+1,673</td><td class="c-red">$+1,442</td><td class="c-green">9.5%</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>股票:put 比例</strong>：股票固定 100 股，put 手数可调。1:N 表示配 N 手 put（N×100 股名义）。</li>
+<li><strong>口径</strong>：开盘价熔断（盘中不触发）；put 成本/收入用每日期权链成交量加权价 vw，非 BS 理论价。</li>
+<li><strong>最优标准</strong>：默认用「收益/回撤比」最大（与现有 final 报告一致）；报告另附「总收益最高」组合供参考。</li>
+<li><strong>本程序为临时重扫</strong>（<code>rescan_skhy.py</code>），不改动现有 <code>gen_final_report.py</code> / <code>real_options_backtest_v10.py</code> / <code>skhy_final_report.html</code>。</li>
+<li><strong>过拟合警示</strong>：SKHY 仅 44 个交易日，样本短、波动大，参数稳定性低，仅供研究，不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "analyze_factors.py": "97654b9b88d0f2e4b9755e525b26c23ef73d4b7f8365eb81101d0f170bcbde31",
+  "factor_report.py": "4593f289f2b4e8f1ce0d8a6b17f105013ed160e0395fff058e22a9fcaef50a9b",
+  "refresh_factor_data.py": "d5ac42d73418d02c620820747a82acaa3cf76fd1384046288f84ae501a95cc4d",
+  "gen_simulation_report.py": "64401ed63ce864d007294b137d0ce6a60dd1ce0bd2eb3bcae5cbe63c31cb9038",
+  "test_factors.py": "9ac2f6a91cb3197a990e35df5a2965300031ca901339a7e275c8576a4f2599ff",
+  "FACTOR_RESEARCH.md": "139493a41799977a964e83b7ba47e06e18f81b1f038785a9edb1b6b1689325e1",
+  "factor_analysis.json": "332b189c471c5a35628429ec9c4fc65e90c18d81227bc26fc83404ed81ebbb13",
+  "skhy_simulation_report.html": "80864b3eaf89c2c3a21407f14bf1d855f8d9f9c77a6feabc3a1152bbfd32ae7a",
+  "data/factor_market_data.json": "c1cd8fdf27514bfc29e141898c9e5440aeb04ea111a86727b8958556c3efdbc4"
+}

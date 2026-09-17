@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>SKHY 自适应策略报告</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1240px; margin:0 auto; }
+h1 { font-size:24px; margin-bottom:6px; }
+h2 { font-size:18px; margin:30px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:18px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:13px; font-weight:600; }
+.kpi .value { font-size:22px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:3px; margin-bottom:0; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:12px 16px; margin:12px 0; font-size:13px; line-height:1.9; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+code { background:#20242d; border:1px solid var(--border); border-radius:4px; padding:1px 6px;
+  font-family:"SF Mono",Menlo,Consolas,monospace; font-size:12px; color:var(--gold); }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>SKHY 自适应策略：按 put/call 贵贱动态切换结构</h1>
+<p class="sub">规则：put 比 call 贵 → 1 call + 1 put（跨式）；put 比 call 便宜/相等 → 2 put + 100 股 · 最近周五 + 跌15%/涨8% · 熔断按内在价值结算 · 数据 2026-07-13 ~ 2026-09-11（44 交易日） · 生成于 2026-09-15 04:31（美东 ET）</p>
+
+<div class="kpis">
+<div class="kpi"><div class="label">自适应总收益</div><div class="value"><span class="c-red">$+3,617</span></div><div class="sub">共 14 轮</div></div>
+<div class="kpi"><div class="label">回撤(逐轮累计)</div><div class="value">$1,829</div><div class="sub">收益/回撤比 1.98</div></div>
+<div class="kpi"><div class="label">结构分布</div><div class="value">6 : 8</div><div class="sub">跨式 43% / 2put 57%</div></div>
+<div class="kpi"><div class="label">触发统计</div><div class="value">跌2 / 涨6 / 到期5</div><div class="sub"></div></div>
+</div>
+
+<div class="callout">
+<strong>策略逻辑：</strong>每轮入场时看 ATM 期权的 <strong>put 权利金 vs call 权利金</strong>——
+put 贵（skew 大、市场担忧下跌）时，买 2 张贵 put 太烧钱，改买 <strong>1 put + 1 相对便宜的 call</strong>（跨式）；
+put 便宜（慢牛/乐观）时，用 <strong>2 张便宜 put 对冲 + 100 股吃慢牛上涨</strong>。
+本质是把「put skew」这个因子变成每轮的择时开关。
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">三策略对比（统一逐轮累计回撤口径）</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>策略</th><th>总收益</th><th>回撤(逐轮累计)</th><th>收益/回撤比</th><th>说明</th></tr>
+<tr><td>自适应（put贵→跨式，put便宜→2put） <span class="c-gold">★最优</span></td><td class="c-red">$+3,617</td><td>$1,829</td><td class="c-gold">1.98</td><td>14 轮 · 跨式6 / 2put8</td></tr><tr><td>固定 2put（100股+2put）</td><td class="c-red">$+1,231</td><td>$2,624</td><td class="c-gold">0.47</td><td>14 轮</td></tr><tr><td>固定 跨式（1call+1put）</td><td class="c-red">$+1,932</td><td>$1,942</td><td class="c-gold">1.00</td><td>14 轮</td></tr>
+</table>
+</div>
+<p class="note">回撤 = 累计逐轮盈亏曲线的最大回撤（绝对金额），三种结构统一口径，可直接对比。固定 2put 逐轮盈亏 = 股票端 + put 净。</p>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">自适应策略逐轮明细</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">
+「结构」列：<span class="c-gold">跨式</span> = put 比 call 贵时选的 1call+1put；<span class="c-red">2put</span> = put 比 call 便宜时选的 2put+100股。
+「成本」列：跨式 = call权利金+put权利金；2put = 2×put权利金。「收入」列：跨式 = call/put 结算收入；2put = put 结算收入（股票端见利润）。
+</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场日</th><th>出场日</th><th>方式</th><th>结构</th><th>入场spot</th><th>出场spot</th><th>行权价</th><th>put价</th><th>call价</th><th>成本</th><th>收入</th><th>利润</th></tr>
+<tr><td>2026-07-14</td><td>2026-07-15</td><td>上涨再平衡</td><td><span class='c-red'>2put</span></td><td>$168.1</td><td>$181.8</td><td>$170</td><td>$5.33</td><td>$12.03</td><td><span class="c-green">$1,067</span></td><td><span class="c-red">$+0</span></td><td class="c-red">$+303</td></tr>
+<tr><td>2026-07-15</td><td>2026-07-17</td><td>下跌止盈</td><td><span class='c-gold'>跨式</span></td><td>$181.8</td><td>$152.1</td><td>$180</td><td>$9.56</td><td>$6.96</td><td><span class="c-green">$696+$956</span></td><td><span class="c-red">$+2,789</span></td><td class="c-red">$+1,137</td></tr>
+<tr><td>2026-07-17</td><td>2026-07-23</td><td>上涨再平衡</td><td><span class='c-red'>2put</span></td><td>$152.1</td><td>$170.7</td><td>$152.5</td><td>$10.43</td><td>$12.59</td><td><span class="c-green">$2,086</span></td><td><span class="c-red">$+0</span></td><td class="c-green">$-226</td></tr>
+<tr><td>2026-07-23</td><td>2026-07-24</td><td>到期</td><td><span class='c-red'>2put</span></td><td>$170.7</td><td>$154.6</td><td>$170</td><td>$4.25</td><td>$6.36</td><td><span class="c-green">$849</span></td><td><span class="c-red">$+3,086</span></td><td class="c-red">$+622</td></tr>
+<tr><td>2026-07-24</td><td>2026-07-29</td><td>下跌止盈</td><td><span class='c-red'>2put</span></td><td>$154.6</td><td>$129.9</td><td>$155</td><td>$10.73</td><td>$11.11</td><td><span class="c-green">$2,147</span></td><td><span class="c-red">$+5,010</span></td><td class="c-red">$+401</td></tr>
+<tr><td>2026-07-29</td><td>2026-07-31</td><td>上涨再平衡</td><td><span class='c-red'>2put</span></td><td>$129.9</td><td>$159.9</td><td>$130</td><td>$5.58</td><td>$6.07</td><td><span class="c-green">$1,115</span></td><td><span class="c-red">$+0</span></td><td class="c-red">$+1,877</td></tr>
+<tr><td>2026-07-31</td><td>2026-08-07</td><td>到期</td><td><span class='c-gold'>跨式</span></td><td>$159.9</td><td>$137.9</td><td>$160</td><td>$13.17</td><td>$6.61</td><td><span class="c-green">$661+$1,317</span></td><td><span class="c-red">$+2,209</span></td><td class="c-red">$+231</td></tr>
+<tr><td>2026-08-07</td><td>2026-08-12</td><td>上涨再平衡</td><td><span class='c-gold'>跨式</span></td><td>$137.9</td><td>$150.7</td><td>$140</td><td>$8.31</td><td>$5.50</td><td><span class="c-green">$550+$831</span></td><td><span class="c-red">$+1,070</span></td><td class="c-green">$-311</td></tr>
+<tr><td>2026-08-12</td><td>2026-08-14</td><td>上涨再平衡</td><td><span class='c-red'>2put</span></td><td>$150.7</td><td>$169.3</td><td>$150</td><td>$4.44</td><td>$6.09</td><td><span class="c-green">$887</span></td><td><span class="c-red">$+0</span></td><td class="c-red">$+974</td></tr>
+<tr><td>2026-08-14</td><td>2026-08-21</td><td>到期</td><td><span class='c-gold'>跨式</span></td><td>$169.3</td><td>$163.4</td><td>$170</td><td>$8.76</td><td>$5.83</td><td><span class="c-green">$583+$876</span></td><td><span class="c-red">$+659</span></td><td class="c-green">$-800</td></tr>
+<tr><td>2026-08-21</td><td>2026-08-28</td><td>到期</td><td><span class='c-red'>2put</span></td><td>$163.4</td><td>$161.0</td><td>$162.5</td><td>$5.42</td><td>$7.45</td><td><span class="c-green">$1,084</span></td><td><span class="c-red">$+292</span></td><td class="c-green">$-1,029</td></tr>
+<tr><td>2026-08-28</td><td>2026-09-04</td><td>到期</td><td><span class='c-red'>2put</span></td><td>$161.0</td><td>$177.0</td><td>$160</td><td>$4.66</td><td>$6.59</td><td><span class="c-green">$933</span></td><td><span class="c-red">$+0</span></td><td class="c-red">$+663</td></tr>
+<tr><td>2026-09-04</td><td>2026-09-11</td><td>上涨再平衡</td><td><span class='c-gold'>跨式</span></td><td>$177.0</td><td>$192.9</td><td>$175</td><td>$8.32</td><td>$3.09</td><td><span class="c-green">$309+$832</span></td><td><span class="c-red">$+1,794</span></td><td class="c-red">$+654</td></tr>
+<tr><td>2026-09-11</td><td>2026-09-18 到期</td><td>持有中</td><td><span class='c-gold'>跨式</span></td><td>$192.9</td><td>$190.1</td><td>$195</td><td>$9.31</td><td>$4.42</td><td><span class="c-green">$442+$931</span></td><td><span class="c-red">$+493</span></td><td class="c-green">$-881</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>结算口径</strong>：熔断平仓、到期、持有中（mark-to-market）一律按<strong>内在价值</strong>结算（2026-09-15 修正前视偏差）。涨熔断时 put 深度虚值归零；跌熔断时实值腿按内在价值结算。持有中估值不再用全天 vw（否则"最后一天刚买入的仓"估值恒等于成本、净利恒 0）。</li>
+<li><strong>决策时点</strong>：每轮入场日开盘，选 ATM 行权价，取该行权价 put 与 call 的 vw 权利金，比较后定结构。判断用「put_vw &gt; call_vw」。</li>
+<li><strong>2put 结构</strong>：利润 = 股票端涨跌 + put 结算收入 − 2×put权利金。</li>
+<li><strong>跨式结构</strong>：利润 = (call + put 结算收入) − (call + put 权利金)。无股票本金。</li>
+<li><strong>回撤口径</strong>：统一用「累计逐轮盈亏曲线最大回撤」，与 final 报告的「相对市值百分比」/「现金净值」口径不同，仅本报告内部三策略对比时一致。</li>
+<li><strong>本程序为临时策略</strong>（<code>skhy_adaptive.py</code>），不改动 final 程序/报告。</li>
+<li><strong>过拟合警示</strong>：SKHY 仅 44 个交易日，样本短、波动大，仅供研究，不构成投资建议。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

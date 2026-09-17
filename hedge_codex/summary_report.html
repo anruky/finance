@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRAM / 海力士 / 闪迪 对冲策略汇总报告</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1120px; margin:0 auto; }
+h1 { font-size:24px; margin-bottom:6px; }
+h2 { font-size:18px; margin:30px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:13px; font-weight:600; }
+.kpi .value { font-size:24px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:3px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:12px 16px; margin:12px 0; font-size:13px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+code { background:#20242d; border:1px solid var(--border); border-radius:4px; padding:1px 6px;
+  font-family:"SF Mono",Menlo,Consolas,monospace; font-size:12px; color:var(--gold); }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>DRAM / 海力士 / 闪迪 对冲策略汇总报告</h1>
+<p class="sub">三标的归一化对比 + 逐轮明细并排 · 生成于 2026-09-11 10:12（美东 ET）</p>
+
+<div class="card">
+<h2 style="margin-top:0;">行情与技术指标<span style="font-size:12px;color:var(--gold);font-weight:600;margin-left:10px;">● 实时快照 @ 2026-09-11 10:12 (美东 ET) · Polygon 标准行情，约 15 分钟延迟</span></h2>
+<div style="margin-bottom:12px;"><span style="display:inline-flex;align-items:center;gap:6px;margin-right:18px;"><span style="width:16px;height:3px;border-radius:2px;background:#4da3ff;"></span>DRAM</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:18px;"><span style="width:16px;height:3px;border-radius:2px;background:#f5a05a;"></span>海力士</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:18px;"><span style="width:16px;height:3px;border-radius:2px;background:#26c281;"></span>闪迪</span></div>
+<div style="margin-bottom:8px;"><svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" role="img">
+<line x1="60" y1="200.0" x2="662" y2="200.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="52" y="204.0" fill="#9aa3b2" font-size="10" text-anchor="end">55</text>
+<line x1="60" y1="154.0" x2="662" y2="154.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="52" y="158.0" fill="#9aa3b2" font-size="10" text-anchor="end">75</text>
+<line x1="60" y1="108.0" x2="662" y2="108.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="52" y="112.0" fill="#9aa3b2" font-size="10" text-anchor="end">96</text>
+<line x1="60" y1="62.0" x2="662" y2="62.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="52" y="66.0" fill="#9aa3b2" font-size="10" text-anchor="end">116</text>
+<line x1="60" y1="16.0" x2="662" y2="16.0" stroke="rgba(154,163,178,0.10)"/>
+<text x="52" y="20.0" fill="#9aa3b2" font-size="10" text-anchor="end">136</text>
+<polyline points="66.8,97.9 80.5,82.2 94.2,97.4 107.9,117.7 121.6,116.1 135.2,114.7 148.9,91.7 162.6,96.1 176.3,94.0 190.0,114.3 203.7,117.2 217.3,135.7 231.0,147.3 244.7,117.7 258.4,125.4 272.1,122.5 285.8,107.4 299.4,112.0 313.1,121.1 326.8,124.5 340.5,128.4 354.2,123.4 367.8,107.9 381.5,99.2 395.2,97.9 408.9,85.6 422.6,106.5 436.2,106.5 449.9,96.7 463.6,96.3 477.3,109.9 491.0,102.0 504.7,101.5 518.3,99.7 532.0,103.8 545.7,99.5 559.4,106.7 573.1,102.2 586.8,103.1 600.4,88.3 614.1,82.9 627.8,80.8 641.5,92.9 655.2,91.0" fill="none" stroke="#4da3ff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="66.8,97.9 80.5,35.7 94.2,61.9 107.9,97.9 121.6,95.4 135.2,99.7 148.9,68.5 162.6,78.5 176.3,72.2 190.0,94.5 203.7,111.8 217.3,131.1 231.0,136.1 244.7,102.9 258.4,110.8 272.1,112.2 285.8,94.9 299.4,99.9 313.1,111.1 326.8,119.5 340.5,123.4 354.2,113.8 367.8,94.7 381.5,78.1 395.2,76.9 408.9,69.4 422.6,93.1 436.2,92.2 449.9,81.9 463.6,81.3 477.3,93.3 491.0,87.2 504.7,89.5 518.3,84.0 532.0,84.9 545.7,79.7 559.4,85.4 573.1,79.0 586.8,81.0 600.4,61.0 614.1,48.3 627.8,28.7 641.5,44.2 655.2,41.9" fill="none" stroke="#f5a05a" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="66.8,97.9 80.5,86.5 94.2,105.8 107.9,133.6 121.6,141.3 135.2,136.3 148.9,109.5 162.6,108.1 176.3,106.5 190.0,130.2 203.7,151.6 217.3,176.4 231.0,187.3 244.7,151.4 258.4,160.2 272.1,150.4 285.8,131.3 299.4,141.8 313.1,154.3 326.8,160.7 340.5,157.0 354.2,152.7 367.8,142.7 381.5,117.7 395.2,102.4 408.9,82.6 422.6,104.5 436.2,112.2 449.9,107.9 463.6,108.6 477.3,122.5 491.0,124.0 504.7,121.5 518.3,123.6 532.0,123.6 545.7,112.4 559.4,116.5 573.1,114.3 586.8,114.0 600.4,89.0 614.1,89.2 627.8,85.6 641.5,95.4 655.2,101.7" fill="none" stroke="#26c281" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="66.8" y="218" fill="#9aa3b2" font-size="10" text-anchor="middle">07-13</text>
+<text x="148.9" y="218" fill="#9aa3b2" font-size="10" text-anchor="middle">07-21</text>
+<text x="231.0" y="218" fill="#9aa3b2" font-size="10" text-anchor="middle">07-29</text>
+<text x="313.1" y="218" fill="#9aa3b2" font-size="10" text-anchor="middle">08-06</text>
+<text x="395.2" y="218" fill="#9aa3b2" font-size="10" text-anchor="middle">08-14</text>
+<text x="477.3" y="218" fill="#9aa3b2" font-size="10" text-anchor="middle">08-24</text>
+<text x="559.4" y="218" fill="#9aa3b2" font-size="10" text-anchor="middle">09-01</text>
+<text x="641.5" y="218" fill="#9aa3b2" font-size="10" text-anchor="middle">09-10</text>
+</svg></div>
+<p class="note">三条曲线 = 收盘价归一化（2026-07-13 起 = 100）。三标的价格量级差异大（DRAM ~$54、海力士 ~$155、闪迪 ~$1500），归一化后才能同图对比。</p>
+<div class="tbl-scroll" style="margin-top:14px;">
+<table>
+<tr><th>标的</th><th>现价</th><th>区间涨跌</th><th>区间最低~最高（收盘）</th><th>数据范围</th></tr>
+
+<tr>
+<td style="color:#4da3ff;font-weight:600;">DRAM（DRAM）</td>
+<td class="c-red">$59.03<div style="font-size:11px;color:var(--muted);">实时 · 当日 <span class="c-red">+0.74%</span></div></td>
+<td class="c-red">+112.7%</td>
+<td>$27.76 ~ $80.72</td>
+<td>2026-04-02 ~ 2026-09-11（112天）</td>
+</tr>
+
+<tr>
+<td style="color:#f5a05a;font-weight:600;">海力士（SKHY）</td>
+<td class="c-red">$190.00<div style="font-size:11px;color:var(--muted);">实时 · 当日 <span class="c-red">+0.80%</span></div></td>
+<td class="c-red">+24.6%</td>
+<td>$126.79 ~ $198.63</td>
+<td>2026-07-13 ~ 2026-09-11（44天）</td>
+</tr>
+
+<tr>
+<td style="color:#26c281;font-weight:600;">闪迪（SNDK）</td>
+<td class="c-red">$1646.31<div style="font-size:11px;color:var(--muted);">实时 · 当日 <span class="c-green">-2.73%</span></div></td>
+<td class="c-red">+3.5%</td>
+<td>$1015.89 ~ $2335.00</td>
+<td>2026-05-26 ~ 2026-09-11（76天）</td>
+</tr>
+</table>
+</div>
+<div class="tbl-scroll" style="margin-top:14px;">
+<table>
+<tr><th>技术指标 &amp; Put 报价（实时）</th><th>DRAM</th><th>海力士</th><th>闪迪</th></tr>
+<tr><td style="color:var(--muted);font-weight:600;">现价（实时）</td><td class="c-red">$59.03</td><td class="c-red">$190.00</td><td class="c-red">$1646.31</td></tr>
+<tr><td style="color:var(--muted);font-weight:600;">当日涨跌</td><td class="c-red">+0.74%</td><td class="c-red">+0.80%</td><td class="c-green">-2.73%</td></tr>
+<tr><td style="color:var(--muted);font-weight:600;">均线 MA20</td><td class="c-red">$57.24</td><td class="c-red">$167.04</td><td class="c-red">$1596.87</td></tr>
+<tr><td style="color:var(--muted);font-weight:600;">现价 vs MA20</td><td class="c-red">+3.1%（站上）</td><td class="c-red">+13.8%（站上）</td><td class="c-red">+3.1%（站上）</td></tr>
+<tr><td style="color:var(--muted);font-weight:600;">买入 ATM Put（成交量加权 vw）</td><td class="c-red">$1.71/股</td><td class="c-red">$6.42/股</td><td class="c-red">$57.73/股</td></tr>
+<tr><td style="color:var(--muted);font-weight:600;">行权价 · 到期</td><td>$59 · 2026-09-18</td><td>$190 · 2026-09-18</td><td>$1650 · 2026-09-18</td></tr>
+<tr><td style="color:var(--muted);font-weight:600;">Put 成本比例（2张）</td><td class="c-green">5.8%</td><td class="c-green">6.8%</td><td class="c-green">7.0%</td></tr>
+</table>
+</div>
+<p class="note">均线 MA20 = 最近 20 个交易日收盘价均值；现价 vs MA20 为正 = 站上均线（短期偏强），为负 = 跌破均线（短期偏弱）。买入 ATM Put = 最新期权链里最接近现价的平值档 put。Put 成本比例（2张）= 2 张 put 总成本 ÷ 100 股市值。海力士/闪迪用各自最优周期选到期日，DRAM 用 7 天。下面「技术指标 & Put 报价」和「现价」列已替换为当前时点的实时数据（快照时间 2026-09-11 10:12 (美东 ET)）。Put 价格 = 最近交易日成交量加权价 vw，与历史逐轮明细口径一致。</p>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">三标的策略概览（各自最优参数）</h2>
+<div class="kpis">
+<div class="kpi">
+<div class="label" style="color:#4da3ff;">DRAM <span style="color:var(--muted);font-size:10px;">7天 + 15%对称</span></div>
+<div class="value c-red">$+2,790</div>
+<div class="sub">策略年化 <span class="c-red">+379.3%</span> · 回撤 28.5% · 21轮</div>
+<div class="sub">B&H年化 <span class="c-red">+447.5%</span> · 回撤 44.4% · 162天</div>
+</div>
+
+<div class="kpi">
+<div class="label" style="color:#f5a05a;">海力士 <span style="color:var(--muted);font-size:10px;">最近周五 + 跌15%/涨8%</span></div>
+<div class="value c-red">$+5,038</div>
+<div class="sub">策略年化 <span class="c-red">+468.5%</span> · 回撤 22.9% · 14轮</div>
+<div class="sub">B&H年化 <span class="c-red">+282.0%</span> · 回撤 33.8% · 60天</div>
+</div>
+
+<div class="kpi">
+<div class="label" style="color:#26c281;">闪迪 <span style="color:var(--muted);font-size:10px;">最近周五 + 跌20%/涨15%</span></div>
+<div class="value c-red">$+60,859</div>
+<div class="sub">策略年化 <span class="c-red">+199.1%</span> · 回撤 23.9% · 20轮</div>
+<div class="sub">B&H年化 <span class="c-red">+12.3%</span> · 回撤 56.5% · 108天</div>
+</div></div>
+<p class="note">年化收益 = (1 + 总收益率)^(365/持有天数) − 1，总收益率 = 总收益 ÷ 期初市值（100 股 × 首日收盘价）。注意：短周期的年化会被放大（尤其海力士仅 42 天），跨标的对比年化时需结合持有天数。三标的分别用各自扫描出的最优参数（DRAM 7天+15%对称、海力士最近周五+跌15%/涨8%、闪迪最近周五+跌20%/涨15%），2:1 过度对冲。</p>
+</div>
+
+<div class="card">
+<h2>最优策略逐轮明细（三标的独立表格，每轮一行，最新在前）</h2>
+<p class="note" style="margin-bottom:10px;">每行 = 一笔 put 持仓轮（入场 → 出场）。周期总利润 = 股票涨跌 + put收入 − put成本；成本占比 = put成本 ÷ 入场市值（100 股 × 入场spot）；收益比 = 周期总利润 ÷ 入场市值。方式：到期 = 持有到期滚动、上涨再平衡 = 涨到熔断线平仓重开、下跌止盈 = 跌到熔断线平仓重开、持有中 = 数据截止时未平仓（mark-to-market 估值）。</p>
+<h2 style="color:#4da3ff;margin-top:26px;font-size:16px;border-left-color:#4da3ff;">DRAM（7天 + 15%对称）<span style="color:var(--muted);font-size:13px;font-weight:400;"> · 21 轮 · 总收益 <span style="color:c-red;">$+2,790</span></span></h2><div class="tbl-scroll"><table><tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>行权价</th><th>股票涨跌</th><th>put成本</th><th>put收入</th><th>周期总利润</th><th>成本占比</th><th>收益比</th></tr><tr><td>2026-09-11</td><td>2026-09-11</td><td>持有中</td><td>$59.0</td><td>$59.0</td><td>$59</td><td class="c-gray">$+0</td><td class="c-green">-$342</td><td class="c-red">$+342</td><td class="c-gray">$+0</td><td class="c-green">5.8%</td><td class="c-gray">+0.0%</td></tr>
+<tr><td>2026-09-04</td><td>2026-09-11</td><td>到期</td><td>$59.7</td><td>$59.0</td><td>$60</td><td class="c-green">$-65</td><td class="c-green">-$537</td><td class="c-red">$+192</td><td class="c-green">$-410</td><td class="c-green">9.0%</td><td class="c-green">-6.9%</td></tr>
+<tr><td>2026-08-28</td><td>2026-09-04</td><td>到期</td><td>$55.8</td><td>$59.7</td><td>$56</td><td class="c-red">$+386</td><td class="c-green">-$301</td><td class="c-red">$+0</td><td class="c-red">$+85</td><td class="c-green">5.4%</td><td class="c-red">+1.5%</td></tr>
+<tr><td>2026-08-21</td><td>2026-08-28</td><td>到期</td><td>$57.7</td><td>$55.8</td><td>$58</td><td class="c-green">$-185</td><td class="c-green">-$421</td><td class="c-red">$+434</td><td class="c-green">$-172</td><td class="c-green">7.3%</td><td class="c-green">-3.0%</td></tr>
+<tr><td>2026-08-14</td><td>2026-08-21</td><td>到期</td><td>$57.3</td><td>$57.7</td><td>$57</td><td class="c-red">$+36</td><td class="c-green">-$380</td><td class="c-red">$+0</td><td class="c-green">$-344</td><td class="c-green">6.6%</td><td class="c-green">-6.0%</td></tr>
+<tr><td>2026-08-07</td><td>2026-08-14</td><td>到期</td><td>$50.6</td><td>$57.3</td><td>$51</td><td class="c-red">$+672</td><td class="c-green">-$503</td><td class="c-red">$+0</td><td class="c-red">$+169</td><td class="c-green">9.9%</td><td class="c-red">+3.3%</td></tr>
+<tr><td>2026-07-28</td><td>2026-08-07</td><td>到期</td><td>$48.3</td><td>$50.6</td><td>$48</td><td class="c-red">$+234</td><td class="c-green">-$721</td><td class="c-red">$+0</td><td class="c-green">$-487</td><td class="c-green">14.9%</td><td class="c-green">-10.1%</td></tr>
+<tr><td>2026-07-23</td><td>2026-07-28</td><td>下跌止盈</td><td>$57.4</td><td>$48.3</td><td>$57</td><td class="c-green">$-917</td><td class="c-green">-$651</td><td class="c-red">$+1,747</td><td class="c-red">$+179</td><td class="c-green">11.3%</td><td class="c-red">+3.1%</td></tr>
+<tr><td>2026-07-17</td><td>2026-07-23</td><td>上涨再平衡</td><td>$49.8</td><td>$57.4</td><td>$50</td><td class="c-red">$+761</td><td class="c-green">-$407</td><td class="c-red">$+15</td><td class="c-red">$+369</td><td class="c-green">8.2%</td><td class="c-red">+7.4%</td></tr>
+<tr><td>2026-07-10</td><td>2026-07-17</td><td>下跌止盈</td><td>$63.0</td><td>$49.8</td><td>$63</td><td class="c-green">$-1,321</td><td class="c-green">-$659</td><td class="c-red">$+2,634</td><td class="c-red">$+654</td><td class="c-green">10.4%</td><td class="c-red">+10.4%</td></tr>
+<tr><td>2026-07-02</td><td>2026-07-10</td><td>到期</td><td>$60.6</td><td>$63.0</td><td>$61</td><td class="c-red">$+241</td><td class="c-green">-$552</td><td class="c-red">$+0</td><td class="c-green">$-311</td><td class="c-green">9.1%</td><td class="c-green">-5.1%</td></tr>
+<tr><td>2026-06-26</td><td>2026-07-02</td><td>到期</td><td>$71.9</td><td>$60.6</td><td>$72</td><td class="c-green">$-1,125</td><td class="c-green">-$598</td><td class="c-red">$+2,274</td><td class="c-red">$+551</td><td class="c-green">8.3%</td><td class="c-red">+7.7%</td></tr>
+<tr><td>2026-06-18</td><td>2026-06-26</td><td>到期</td><td>$75.2</td><td>$71.9</td><td>$75</td><td class="c-green">$-337</td><td class="c-green">-$725</td><td class="c-red">$+624</td><td class="c-green">$-438</td><td class="c-green">9.6%</td><td class="c-green">-5.8%</td></tr>
+<tr><td>2026-06-12</td><td>2026-06-18</td><td>上涨再平衡</td><td>$65.0</td><td>$75.2</td><td>$65</td><td class="c-red">$+1,024</td><td class="c-green">-$609</td><td class="c-red">$+9</td><td class="c-red">$+423</td><td class="c-green">9.4%</td><td class="c-red">+6.5%</td></tr>
+<tr><td>2026-06-05</td><td>2026-06-12</td><td>到期</td><td>$55.8</td><td>$65.0</td><td>$56</td><td class="c-red">$+922</td><td class="c-green">-$450</td><td class="c-red">$+0</td><td class="c-red">$+472</td><td class="c-green">8.1%</td><td class="c-red">+8.5%</td></tr>
+<tr><td>2026-05-27</td><td>2026-06-05</td><td>到期</td><td>$62.4</td><td>$55.8</td><td>$62</td><td class="c-green">$-665</td><td class="c-green">-$908</td><td class="c-red">$+1,242</td><td class="c-green">$-331</td><td class="c-green">14.5%</td><td class="c-green">-5.3%</td></tr>
+<tr><td>2026-05-22</td><td>2026-05-27</td><td>上涨再平衡</td><td>$52.8</td><td>$62.4</td><td>$53</td><td class="c-red">$+962</td><td class="c-green">-$412</td><td class="c-red">$+45</td><td class="c-red">$+595</td><td class="c-green">7.8%</td><td class="c-red">+11.3%</td></tr>
+<tr><td>2026-05-15</td><td>2026-05-22</td><td>到期</td><td>$51.1</td><td>$52.8</td><td>$51</td><td class="c-red">$+172</td><td class="c-green">-$472</td><td class="c-red">$+0</td><td class="c-green">$-300</td><td class="c-green">9.2%</td><td class="c-green">-5.9%</td></tr>
+<tr><td>2026-05-11</td><td>2026-05-15</td><td>到期</td><td>$54.9</td><td>$51.1</td><td>$55</td><td class="c-green">$-381</td><td class="c-green">-$485</td><td class="c-red">$+780</td><td class="c-green">$-86</td><td class="c-green">8.8%</td><td class="c-green">-1.6%</td></tr>
+<tr><td>2026-05-05</td><td>2026-05-11</td><td>上涨再平衡</td><td>$44.4</td><td>$54.9</td><td>$44</td><td class="c-red">$+1,051</td><td class="c-green">-$277</td><td class="c-red">$+0</td><td class="c-red">$+774</td><td class="c-green">6.2%</td><td class="c-red">+17.4%</td></tr>
+<tr><td>2026-04-07</td><td>2026-04-14</td><td>上涨再平衡</td><td>$29.1</td><td>$34.3</td><td>$29</td><td class="c-red">$+524</td><td class="c-green">-$267</td><td class="c-red">$+0</td><td class="c-red">$+257</td><td class="c-green">9.2%</td><td class="c-red">+8.8%</td></tr></table></div>
+<h2 style="color:#f5a05a;margin-top:26px;font-size:16px;border-left-color:#f5a05a;">海力士（最近周五 + 跌15%/涨8%）<span style="color:var(--muted);font-size:13px;font-weight:400;"> · 14 轮 · 总收益 <span style="color:c-red;">$+5,038</span></span></h2><div class="tbl-scroll"><table><tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>行权价</th><th>股票涨跌</th><th>put成本</th><th>put收入</th><th>周期总利润</th><th>成本占比</th><th>收益比</th></tr><tr><td>2026-09-11</td><td>2026-09-11</td><td>持有中</td><td>$192.9</td><td>$189.9</td><td>$195</td><td class="c-green">$-304</td><td class="c-green">-$1,863</td><td class="c-red">$+1,863</td><td class="c-green">$-304</td><td class="c-green">9.7%</td><td class="c-green">-1.6%</td></tr>
+<tr><td>2026-09-04</td><td>2026-09-11</td><td>上涨再平衡</td><td>$177.0</td><td>$192.9</td><td>$175</td><td class="c-red">$+1,594</td><td class="c-green">-$1,664</td><td class="c-red">$+0</td><td class="c-green">$-70</td><td class="c-green">9.4%</td><td class="c-green">-0.4%</td></tr>
+<tr><td>2026-08-28</td><td>2026-09-04</td><td>到期</td><td>$161.0</td><td>$177.0</td><td>$160</td><td class="c-red">$+1,596</td><td class="c-green">-$933</td><td class="c-red">$+0</td><td class="c-red">$+663</td><td class="c-green">5.8%</td><td class="c-red">+4.1%</td></tr>
+<tr><td>2026-08-21</td><td>2026-08-28</td><td>到期</td><td>$163.4</td><td>$161.0</td><td>$162.5</td><td class="c-green">$-237</td><td class="c-green">-$1,084</td><td class="c-red">$+292</td><td class="c-green">$-1,029</td><td class="c-green">6.6%</td><td class="c-green">-6.3%</td></tr>
+<tr><td>2026-08-14</td><td>2026-08-21</td><td>到期</td><td>$169.3</td><td>$163.4</td><td>$170</td><td class="c-green">$-591</td><td class="c-green">-$1,751</td><td class="c-red">$+1,318</td><td class="c-green">$-1,024</td><td class="c-green">10.3%</td><td class="c-green">-6.0%</td></tr>
+<tr><td>2026-08-12</td><td>2026-08-14</td><td>上涨再平衡</td><td>$150.7</td><td>$169.3</td><td>$150</td><td class="c-red">$+1,862</td><td class="c-green">-$887</td><td class="c-red">$+0</td><td class="c-red">$+974</td><td class="c-green">5.9%</td><td class="c-red">+6.5%</td></tr>
+<tr><td>2026-08-07</td><td>2026-08-12</td><td>上涨再平衡</td><td>$137.9</td><td>$150.7</td><td>$140</td><td class="c-red">$+1,279</td><td class="c-green">-$1,661</td><td class="c-red">$+179</td><td class="c-green">$-204</td><td class="c-green">12.0%</td><td class="c-green">-1.5%</td></tr>
+<tr><td>2026-07-31</td><td>2026-08-07</td><td>到期</td><td>$159.9</td><td>$137.9</td><td>$160</td><td class="c-green">$-2,197</td><td class="c-green">-$2,634</td><td class="c-red">$+4,418</td><td class="c-green">$-413</td><td class="c-green">16.5%</td><td class="c-green">-2.6%</td></tr>
+<tr><td>2026-07-29</td><td>2026-07-31</td><td>上涨再平衡</td><td>$129.9</td><td>$159.9</td><td>$130</td><td class="c-red">$+2,993</td><td class="c-green">-$1,115</td><td class="c-red">$+0</td><td class="c-red">$+1,877</td><td class="c-green">8.6%</td><td class="c-red">+14.4%</td></tr>
+<tr><td>2026-07-24</td><td>2026-07-29</td><td>下跌止盈</td><td>$154.6</td><td>$129.9</td><td>$155</td><td class="c-green">$-2,462</td><td class="c-green">-$2,147</td><td class="c-red">$+5,010</td><td class="c-red">$+401</td><td class="c-green">13.9%</td><td class="c-red">+2.6%</td></tr>
+<tr><td>2026-07-23</td><td>2026-07-24</td><td>到期</td><td>$170.7</td><td>$154.6</td><td>$170</td><td class="c-green">$-1,615</td><td class="c-green">-$849</td><td class="c-red">$+3,086</td><td class="c-red">$+622</td><td class="c-green">5.0%</td><td class="c-red">+3.6%</td></tr>
+<tr><td>2026-07-17</td><td>2026-07-23</td><td>上涨再平衡</td><td>$152.1</td><td>$170.7</td><td>$152.5</td><td class="c-red">$+1,860</td><td class="c-green">-$2,086</td><td class="c-red">$+77</td><td class="c-green">$-149</td><td class="c-green">13.7%</td><td class="c-green">-1.0%</td></tr>
+<tr><td>2026-07-15</td><td>2026-07-17</td><td>下跌止盈</td><td>$181.8</td><td>$152.1</td><td>$180</td><td class="c-green">$-2,970</td><td class="c-green">-$1,911</td><td class="c-red">$+5,578</td><td class="c-red">$+697</td><td class="c-green">10.5%</td><td class="c-red">+3.8%</td></tr>
+<tr><td>2026-07-14</td><td>2026-07-15</td><td>上涨再平衡</td><td>$168.1</td><td>$181.8</td><td>$170</td><td class="c-red">$+1,370</td><td class="c-green">-$1,067</td><td class="c-red">$+1,115</td><td class="c-red">$+1,418</td><td class="c-green">6.3%</td><td class="c-red">+8.4%</td></tr></table></div>
+<h2 style="color:#26c281;margin-top:26px;font-size:16px;border-left-color:#26c281;">闪迪（最近周五 + 跌20%/涨15%）<span style="color:var(--muted);font-size:13px;font-weight:400;"> · 20 轮 · 总收益 <span style="color:c-red;">$+60,859</span></span></h2><div class="tbl-scroll"><table><tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>行权价</th><th>股票涨跌</th><th>put成本</th><th>put收入</th><th>周期总利润</th><th>成本占比</th><th>收益比</th></tr><tr><td>2026-09-11</td><td>2026-09-11</td><td>持有中</td><td>$1645.0</td><td>$1645.0</td><td>$1650</td><td class="c-gray">$+0</td><td class="c-green">-$11,511</td><td class="c-red">$+11,511</td><td class="c-gray">$+0</td><td class="c-green">7.0%</td><td class="c-gray">+0.0%</td></tr>
+<tr><td>2026-09-04</td><td>2026-09-11</td><td>到期</td><td>$1740.0</td><td>$1645.0</td><td>$1740</td><td class="c-green">$-9,496</td><td class="c-green">-$23,556</td><td class="c-red">$+18,993</td><td class="c-green">$-14,059</td><td class="c-green">13.5%</td><td class="c-green">-8.1%</td></tr>
+<tr><td>2026-08-28</td><td>2026-09-04</td><td>到期</td><td>$1485.0</td><td>$1740.0</td><td>$1485</td><td class="c-red">$+25,502</td><td class="c-green">-$10,852</td><td class="c-red">$+0</td><td class="c-red">$+14,650</td><td class="c-green">7.3%</td><td class="c-red">+9.9%</td></tr>
+<tr><td>2026-08-21</td><td>2026-08-28</td><td>到期</td><td>$1596.1</td><td>$1485.0</td><td>$1595</td><td class="c-green">$-11,110</td><td class="c-green">-$14,616</td><td class="c-red">$+22,004</td><td class="c-green">$-3,722</td><td class="c-green">9.2%</td><td class="c-green">-2.3%</td></tr>
+<tr><td>2026-08-14</td><td>2026-08-21</td><td>到期</td><td>$1646.9</td><td>$1596.1</td><td>$1650</td><td class="c-green">$-5,085</td><td class="c-green">-$18,898</td><td class="c-red">$+10,784</td><td class="c-green">$-13,200</td><td class="c-green">11.5%</td><td class="c-green">-8.0%</td></tr>
+<tr><td>2026-08-07</td><td>2026-08-14</td><td>上涨再平衡</td><td>$1212.2</td><td>$1646.9</td><td>$1210</td><td class="c-red">$+43,472</td><td class="c-green">-$12,709</td><td class="c-red">$+0</td><td class="c-red">$+30,763</td><td class="c-green">10.5%</td><td class="c-red">+25.4%</td></tr>
+<tr><td>2026-07-31</td><td>2026-08-07</td><td>到期</td><td>$1383.7</td><td>$1212.2</td><td>$1385</td><td class="c-green">$-17,147</td><td class="c-green">-$29,437</td><td class="c-red">$+34,558</td><td class="c-green">$-12,026</td><td class="c-green">21.3%</td><td class="c-green">-8.7%</td></tr>
+<tr><td>2026-07-29</td><td>2026-07-31</td><td>上涨再平衡</td><td>$1119.3</td><td>$1383.7</td><td>$1120</td><td class="c-red">$+26,436</td><td class="c-green">-$16,512</td><td class="c-red">$+0</td><td class="c-red">$+9,924</td><td class="c-green">14.8%</td><td class="c-red">+8.9%</td></tr>
+<tr><td>2026-07-24</td><td>2026-07-29</td><td>下跌止盈</td><td>$1436.6</td><td>$1119.3</td><td>$1435</td><td class="c-green">$-31,723</td><td class="c-green">-$20,200</td><td class="c-red">$+63,134</td><td class="c-red">$+11,211</td><td class="c-green">14.1%</td><td class="c-red">+7.8%</td></tr>
+<tr><td>2026-07-23</td><td>2026-07-24</td><td>到期</td><td>$1567.6</td><td>$1436.6</td><td>$1570</td><td class="c-green">$-13,104</td><td class="c-green">-$6,980</td><td class="c-red">$+26,688</td><td class="c-red">$+6,604</td><td class="c-green">4.5%</td><td class="c-red">+4.2%</td></tr>
+<tr><td>2026-07-17</td><td>2026-07-23</td><td>上涨再平衡</td><td>$1354.8</td><td>$1567.6</td><td>$1355</td><td class="c-red">$+21,278</td><td class="c-green">-$21,311</td><td class="c-red">$+0</td><td class="c-green">$-33</td><td class="c-green">15.7%</td><td class="c-green">-0.0%</td></tr>
+<tr><td>2026-07-16</td><td>2026-07-17</td><td>到期</td><td>$1527.5</td><td>$1354.8</td><td>$1530</td><td class="c-green">$-17,267</td><td class="c-green">-$17,483</td><td class="c-red">$+35,036</td><td class="c-red">$+286</td><td class="c-green">11.4%</td><td class="c-red">+0.2%</td></tr>
+<tr><td>2026-07-10</td><td>2026-07-16</td><td>下跌止盈</td><td>$1915.9</td><td>$1527.5</td><td>$1915</td><td class="c-green">$-38,843</td><td class="c-green">-$25,034</td><td class="c-red">$+77,502</td><td class="c-red">$+13,625</td><td class="c-green">13.1%</td><td class="c-red">+7.1%</td></tr>
+<tr><td>2026-07-02</td><td>2026-07-10</td><td>到期</td><td>$1745.0</td><td>$1915.9</td><td>$1740</td><td class="c-red">$+17,092</td><td class="c-green">-$22,923</td><td class="c-red">$+0</td><td class="c-green">$-5,831</td><td class="c-green">13.1%</td><td class="c-green">-3.3%</td></tr>
+<tr><td>2026-06-26</td><td>2026-07-02</td><td>到期</td><td>$2090.7</td><td>$1745.0</td><td>$2090</td><td class="c-green">$-34,571</td><td class="c-green">-$17,251</td><td class="c-red">$+69,000</td><td class="c-red">$+17,178</td><td class="c-green">8.3%</td><td class="c-red">+8.2%</td></tr>
+<tr><td>2026-06-18</td><td>2026-06-26</td><td>到期</td><td>$2184.8</td><td>$2090.7</td><td>$2180</td><td class="c-green">$-9,404</td><td class="c-green">-$27,636</td><td class="c-red">$+17,858</td><td class="c-green">$-19,182</td><td class="c-green">12.6%</td><td class="c-green">-8.8%</td></tr>
+<tr><td>2026-06-12</td><td>2026-06-18</td><td>到期</td><td>$1891.0</td><td>$2184.8</td><td>$1890</td><td class="c-red">$+29,377</td><td class="c-green">-$15,135</td><td class="c-red">$+0</td><td class="c-red">$+14,242</td><td class="c-green">8.0%</td><td class="c-red">+7.5%</td></tr>
+<tr><td>2026-06-05</td><td>2026-06-12</td><td>上涨再平衡</td><td>$1559.3</td><td>$1891.0</td><td>$1560</td><td class="c-red">$+33,166</td><td class="c-green">-$17,435</td><td class="c-red">$+0</td><td class="c-red">$+15,731</td><td class="c-green">11.2%</td><td class="c-red">+10.1%</td></tr>
+<tr><td>2026-05-29</td><td>2026-06-05</td><td>到期</td><td>$1695.0</td><td>$1559.3</td><td>$1690</td><td class="c-green">$-13,566</td><td class="c-green">-$20,166</td><td class="c-red">$+26,136</td><td class="c-green">$-7,596</td><td class="c-green">11.9%</td><td class="c-green">-4.5%</td></tr>
+<tr><td>2026-05-26</td><td>2026-05-29</td><td>到期</td><td>$1535.2</td><td>$1695.0</td><td>$1535</td><td class="c-red">$+15,977</td><td class="c-green">-$8,251</td><td class="c-red">$+0</td><td class="c-red">$+7,726</td><td class="c-green">5.4%</td><td class="c-red">+5.0%</td></tr></table></div>
+</div>
+
+<div class="card">
+<h2>说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>如何刷新数据</strong>：在 <code>hedge/</code> 目录执行 <code>./refresh_summary.sh</code>，一次刷齐全量数据（股票日线 + 期权增量 + 实时指标 + 逐轮明细回测），通常几十秒；<code>./refresh_summary.sh --full</code> 会强制期权全量重拉（慢，修复历史数据用）。</li>
+<li><strong>策略框架通用</strong>：买 put 对冲 + 开盘价涨跌熔断 + 2:1 过度对冲。三标的各自扫描出的最优涨/跌熔断和周期不同（DRAM 7天+15%对称、海力士最近周五+跌15%/涨8%、闪迪最近周五+跌20%/涨15%）。</li>
+<li><strong>收益比</strong> = 周期总利润 ÷ 入场市值（100 股 × 入场spot），是资金收益率口径。</li>
+<li><strong>三标的可对比窗口为 07-13 之后</strong>：海力士(SKHY) 07-13 才在 Nasdaq 上市，DRAM 数据 04-02 起、闪迪 05-26 起，故归一化图在各自数据起点前为空；逐轮明细表为三标的独立表格，各列自身完整轮次。</li>
+<li><strong>真实成交价</strong>：Put 成本用每日期权链成交量加权价 vw，非 BS 理论价。</li>
+<li><strong>仅供研究，不构成投资建议</strong>。三标的样本量有限（DRAM 99天/海力士31天/闪迪65天），参数含过拟合风险。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

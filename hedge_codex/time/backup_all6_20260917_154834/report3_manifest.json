@@ -1,0 +1,17 @@
+{
+  "skhy_report3_exit_optimization.html": "639f824f147a148e6eeb5a8a5ae9db4f4066881b3e66b6e20363a3fe9992490a",
+  "exit_optimization.json": "2be7808373eb31b1361b5e9ce6ef7b0536e592ae3bfa04b0ec1e1d745a1de1bd",
+  "rule_search_summary.json": "bb2c829481dac64759660189bae844b3e5f77517d5ec00095f6601ac19ad664e",
+  "execution_sensitivity.json": "3c2ce40db944766c19088e266617931b4c21bfff3ce5e874007407fa78eae2f1",
+  "exit_strategy_comparison.png": "59f4b896bb60811f1e98e5568a5bfd214f30617c9209d04d230e9a427fa26746",
+  "analyze_exit.py": "054db56a8da4c19ff1bc888c0153d56abb4fa9d1a020f4bb7b2f3de32829f805",
+  "verify_exit.py": "b3f4301aa4ec62fa13a19e91700cc28bc66fa8544882d38ccc845ca000efa868",
+  "plot_comparison.py": "5447c6e2e967a1220f117a5760f0227fda45cca32de94b2110765798745319a3",
+  "build_report.py": "b44e101f53e9ee50a153db4b3caf12c834c2a6f595de53cb9db849416a887966",
+  "optimization_chart.js": "4f49d2e5691e66a49b3a357592684242593cafee20a71e6153c91b7b4b97bf85",
+  "prior_stock_closes.json": "e55a03d3728d4357e13f2844a35f01fedca21f4826164cbf55069d7ed031ebd0",
+  "README_report3.md": "68fea83cc59ff14d42466eb70c5d2c1bed3df66099ccb307b5302e6afa908bef",
+  "report3_summary.md": "0e8953de51bd4ae4d7fc39175c367e7b7f9cbe929d61f0e002f917ade0cdf564",
+  "report3_inputs/skhy_report2_cycles.json": "ff73a54427899c76be8eb8b1c1b38a2d3ae5fd250b922cde258da003b39520b2",
+  "report3_inputs/report2_market_data.json": "7e8ae86d77acb9b4afb7a871d368b2f969d5f91998dc8831d8af9c4012d18a54"
+}

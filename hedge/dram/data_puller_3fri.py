@@ -23,6 +23,7 @@ DRAM 多周五到期日期权拉取 (未来 3 个周五)
   ]
 """
 import json
+import os
 import math
 import time
 import argparse
@@ -95,15 +96,30 @@ def main():
     ap.add_argument('--start', default='2026-04-02')
     ap.add_argument('--end', default='2026-08-14')
     ap.add_argument('--limit', type=int, default=0)
+    ap.add_argument('--full', action='store_true', help='全量重拉（默认增量，只拉新增交易日）')
     args = ap.parse_args()
 
     stock_file = f"{DATA_DIR}/{TICKER}_stock.json"
     out_file = f"{DATA_DIR}/{TICKER}_options_3fri.json"
     rows = json.load(open(stock_file))
     rows = [r for r in rows if args.start <= r[0] <= args.end]
+
+    # 增量：默认跳过已存在的交易日，只拉新增（--full 则全量重拉）
+    old_chains = []
+    if not args.full and os.path.exists(out_file):
+        try:
+            old_chains = json.load(open(out_file))
+        except Exception:
+            old_chains = []
+    existing = {c['date'] for c in old_chains}
+    new_rows = [r for r in rows if r[0] not in existing]
+    if not new_rows:
+        print(f"无新增交易日（已有 {len(existing)} 天，最新 {max(existing) if existing else '无'}），跳过拉取")
+        return
     if args.limit > 0:
-        rows = rows[:args.limit]
-    print(f"交易日: {len(rows)} 天 ({rows[0][0]} ~ {rows[-1][0]})")
+        new_rows = new_rows[:args.limit]
+    print(f"交易日: 新增 {len(new_rows)} 天 ({new_rows[0][0]} ~ {new_rows[-1][0]})，已有 {len(existing)} 天")
+    rows = new_rows
 
     # 构建任务
     tasks = []  # (date_str, expiry, cp, strike, fri_idx)
@@ -157,6 +173,8 @@ def main():
             day['fridays'].append({'expiry': fm['expiry'], 'dte': fm['dte'], 'calls': calls, 'puts': puts})
         chains.append(day)
 
+    chains = old_chains + chains
+    chains.sort(key=lambda x: x['date'])
     json.dump(chains, open(out_file, 'w'))
     total_puts = sum(len(f['puts']) for c in chains for f in c['fridays'])
     print(f"完成: {len(chains)} 天 -> {out_file}")

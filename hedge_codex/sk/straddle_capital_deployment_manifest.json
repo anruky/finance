@@ -1,0 +1,9 @@
+{
+  "backtest_straddle.py": "66a40c13eac727705d7ef618e41e8f6bfaa086bd877f3d88c12dc35fd6fca61d",
+  "capital_report.py": "04ce201189e7862f69803cea18536c8afee86780915ab2c45aae4f866293079b",
+  "gen_straddle_report.py": "08b2128a1f012a12df0596abb22f4bed7485c1178263afc1188d485454a6b8b4",
+  "test_capital.py": "9d5d9b1236101e383f71bdf36377e22abd79376d45745b6ca75da40bddd9c7ff",
+  "STRADDLE_README.md": "a1028743da3c20fe81a17c3409697600da1fbf06d1f38baac0f6a35ec218a93f",
+  "skhy_straddle_report.html": "660988beef821e8405b17811677196c728c72db7d2d21dd62b0cb6edb62cca6c",
+  "skhy_straddle_results.json": "8ee63ff5d10539d547b0c72940cd978afb8504ab2f83f1582555d7d58cc4a9cd"
+}

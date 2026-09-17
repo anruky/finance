@@ -1,0 +1,17 @@
+{
+  "gen_final_report.py": "783ce84a26dd0ddc1dc38784f04d219c89083c64d0cb9d4c3d4b348e47411510",
+  "real_options_backtest_v10.py": "318cbb8e1d25d55a2117e48cef42c044a31e0075fedd096ad85922f5cfac8632",
+  "data_puller_3fri.py": "c807e6c01b9dc7bf432260e4d9ae361d273591fa86c5f952f542c79869dca9f0",
+  "refresh_data.py": "87a4ce7d9a80493a4efed90932f2b3a1dff0deb20e35bed91d1f7bc48d9cb38d",
+  "backtest_audited.py": "a519d9722feec77e252baea0663d5d2ac749e7e36b508fed2b4071f9b0ffc4d4",
+  "report_builder.py": "f52649a1b5668b82d913c9f407446660dba01fefb40a7ab1264b65e77697f7ae",
+  "test_backtest.py": "f126a571889fffe2c9992ee184ca914f85c2bb3f62e6bbe5320d235cac680ae4",
+  "README.md": "884f8751dcf997e0ac71b3d72f9e4be065ecfa14b55b5c7bfda3805a87989521",
+  "skhy_final_report.html": "56cd1657b81aeae2b90ef7a619d4ed2421daba1ada2b18e5f185a9bd6cb44b0a",
+  "skhy_v10_backtest_report.html": "34161efdcc560df75f2994fc54da78c1b1bd8d19f5f52d31af3a4f7938d54210",
+  "results.json": "68acf2bbbdf7bfc1299b4d2d94a5e62e22086aa1d08811e3c50d96f4c91b8e85",
+  "data/refresh_manifest.json": "735de604ac94a16f710a7644fcb7dbf7457c90cf0ae244837384dbf769fc0793",
+  "data/SKHY_stock.json": "799b16dcf73cc7a646f94f29e127b531ae6cb985a4146147542c64e4ca934b53",
+  "data/SKHY_options_3fri.json": "ac41eafa77f616fe5e607d1fe2a8143f4a62d065ac6b0535584a4cc5f2760d3b",
+  "data/SKHY_put_history.json": "2bc06b712c30ecb1035372d400b209883febbd1f2d3d6a59d877237e09b7f2c6"
+}

@@ -1,24 +1,42 @@
 #!/usr/bin/env python3
 """
-SKHY（SK海力士美股 ADR）对冲策略最终报告生成器
-===============================================
-涨熔断 × 跌熔断 不对称扫描，找真正最优参数（不沿用 DRAM 的对称 15%）。
+SKHY（SK海力士美股 ADR）对冲策略最终报告生成器 —— 自适应策略版
+================================================================
+策略（2026-09-15 定版）：每轮入场按 put/call 相对贵贱动态切换结构
+  · put 比 call 贵        → 1 call + 1 put（跨式，纯做多波动）
+  · put 比 call 便宜/相等 → 2 put + 100 股（股票 + 2张put对冲）
+
+扫描：周期 target ∈ {2,7,14,21} × 跌熔断 × 涨熔断，找最优。
+结算口径：熔断/到期/持有中一律按内在价值结算（消除前视偏差）。
+
+复用 skhy_adaptive.run_adaptive 作为回测核心。
 """
 import json
 import os
-from collections import defaultdict
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
+ET = ZoneInfo("America/New_York")
+SK = os.path.dirname(os.path.abspath(__file__))
 DATA = "/Users/gavinz/git/finance/data"
-OUT_HTML = "/Users/gavinz/git/finance/hedge/sk/skhy_final_report.html"
+OUT_HTML = os.path.join(SK, "skhy_final_report.html")
 
-# 复用 v10 的核心逻辑
-exec(open(os.path.join(os.path.dirname(__file__), "real_options_backtest_v10.py")).read().split("def pc(")[0])
-OUT_HTML = "/Users/gavinz/git/finance/hedge/sk/skhy_final_report.html"  # 覆盖 exec 引入的 v10 输出路径
+import sys
+sys.path.insert(0, SK)
+import skhy_adaptive as A
+import real_options_backtest_v10 as v10mod
+
+run_adaptive = A.run_adaptive
+round_mdd = A.round_mdd
+load_3fri = v10mod.load_3fri
+load_stock = v10mod.load_stock
+bh_benchmark = v10mod.bh_benchmark
+run_v10 = v10mod.run_v10
 
 TARGET_LABELS = {2: "最近周五(1-4天)", 7: "7天(6-11天)", 14: "14天(13-18天)", 21: "21天(20-21天)"}
-SYM_MOVES = [8, 10, 15, 20]              # 对称参考（周期 × 熔断线）
-ASYM_MOVES = [8, 10, 12, 15, 18, 20, 25]  # 不对称扫描（涨/跌独立）
+TARGETS = [2, 7, 14, 21]
+DOWNS = [5, 8, 10, 12, 15, 20, 25]
+UPS = [5, 8, 10, 12, 15, 20, 25]
 
 
 def pc(v):
@@ -29,428 +47,476 @@ def money(v):
     return f'<span class="{pc(v)}">${v:+,.0f}</span>'
 
 
+def _ma(arr, k):
+    out = [None] * len(arr)
+    for i in range(len(arr)):
+        if i + 1 >= k:
+            out[i] = sum(arr[i - k + 1:i + 1]) / k
+    return out
+
+
+def _ema(arr, k):
+    out = [None] * len(arr)
+    m = 2 / (k + 1)
+    prev = None
+    for i, v in enumerate(arr):
+        prev = v if prev is None else prev * (1 - m) + v * m
+        out[i] = prev
+    return out
+
+
+def build_indicator_board(stock):
+    """计算 SKHY 常用技术指标，返回 {svg, latest} 供报告嵌入。"""
+    import math
+    dates = [r[0] for r in stock]
+    opens = [r[1] for r in stock]
+    highs = [r[2] for r in stock]
+    lows = [r[3] for r in stock]
+    closes = [r[4] for r in stock]
+    vols = [r[5] for r in stock]
+    n = len(stock)
+
+    ma5 = _ma(closes, 5); ma10 = _ma(closes, 10); ma20 = _ma(closes, 20)
+    e12 = _ema(closes, 12); e26 = _ema(closes, 26)
+    dif = [a - b for a, b in zip(e12, e26)]
+    dea = _ema(dif, 9)
+    macd_hist = [(d - e) * 2 for d, e in zip(dif, dea)]
+
+    rsi14 = [None] * n
+    gains, losses = [], []
+    for i in range(1, n):
+        ch = closes[i] - closes[i - 1]
+        gains.append(max(ch, 0)); losses.append(max(-ch, 0))
+    if n > 14:
+        avg_g = sum(gains[:14]) / 14; avg_l = sum(losses[:14]) / 14
+        for i in range(14, n):
+            rs = avg_g / avg_l if avg_l > 0 else 100
+            rsi14[i] = 100 - 100 / (1 + rs)
+            avg_g = (avg_g * 13 + gains[i - 1]) / 14
+            avg_l = (avg_l * 13 + losses[i - 1]) / 14
+
+    boll_mid = ma20
+    boll_up = [None] * n; boll_dn = [None] * n
+    for i in range(n):
+        if boll_mid[i] is not None:
+            w = closes[i - 19:i + 1]
+            sd = (sum((x - boll_mid[i]) ** 2 for x in w) / 20) ** 0.5
+            boll_up[i] = boll_mid[i] + 2 * sd
+            boll_dn[i] = boll_mid[i] - 2 * sd
+
+    trs = [highs[0] - lows[0]]
+    for i in range(1, n):
+        trs.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
+    atr = _ma(trs, 14)
+    vma5 = _ma(vols, 5); vma10 = _ma(vols, 10)
+
+    last = n - 1
+    latest = dict(
+        close=closes[last], ma5=ma5[last], ma10=ma10[last], ma20=ma20[last],
+        dif=dif[last], dea=dea[last], macd=macd_hist[last], rsi=rsi14[last],
+        boll_up=boll_up[last], boll_mid=boll_mid[last], boll_dn=boll_dn[last],
+        atr=atr[last], atr_pct=atr[last] / closes[last] * 100 if atr[last] else 0,
+        vma5=vma5[last], vma10=vma10[last],
+    )
+
+    UP = "#E24B4A"; DOWN = "#26c281"; TEXT = "#e6e8ec"; MUTED = "#9aa3b2"; GRID = "rgba(154,163,178,0.10)"
+    C20 = "#c792ea"
+    W = 680; L = 54; R = 668
+    def px(i): return L + (R - L) * (i + 0.5) / n
+    p_t, p_b = 18, 210
+    def py(v):
+        return p_t + (p_b - p_t) * (200.0 - v) / (200.0 - 120.0)
+    def seg(pts, c, w=1.4):
+        return f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}" fill="none" stroke="{c}" stroke-width="{w}"/>'
+    s = []
+    for v in [120, 140, 160, 180, 200]:
+        y = py(v)
+        s.append(f'<line x1="{L}" y1="{y:.1f}" x2="{R}" y2="{y:.1f}" stroke="{GRID}"/>')
+        s.append(f'<text x="{L-7}" y="{y+4:.1f}" fill="{MUTED}" font-size="10" text-anchor="end">${v}</text>')
+    for i in range(n):
+        o, h, l, c = opens[i], highs[i], lows[i], closes[i]
+        col = UP if c >= o else DOWN
+        x = px(i); yc, yo, yh, yl = py(c), py(o), py(h), py(l)
+        bt = min(yc, yo); bh = max(abs(yc - yo), 1.2)
+        s.append(f'<line x1="{x:.1f}" y1="{yh:.1f}" x2="{x:.1f}" y2="{yl:.1f}" stroke="{col}" stroke-width="1"/>')
+        s.append(f'<rect x="{x-5:.1f}" y="{bt:.1f}" width="10" height="{bh:.1f}" fill="{col}"/>')
+    s.append(seg([(px(i), py(v)) for i, v in enumerate(ma20) if v is not None], C20, 1.6))
+    s.append(f'<text x="{L}" y="{p_t+14}" fill="{TEXT}" font-size="12" font-weight="600">SKHY · K线 + 均线(MA20)</text>')
+    s.append(f'<circle cx="{R}" cy="{p_t+10}" r="3" fill="{C20}"/><text x="{R+6}" y="{p_t+14}" fill="{MUTED}" font-size="10">MA20</text>')
+    for j in range(0, n, max(1, n // 6)):
+        s.append(f'<text x="{px(j):.1f}" y="{p_b+18}" fill="{MUTED}" font-size="10" text-anchor="middle">{dates[j][5:]}</text>')
+    svg = '<svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img">\n' + "\n".join(s) + '\n</svg>'
+    return dict(svg=svg, latest=latest)
+
+
 def main():
     data, day_map = load_3fri()
     stock, closes, bars = load_stock()
     stock_entry = closes[stock[0][0]]
     stock_exit = closes[stock[-1][0]]
+    meta = dict(entry_date=stock[0][0], entry_price=stock_entry,
+                exit_date=stock[-1][0], exit_price=stock_exit, n_days=len(stock))
 
     bh = bh_benchmark(stock, closes)
-    bh_ratio = bh["total"] / bh["mdd"] if bh["mdd"] > 0 else 0
+    bh_mdd_abs = bh["mdd"]
+    bh_ratio_abs = bh["total"] / bh["mdd"] if bh["mdd"] > 0 else 0
 
-    # 1. 对称扫描，先确定最优周期
-    sym_results = []
-    for target in TARGET_LABELS:
-        for m in SYM_MOVES:
-            r = run_v10(day_map, closes, bars, stock, stock_entry, stock_exit, m, target)
-            r["target"] = target
-            r["move"] = m
-            r["ratio"] = r["total"] / r["mdd"] if r["mdd"] > 0 else 0
-            sym_results.append(r)
-    best_sym = max(sym_results, key=lambda x: x["ratio"])
-    best_target = best_sym["target"]
+    # ============ 全空间扫描：周期 × 跌熔断 × 涨熔断 ============
+    results = []
+    for t in TARGETS:
+        for down in DOWNS:
+            for up in UPS:
+                r = run_adaptive(day_map, closes, bars, stock, down, t, up_pct=up)
+                mdd = round_mdd(r["rounds"], lambda rd: rd["pnl"])
+                r["down"] = down; r["up"] = up; r["target"] = t
+                r["mdd"] = mdd
+                r["ratio"] = r["total"] / mdd if mdd > 0 else 0
+                results.append(r)
+    print(f"扫描完成: {len(results)} 组（周期 {len(TARGETS)} × 跌 {len(DOWNS)} × 涨 {len(UPS)}）")
 
-    # 2. 不对称扫描（针对最优周期，涨/跌熔断独立）
-    asym_results = []
-    for down in ASYM_MOVES:
-        for up in ASYM_MOVES:
-            r = run_v10(day_map, closes, bars, stock, stock_entry, stock_exit, down, best_target, up_pct=up)
-            r["down"] = down
-            r["up"] = up
-            r["ratio"] = r["total"] / r["mdd"] if r["mdd"] > 0 else 0
-            asym_results.append(r)
-    best = max(asym_results, key=lambda x: x["ratio"])
+    best = max(results, key=lambda x: x["ratio"])
+    best_total = max(results, key=lambda x: x["total"])
+    print(f"最优(收益/回撤比): 周期{best['target']} 跌{best['down']}%/涨{best['up']}% "
+          f"-> 收益${best['total']:+,.0f} 回撤${best['mdd']:,.0f} 比{best['ratio']:.2f}")
+    print(f"最优(总收益): 周期{best_total['target']} 跌{best_total['down']}%/涨{best_total['up']}% "
+          f"-> 收益${best_total['total']:+,.0f}")
 
-    # 最新期权数据(用于"现在如何买")
-    last = data[-1]
-    last_spot = last["spot"]
-    latest_date = last["date"]
-    near_f = min([f for f in last["fridays"] if f["dte"] > 0], key=lambda f: abs(f["dte"] - best_target))
-    near_atm = min(near_f["puts"], key=lambda p: abs(p["strike"] - last_spot))
+    # 固定 2put / 固定跨式 作为对比基准（同参数，逐轮累计回撤口径）
+    f2p = run_v10(day_map, closes, bars, stock, stock_entry, stock_exit,
+                  best["down"], best["target"], num_puts=2, up_pct=best["up"])
+    f2p_rounds = [dict(entry_date=rd["entry_date"], pnl=rd["stock_pnl"] + rd["pnl"]) for rd in f2p["rounds"]]
+    f2p_sum = sum(r["pnl"] for r in f2p_rounds)
+    f2p_mdd = round_mdd(f2p_rounds, lambda rd: rd["pnl"])
+    f2p_ratio = f2p_sum / f2p_mdd if f2p_mdd > 0 else 0
+
+    import rescan_skhy_straddle as st
+    fst = st.run_straddle(day_map, closes, bars, stock, best["down"], best["target"], up_pct=best["up"])
+    fst_rounds = [dict(entry_date=rd["entry_date"], pnl=rd["pnl"]) for rd in fst["rounds"]]
+    fst_sum = sum(r["pnl"] for r in fst_rounds)
+    fst_mdd = round_mdd(fst_rounds, lambda rd: rd["pnl"])
+    fst_ratio = fst_sum / fst_mdd if fst_mdd > 0 else 0
+
+    # ============ 熔断矩阵（固定最优周期）============
+    def mat(field, kind):
+        mat_dict = {}
+        vals = []
+        for down in DOWNS:
+            row = []
+            for up in UPS:
+                r = next(x for x in results if x["target"] == best["target"] and x["down"] == down and x["up"] == up)
+                v = r[field]
+                row.append(v)
+                vals.append(v)
+            mat_dict[down] = row
+        return mat_dict, vals
+
+    pnl_mat, pnl_vals = mat("total", "pnl")
+    ratio_mat, ratio_vals = mat("ratio", "ratio")
+
+    def matrix_html(mat, vals, kind, title, as_money=True):
+        head = "".join(f"<th>涨{up}%</th>" for up in UPS)
+        rows = []
+        for down in DOWNS:
+            tds = []
+            for i in range(len(UPS)):
+                v = mat[down][i]
+                is_best = (down == best["down"] and UPS[i] == best["up"])
+                txt = f"${v:+,.0f}" if as_money else f"{v:.2f}"
+                mark = " ★" if is_best else ""
+                if is_best:
+                    cls = "c-gold"
+                elif kind == "pnl":
+                    cls = "c-red" if v > 0 else "c-green"
+                else:
+                    cls = ""
+                tds.append(f'<td class="{cls}">{txt}{mark}</td>')
+            rows.append(f"<tr><td>{down}%</td>{''.join(tds)}</tr>")
+        return (f'<div style="margin-top:6px;"><h3 style="font-size:15px;color:var(--text);margin:18px 0 8px;">{title}</h3>'
+                f'<table><tr><th>跌\\涨</th>{head}</tr>{"".join(rows)}</table></div>')
+
+    pnl_matrix_html = matrix_html(pnl_mat, pnl_vals, "pnl", "熔断矩阵 —— 总收益（周期=最近周五）")
+    ratio_matrix_html = matrix_html(ratio_mat, ratio_vals, "ratio", "熔断矩阵 —— 收益/回撤比（周期=最近周五）", as_money=False)
+
+    # ============ 周期敏感性（固定最优熔断）============
+    target_rows = []
+    for t in TARGETS:
+        r = next(x for x in results if x["target"] == t and x["down"] == best["down"] and x["up"] == best["up"])
+        is_best = (t == best["target"])
+        mark = ' <span class="c-gold">★</span>' if is_best else ""
+        target_rows.append(
+            f'<tr><td>{TARGET_LABELS[t]}</td>'
+            f'<td class="{pc(r["total"])}">${r["total"]:+,.0f}{mark}</td>'
+            f'<td>${r["mdd"]:,.0f}</td>'
+            f'<td class="c-gold">{r["ratio"]:.2f}</td>'
+            f'<td>{r["n_rounds"]}</td>'
+            f'<td>跨式{r["n_straddle"]} / 2put{r["n_2put"]}</td></tr>'
+        )
+    target_rows_html = "\n".join(target_rows)
+
+    # ============ 最优组合逐轮明细 ============
+    detail_rows = []
+    for rd in reversed(best["rounds"]):
+        struct_txt = ("<span class='c-gold'>跨式</span>" if rd["struct"] == "straddle"
+                      else "<span class='c-red'>2put</span>")
+        if rd["kind"] == "持有中":
+            exit_cell = f"<td>{rd.get('expiry', rd['exit_date'])} 到期</td>"
+        else:
+            exit_cell = f"<td>{rd['exit_date']}</td>"
+        chg = (rd["exit_spot"] / rd["entry_spot"] - 1) * 100
+        detail_rows.append(
+            f'<tr><td>{rd["entry_date"]}</td>{exit_cell}<td>{rd["kind"]}</td>'
+            f'<td>{struct_txt}</td>'
+            f'<td>${rd["entry_spot"]:.1f}</td><td>${rd["exit_spot"]:.1f}</td>'
+            f'<td class="{pc(chg)}">{chg:+.1f}%</td>'
+            f'<td>${rd["strike"]:g}</td>'
+            f'<td>${rd["put_price"]:.2f}</td><td>${rd["call_price"]:.2f}</td>'
+            f'<td class="c-green">${rd["cost"]:,.0f}</td>'
+            f'<td class="c-red">${rd["income"]:+,.0f}</td>'
+            f'<td class="{pc(rd["pnl"])}">${rd["pnl"]:+,.0f}</td></tr>'
+        )
+    detail_html = "\n".join(detail_rows)
+
+    # ============ 现在如何买（基于最新数据做 adaptive 决策）============
+    last_day = data[-1]
+    latest_date = last_day["date"]
+    last_spot = closes[stock[-1][0]]  # 用最新收盘价
+    near_f = min([f for f in last_day["fridays"] if f["dte"] > 0], key=lambda f: abs(f["dte"] - best["target"]))
+    near_atm_put = min(near_f["puts"], key=lambda p: abs(p["strike"] - last_spot))
+    near_strike = near_atm_put["strike"]
+    near_put_vw = near_atm_put["vw"]
+    near_call = next((x for x in near_f.get("calls", []) if abs(x["strike"] - near_strike) < 1e-9), None)
+    near_call_vw = near_call["vw"] if near_call else None
     near_expiry = near_f["expiry"]
     near_dte = near_f["dte"]
-    near_strike = near_atm["strike"]
-    near_vw = near_atm["vw"]
-    cost_2 = near_vw * 100 * 2
+
+    if near_call_vw is not None:
+        if near_put_vw > near_call_vw:
+            now_struct = "跨式（1 call + 1 put）"
+            now_cost = (near_put_vw + near_call_vw) * 100
+            now_reason = f'put ${near_put_vw:.2f} &gt; call ${near_call_vw:.2f}，put 更贵 → 买便宜 call 抓波动'
+        else:
+            now_struct = "2 put + 100 股"
+            now_cost = near_put_vw * 200
+            now_reason = f'put ${near_put_vw:.2f} ≤ call ${near_call_vw:.2f}，put 更便宜 → 用便宜 put 对冲 + 股票吃慢牛'
+    else:
+        now_struct = "数据缺 call，无法判断"
+        now_cost = near_put_vw * 200
+        now_reason = "最新期权链缺同档 call 数据"
+
     up_line = last_spot * (1 + best["up"] / 100.0)
     dn_line = last_spot * (1 - best["down"] / 100.0)
 
-    # 股票端点（供模板动态化）
-    meta = dict(
-        entry_date=stock[0][0], entry_price=stock_entry,
-        exit_date=stock[-1][0], exit_price=stock_exit,
-        n_days=len(stock),
-    )
-    all_closes = [closes[r[0]] for r in stock]
-    meta["max_price"] = max(all_closes)
-    meta["min_price"] = min(all_closes)
+    # 技术指标
+    indic = build_indicator_board(stock)
+    ind = indic["latest"]
+    _price_vs_ma20 = "站上" if ind["close"] > ind["ma20"] else "跌破"
+    _trend = "多头" if ind["close"] > ind["ma20"] else "空头"
 
-    # DRAM 同期对比：用 DRAM 原策略（7天+15%对称），完整数据延续滚动，算 07-13 后净值变化
-    dram_data = json.load(open(os.path.join(DATA, "DRAM_options_3fri.json")))
-    dram_day_map = {d["date"]: d for d in dram_data}
-    dram_stock = json.load(open(os.path.join(DATA, "DRAM_stock.json")))
-    dram_closes = {r[0]: r[4] for r in dram_stock}
-    dram_bars = {r[0]: r for r in dram_stock}
-    dram_se = dram_closes[dram_stock[0][0]]
-    dram_sx = dram_closes[dram_stock[-1][0]]
+    # 三策略对比
+    def cmp_row(name, total, mdd, ratio, extra, is_best):
+        mark = ' <span class="c-gold">★最优</span>' if is_best else ""
+        return (f'<tr><td>{name}{mark}</td>'
+                f'<td class="{pc(total)}">${total:+,.0f}</td>'
+                f'<td>${mdd:,.0f}</td>'
+                f'<td class="c-gold">{ratio:.2f}</td>'
+                f'<td>{extra}</td></tr>')
 
-    def _dram_cf(move_pct, target, num_puts=2):
-        cashflow = defaultdict(float)
-        pos = None
-        d = move_pct / 100.0
-        for r in dram_stock:
-            date = r[0]; S = dram_closes[date]; o = dram_bars[date][1]
-            day = dram_day_map.get(date)
-            if pos is None:
-                if day is None: continue
-                pp = pick_put(day, o, target)
-                if pp is None: continue
-                cost = pp["vw"] * 100 * num_puts
-                pos = dict(expiry=pp["expiry"], strike=pp["strike"], vw=pp["vw"], entry_spot=o, cost=cost)
-                cashflow[date] -= cost; continue
-            p0 = pos["entry_spot"]
-            dn = o <= p0 * (1 - d); up = o >= p0 * (1 + d)
-            if date >= pos["expiry"]:
-                if dn or up:
-                    vw_h = find_put_price(day, pos["expiry"], pos["strike"])
-                    payoff = vw_h * 100 * num_puts if vw_h is not None else (max(pos["strike"]-o, 0)*100*num_puts if dn else 0.0)
-                    cashflow[date] += payoff; pos = None
-                    if day is not None:
-                        pp = pick_put(day, o, target)
-                        if pp is not None:
-                            cost = pp["vw"]*100*num_puts; pos = dict(expiry=pp["expiry"], strike=pp["strike"], vw=pp["vw"], entry_spot=o, cost=cost); cashflow[date] -= cost
-                else:
-                    payoff = max(pos["strike"]-S, 0)*100*num_puts
-                    cashflow[date] += payoff; pos = None
-                    if day is not None:
-                        pp = pick_put(day, S, target)
-                        if pp is not None:
-                            cost = pp["vw"]*100*num_puts; pos = dict(expiry=pp["expiry"], strike=pp["strike"], vw=pp["vw"], entry_spot=S, cost=cost); cashflow[date] -= cost
-                continue
-            if dn:
-                vw_h = find_put_price(day, pos["expiry"], pos["strike"])
-                payoff = vw_h * 100 * num_puts if vw_h is not None else max(pos["strike"]-o, 0)*100*num_puts
-                cashflow[date] += payoff; pos = None
-                if day is not None:
-                    pp = pick_put(day, o, target)
-                    if pp is not None:
-                        cost = pp["vw"]*100*num_puts; pos = dict(expiry=pp["expiry"], strike=pp["strike"], vw=pp["vw"], entry_spot=o, cost=cost); cashflow[date] -= cost
-                continue
-            if up:
-                vw_h = find_put_price(day, pos["expiry"], pos["strike"])
-                payoff = vw_h * 100 * num_puts if vw_h is not None else 0.0
-                cashflow[date] += payoff; pos = None
-                if day is not None:
-                    pp = pick_put(day, o, target)
-                    if pp is not None:
-                        cost = pp["vw"]*100*num_puts; pos = dict(expiry=pp["expiry"], strike=pp["strike"], vw=pp["vw"], entry_spot=o, cost=cost); cashflow[date] -= cost
-                continue
-        return cashflow
-
-    dram_cf = _dram_cf(15, 7)
-    cum = 0.0
-    dram_eq = {}
-    for r in dram_stock:
-        cum += dram_cf.get(r[0], 0.0)
-        dram_eq[r[0]] = (dram_closes[r[0]] - dram_se) * 100 + cum
-
-    base_dt = meta["entry_date"]
-    if base_dt not in dram_eq:
-        base_dt = min(d for d in dram_eq if d >= base_dt)
-    base_eq = dram_eq[base_dt]
-    end_eq = dram_eq[dram_stock[-1][0]]
-    dram_net = end_eq - base_eq
-    dram_cap = dram_closes[base_dt] * 100
-
-    peak = base_eq; dram_mdd = 0.0
-    for r in dram_stock:
-        if r[0] >= base_dt:
-            v = dram_eq[r[0]]; peak = max(peak, v); dram_mdd = max(dram_mdd, peak - v)
-    dram_peak_actual = dram_se * 100 + peak
-    dram_st_mdd_pct = dram_mdd / dram_peak_actual * 100 if dram_peak_actual > 0 else 0
-
-    b13 = dram_closes[base_dt]
-    dram_bh_ret = (dram_sx / b13 - 1) * 100
-    bpeak = (b13 - dram_se) * 100; bmdd = 0.0
-    for r in dram_stock:
-        if r[0] >= base_dt:
-            v = (dram_closes[r[0]] - dram_se) * 100; bpeak = max(bpeak, v); bmdd = max(bmdd, bpeak - v)
-    bpeak_actual = dram_se * 100 + bpeak
-    dram_bh_mdd_pct = bmdd / bpeak_actual * 100 if bpeak_actual > 0 else 0
-
-    dram_cmp = dict(
-        days=sum(1 for r in dram_stock if r[0] >= base_dt),
-        bh_ret=dram_bh_ret, bh_mdd=dram_bh_mdd_pct,
-        st_ret=dram_net / dram_cap * 100, st_mdd=dram_st_mdd_pct,
-        st_ratio=dram_net / dram_mdd if dram_mdd > 0 else 0,
-        down=15, up=15, target=7,
+    best_name = max([("自适应", best["total"], best["ratio"]),
+                     ("固定2put", f2p_sum, f2p_ratio),
+                     ("固定跨式", fst_sum, fst_ratio)], key=lambda x: x[2])[0]
+    cmp_html = (
+        cmp_row("自适应（put贵→跨式，put便宜→2put）", best["total"], best["mdd"], best["ratio"],
+                f'{best["n_rounds"]} 轮 · 跨式{best["n_straddle"]} / 2put{best["n_2put"]}', best_name == "自适应") +
+        cmp_row("固定 2put（100股+2put）", f2p_sum, f2p_mdd, f2p_ratio, f'{len(f2p_rounds)} 轮', best_name == "固定2put") +
+        cmp_row("固定 跨式（1call+1put）", fst_sum, fst_mdd, fst_ratio, f'{len(fst_rounds)} 轮', best_name == "固定跨式") +
+        cmp_row("B&H（持有100股）", bh["total"], bh_mdd_abs, bh_ratio_abs, f'{meta["n_days"]} 交易日', best_name == "B&H")
     )
 
-    generate_html(best, asym_results, best_sym, best_target, bh, bh_ratio,
-                  last_spot, latest_date, near_expiry, near_dte, near_strike, near_vw,
-                  cost_2, up_line, dn_line, meta, dram_cmp)
+    css = """
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1120px; margin:0 auto; }
+h1 { font-size:26px; margin-bottom:6px; }
+h2 { font-size:19px; margin:32px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+h3 { font-size:15px; margin:18px 0 8px; }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:12px; }
+.kpi .value { font-size:22px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:2px; margin-bottom:0; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.callout-gold { background:rgba(245,195,68,.08); border:1px solid rgba(245,195,68,.35); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.callout-warn { background:rgba(245,195,68,.06); border:1px solid rgba(245,195,68,.3); border-radius:10px;
+  padding:14px 16px; margin:12px 0; font-size:14px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+.tbl-scroll { overflow-x:auto; }
+code { background:#20242d; border:1px solid var(--border); border-radius:4px; padding:1px 6px;
+  font-family:"SF Mono",Menlo,Consolas,monospace; font-size:12px; color:var(--gold); }
+"""
 
-
-def generate_html(best, asym_results, best_sym, best_target, bh, bh_ratio,
-                  last_spot, latest_date, near_expiry, near_dte, near_strike, near_vw,
-                  cost_2, up_line, dn_line, meta, dram_cmp):
-    best_label = TARGET_LABELS[best_target]
-
-    # 不对称矩阵（收益）
-    matrix_rows = []
-    for down in ASYM_MOVES:
-        cells = []
-        for up in ASYM_MOVES:
-            r = next(x for x in asym_results if x["down"] == down and x["up"] == up)
-            is_best = (down == best["down"] and up == best["up"])
-            cls = "c-gold" if is_best else ("c-red" if r["total"] > 0 else "c-green")
-            mark = " ★" if is_best else ""
-            cells.append(f'<td class="{cls}">${r["total"]:+,.0f}{mark}</td>')
-        matrix_rows.append(f"<tr><td>{down}%</td>{''.join(cells)}</tr>")
-
-    # 比率矩阵
-    ratio_rows = []
-    for down in ASYM_MOVES:
-        cells = []
-        for up in ASYM_MOVES:
-            r = next(x for x in asym_results if x["down"] == down and x["up"] == up)
-            is_best = (down == best["down"] and up == best["up"])
-            cls = "c-gold" if is_best else ""
-            mark = " ★" if is_best else ""
-            cells.append(f'<td class="{cls}">{r["ratio"]:.2f}{mark}</td>')
-        ratio_rows.append(f"<tr><td>{down}%</td>{''.join(cells)}</tr>")
-
-    # 最优策略明细
-    best_rounds = "\n".join(f"""<tr>
-<td>{rd['entry_date']}</td>
-<td>{rd['exit_date']}</td>
-<td>{rd['kind']}</td>
-<td>${rd['entry_spot']:.1f}</td>
-<td>${rd['exit_spot']:.1f}</td>
-<td class="{pc(rd['exit_spot']-rd['entry_spot'])}">{(rd['exit_spot']/rd['entry_spot']-1)*100:+.1f}%</td>
-<td>${rd['strike']:.0f}</td>
-<td class="{pc(rd['stock_pnl'])}">${rd['stock_pnl']:+,.0f}</td>
-<td class="c-green">-${rd['put_cost']:,.0f}</td>
-<td class="c-green">{rd['put_cost']/(rd['entry_spot']*100)*100:.1f}%</td>
-<td class="c-red">${rd['put_income']:+,.0f}</td>
-<td class="{pc(rd['stock_pnl']+rd['pnl'])}">${rd['stock_pnl']+rd['pnl']:+,.0f}</td>
-</tr>""" for rd in reversed(best["rounds"]))
-
-    # 情景损益表(假设持有到期的微笑曲线)
-    scenario_rows = []
-    for pct in [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20]:
-        exit_ = last_spot * (1 + pct / 100)
-        stock_pnl = (exit_ - last_spot) * 100
-        payoff = max(near_strike - exit_, 0) * 200
-        net = stock_pnl + payoff - cost_2
-        scenario_rows.append(f"""<tr>
-<td>{exit_:.2f}</td>
-<td>{pct:+d}%</td>
-<td class="{pc(stock_pnl)}">{stock_pnl:+,.0f}</td>
-<td class="{pc(payoff)}">{payoff:+,.0f}</td>
-<td class="{pc(net)}">{net:+,.0f}</td>
-<td class="{pc(net)}">{net/(last_spot*100)*100:+.1f}%</td>
-</tr>""")
-    scenario_html = "\n".join(scenario_rows)
-
-    mdd_reduce = bh["mdd_pct"] - best["mdd_pct"]
-    if mdd_reduce >= 0:
-        mdd_desc = f'回撤从 {bh["mdd_pct"]:.1f}% 降到 <span class="c-green">{best["mdd_pct"]:.1f}%</span>（降了 <span class="c-red">{mdd_reduce:.1f} 个百分点</span>）'
-        mdd_kpi_label = "回撤比例降幅"
-        mdd_kpi_val_cls = "c-red"
-    else:
-        mdd_desc = f'回撤从 {bh["mdd_pct"]:.1f}% 升到 <span class="c-red">{best["mdd_pct"]:.1f}%</span>（升了 <span class="c-green">{abs(mdd_reduce):.1f} 个百分点</span>）'
-        mdd_kpi_label = "回撤比例升幅"
-        mdd_kpi_val_cls = "c-green"
-
-    skhy_ret = best["total"] / (meta["entry_price"] * 100) * 100
+    def kpi(label, value_html, sub=""):
+        return (f'<div class="kpi"><div class="label">{label}</div>'
+                f'<div class="value">{value_html}</div><div class="sub">{sub}</div></div>')
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SKHY 对冲策略最终报告（涨/跌熔断不对称优化）</title>
-<style>
-:root {{ --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
-  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }}
-* {{ box-sizing:border-box; margin:0; padding:0; }}
-body {{ background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
-  line-height:1.6; padding:32px 20px; }}
-.wrap {{ max-width:1080px; margin:0 auto; }}
-h1 {{ font-size:26px; margin-bottom:6px; }}
-h2 {{ font-size:19px; margin:32px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }}
-.sub {{ color:var(--muted); font-size:13px; margin-bottom:24px; }}
-.card {{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }}
-.kpis {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }}
-.kpi {{ background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }}
-.kpi .label {{ color:var(--muted); font-size:12px; }}
-.kpi .value {{ font-size:22px; font-weight:700; margin-top:4px; }}
-.kpi .sub {{ color:var(--muted); font-size:12px; margin-top:2px; }}
-table {{ width:100%; border-collapse:collapse; font-size:13px; }}
-th,td {{ padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }}
-th {{ background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }}
-th:first-child, td:first-child {{ text-align:left; }}
-.c-red {{ color:var(--red); font-weight:600; }}
-.c-green {{ color:var(--green); font-weight:600; }}
-.c-gray {{ color:var(--muted); }}
-.c-gold {{ color:var(--gold); font-weight:700; }}
-.callout {{ background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
-  padding:14px 16px; margin:12px 0; font-size:14px; }}
-.callout-gold {{ background:rgba(245,195,68,.08); border:1px solid rgba(245,195,68,.35); border-radius:10px;
-  padding:14px 16px; margin:12px 0; font-size:14px; }}
-.callout-warn {{ background:rgba(245,195,68,.06); border:1px solid rgba(245,195,68,.3); border-radius:10px;
-  padding:14px 16px; margin:12px 0; font-size:14px; }}
-.note {{ color:var(--muted); font-size:12px; margin-top:8px; }}
-.tbl-scroll {{ overflow-x:auto; }}
-</style>
+<title>SKHY 对冲策略最终报告（自适应结构切换版）</title>
+<style>{css}</style>
 </head>
 <body>
 <div class="wrap">
-<h1>SKHY 对冲策略最终报告 <span style="color:var(--muted);font-size:15px;">（涨熔断 × 跌熔断 不对称优化 · 开盘价熔断）</span></h1>
-<p class="sub">数据源：SKHY_stock.json（{meta['n_days']} 交易日）+ SKHY_options_3fri.json（真实 3 周五到期日期权链） · 生成于 {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+<h1>SKHY 对冲策略最终报告 <span style="color:var(--muted);font-size:15px;">（自适应结构切换 · put贵→跨式 / put便宜→2put）</span></h1>
+<p class="sub">数据源：SKHY_stock.json（{meta['n_days']} 交易日）+ SKHY_options_3fri.json（真实 3 周五到期日期权链，含 call/put） · 生成于 {datetime.now(ET).strftime('%Y-%m-%d %H:%M')}（美东 ET）</p>
 
 <div class="card">
-<h2>策略模型</h2>
+<h2 style="margin-top:0;">行情与技术指标</h2>
+<div style="margin-bottom:12px;">{indic['svg']}</div>
+<div class="tbl-scroll">
+<table>
+<tr><th>指标</th><th>最新值</th><th>信号解读</th></tr>
+<tr><td>现价</td><td class="c-red">${ind['close']:.2f}</td><td>{_price_vs_ma20} MA20（{ind['ma20']:.2f}）</td></tr>
+<tr><td>均线 MA20</td><td class="c-red">{ind['ma20']:.2f}</td><td>{_trend}（现价{_price_vs_ma20}均线）</td></tr>
+<tr><td>ATM Put（现价档）</td><td>${near_put_vw:.2f}/股</td><td>行权价 ${near_strike:.0f} · 到期 {near_expiry}（dte {near_dte}）</td></tr>
+<tr><td>ATM Call（同档）</td><td>{('$%.2f/股' % near_call_vw) if near_call_vw is not None else '—'}</td><td>put/call 贵贱 → 决定结构</td></tr>
+</table>
+</div>
+<p class="note">说明：SKHY 上市仅 {meta['n_days']} 个交易日，MA20 样本偏短、信号仅供参考。</p>
+</div>
+
+<div class="card">
+<h2>策略模型（自适应结构切换）</h2>
 <div class="callout">
-<strong>股票：{meta['entry_date']} 买入 100 股 @ ${meta['entry_price']:.2f}，一直持有到 {meta['exit_date']} @ ${meta['exit_price']:.2f}，中间不卖出。</strong><br>
-<strong>Put：每次买入「{best_label}」的 ATM put 2 张，真实成交价 vw。</strong><br>
+<strong>每轮入场时看 ATM 期权的 put 权利金 vs call 权利金</strong>，动态切换结构：<br>
+· <strong>put 比 call 贵</strong>（skew 大、市场担忧下跌）→ 买 <strong>1 call + 1 put（跨式）</strong>，不持股票，纯做多波动；<br>
+· <strong>put 比 call 便宜/相等</strong>（慢牛/乐观）→ 买 <strong>2 put + 100 股</strong>，股票吃慢牛上涨、2张便宜 put 对冲。 <br>
+本质是把「put skew」这个因子变成每轮的择时开关。
+</div>
+<div class="callout-gold">
 <strong>熔断（不对称）</strong>：开盘价相对入场价 <strong class="c-green">跌 {best['down']}%</strong> 或 <strong class="c-red">涨 {best['up']}%</strong> 就开盘平仓 + 重买；盘中不触发。没触发就持有到期，再滚动下一轮。<br>
-<strong>2:1 过度对冲</strong>：2 张 put 覆盖 200 股 vs 持有 100 股，下跌时 put 赔付是股票亏损的 2 倍。<br>
-<strong>基准 = B&H</strong>：收益 <span class="c-red">${bh['total']:+,.0f}</span>，最大回撤 <span class="c-green">${bh['mdd']:,.0f}（{bh['mdd_pct']:.1f}%）</span>，收益/回撤比 {bh_ratio:.2f}。
+<strong>周期</strong>：{TARGET_LABELS[best['target']]}（买入 dte 最接近该值的周五到期期权）。<br>
+<strong>结算口径</strong>：熔断/到期/持有中一律按<strong>内在价值</strong>结算（2026-09-15 修正前视偏差，涨熔断时虚值 put 归零）。
 </div>
 </div>
 
 <div class="card">
 <h2>核心结论</h2>
 <div class="callout-gold">
-<strong>最优组合：{best_label} put + 跌 {best['down']}% / 涨 {best['up']}% 熔断（不对称）——这是「不盯盘」前提下的最优策略。</strong><br>
-收益 <span class="c-red">${best['total']:+,.0f}</span>（比 B&H 多赚 <span class="c-red">${best['total']-bh['total']:+,.0f}</span>），
-{mdd_desc}。
-收益/回撤比 <strong class="c-gold">{best['ratio']:.2f}</strong>，是 B&H（{bh_ratio:.2f}）的 <strong class="c-gold">{best['ratio']/bh_ratio:.1f} 倍</strong>。
+<strong>最优组合：{TARGET_LABELS[best['target']]} + 跌 {best['down']}% / 涨 {best['up']}% 熔断（自适应结构切换）。</strong><br>
+总收益 <span class="c-red">${best['total']:+,.0f}</span>（B&H 为 ${bh['total']:+,.0f}，自适应<strong>少赚 ${(best['total']-bh['total']):+,.0f}</strong>，但这是用"放弃部分上涨"换来的），
+回撤从 B&H 的 <span class="c-green">${bh['mdd']:,.0f}</span> 降到 <strong>${best['mdd']:,.0f}</strong>，
+收益/回撤比 <strong class="c-gold">{best['ratio']:.2f}</strong>（B&H 仅 {bh_ratio_abs:.2f}），是 B&H 的 <strong class="c-gold">{best['ratio']/bh_ratio_abs:.1f} 倍</strong>。
 </div>
-<div class="kpis">
-<div class="kpi"><div class="label">B&H 收益</div><div class="value c-red">${bh['total']:+,.0f}</div><div class="sub">回撤 {bh['mdd_pct']:.1f}% · 比 {bh_ratio:.2f}</div></div>
-<div class="kpi"><div class="label">策略收益</div><div class="value c-red">${best['total']:+,.0f}</div><div class="sub">{best_label} · 跌{best['down']}%/涨{best['up']}%</div></div>
-<div class="kpi"><div class="label">策略回撤比例</div><div class="value c-red">{best['mdd_pct']:.1f}%</div><div class="sub">回撤 ${best['mdd']:,.0f}</div></div>
-<div class="kpi"><div class="label">{mdd_kpi_label}</div><div class="value {mdd_kpi_val_cls}">{mdd_reduce:+.1f}%</div><div class="sub">{bh['mdd_pct']:.1f}% → {best['mdd_pct']:.1f}%</div></div>
-<div class="kpi"><div class="label">收益/回撤比</div><div class="value c-gold">{best['ratio']:.2f}</div><div class="sub">B&H 为 {bh_ratio:.2f}</div></div>
-<div class="kpi"><div class="label">股票收益</div><div class="value c-red">${best['stock_pnl']:+,.0f}</div><div class="sub">put 净 {money(best['put_net'])}</div></div>
+<div class="kpis" style="margin-top:14px;">
+{kpi('自适应总收益', money(best['total']), f'共 {best["n_rounds"]} 轮')}
+{kpi('回撤(逐轮累计)', f'${best["mdd"]:,.0f}', f'收益/回撤比 {best["ratio"]:.2f}')}
+{kpi('结构分布', f'{best["n_straddle"]} : {best["n_2put"]}', f'跨式 {best["n_straddle"]/best["n_rounds"]*100:.0f}% / 2put {best["n_2put"]/best["n_rounds"]*100:.0f}%')}
+{kpi('触发统计', f'跌{best["down_hits"]} / 涨{best["up_hits"]} / 到期{best["expiries"]}', '')}
+{kpi('B&H 收益', money(bh['total']), f'回撤 ${bh["mdd"]:,.0f} · 比 {bh_ratio_abs:.2f}')}
 </div>
-<p class="note">回撤比例 = 最大回撤 ÷ 峰值净值。收益/回撤比 = 总收益 ÷ 最大回撤，越高越好。</p>
-</div>
-
-<div class="card">
-<h2>涨熔断 × 跌熔断 不对称扫描（总收益）</h2>
-<p style="font-size:13px;color:var(--muted);margin-bottom:8px;">周期 = {best_label}（先由对称扫描确定）。★ = 全局最优（收益/回撤比）。行 = 跌熔断，列 = 涨熔断。</p>
-<div class="tbl-scroll">
-<table>
-<tr><th>跌\涨</th>{''.join(f'<th>{m}%</th>' for m in ASYM_MOVES)}</tr>
-{''.join(matrix_rows)}
-</table>
-</div>
-</div>
-
-<div class="card">
-<h2>收益/回撤比 矩阵</h2>
-<div class="tbl-scroll">
-<table>
-<tr><th>跌\涨</th>{''.join(f'<th>{m}%</th>' for m in ASYM_MOVES)}</tr>
-{''.join(ratio_rows)}
-</table>
-</div>
-</div>
-
-<div class="card">
-<h2>为什么是「跌 {best['down']}% + 涨 {best['up']}%」</h2>
-<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
-<li><strong>涨熔断要更灵敏（{best['up']}%），不是对称的 15%</strong>：SKHY 是次新股，涨得急、来回波动频繁——涨 8% 就追高，能精准捕捉「涨了又回调」的每一波（如 07-14 涨 8% 追高到 strike 181，07-15 大跌 16% 时高行权价 put 赔付 $3,667）。涨熔断太迟钝（15%）会让 put 停留在旧行权价，回调时保护不足。</li>
-<li><strong>跌熔断 {best['down']}%</strong>：跌到 {best['down']}% 才止盈落袋，只捕捉真正的趋势下跌，避免小波动反复付权利金。</li>
-<li><strong>对称 15% 只是 DRAM 的结论</strong>：DRAM 是涨 8% 追高后继续涨、反复亏权利金，所以 DRAM 最优是涨 15%；SKHY 的波动节奏相反（涨了就回调），最优涨熔断是 8%。<strong>两标的最优参数不能通用。</strong></li>
-</ul>
 <div class="callout-warn">
-<strong>⚠️ 过拟合警示</strong>：SKHY 仅 {meta['n_days']} 个交易日、{best['n_rounds']} 轮交易。最优的「涨 {best['up']}%」高度依赖「涨了就回调」这个具体节奏（尤其 07-15 那笔 $3,667 赔付）。若未来 SKHY 变成单边慢涨（涨了不回调），8% 追高会频繁亏权利金。这个参数是短数据下的拟合结果，稳定性远低于长周期回测，仅供研究。
+<strong>⚠️ 但这是一个「孤立的尖峰」</strong>——见下方熔断矩阵，最优点（跌{best['down']}%/涨{best['up']}%）周围一圈参数几乎全是负收益，49 组里只有这 1 个点显著赚钱。
+它是 44 个交易日里「某几次 +8%~+9% 上涨 + 两次 -16% 大跌」被刚好框住的产物，<strong>换一段行情这个尖峰就会移动甚至消失</strong>，不能当稳定规律。
 </div>
 </div>
 
 <div class="card">
-<h2>最优策略逐轮明细：跌 {best['down']}% / 涨 {best['up']}% 熔断</h2>
-<p style="font-size:14px;margin-bottom:10px;">共 {best['n_rounds']} 轮（跌熔断 {best['down_hits']} 次 / 涨熔断 {best['up_hits']} 次 / 到期 {best['expiries']} 次）。股票不动收益 {money(best['stock_pnl'])}；put 净 {money(best['put_net'])}。</p>
+<h2 style="margin-top:0;">四策略对比（统一逐轮累计回撤口径）</h2>
 <div class="tbl-scroll">
 <table>
-<tr><th>入场日</th><th>出场日</th><th>方式</th><th>入场spot</th><th>出场spot</th><th>波动比例</th><th>行权价</th><th>股票涨跌</th><th>put成本</th><th>成本占比</th><th>put收入</th><th>周期总利润</th></tr>
-{best_rounds}
+<tr><th>策略</th><th>总收益</th><th>回撤(绝对金额)</th><th>收益/回撤比</th><th>说明</th></tr>
+{cmp_html}
 </table>
 </div>
-<p class="note">周期总利润 = 股票涨跌 + put收入 − put成本。倒序排列（最近的交易在最上）。</p>
+<p class="note">回撤 = 累计逐轮盈亏曲线的最大回撤（绝对金额），四种口径统一，可直接对比。B&H 逐轮盈亏 = 每日收盘价相对首日收盘价的涨跌 ×100 股。</p>
+</div>
+
+<div class="card">
+<h2>熔断比例扫描（不对称矩阵，周期=最近周五）</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">★ = 全局最优（回撤比口径）。行 = 跌熔断，列 = 涨熔断。</p>
+{pnl_matrix_html}
+{ratio_matrix_html}
+</div>
+
+<div class="card">
+<h2>周期敏感性（固定最优熔断 {best['down']}%/{best['up']}%）</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">周期 7/14/21 天全部负收益，只有最近周五（1-4 天）显著为正——SKHY 波动太快，长周期 put 追不上节奏。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>周期</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th><th>结构分布</th></tr>
+{target_rows_html}
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>最优策略逐轮明细：跌 {best['down']}% / 涨 {best['up']}%</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">
+「结构」列：<span class="c-gold">跨式</span> = put 比 call 贵时选的 1call+1put；<span class="c-red">2put</span> = put 比 call 便宜时选的 2put+100股。
+「成本」列：跨式 = call+put 权利金；2put = 2×put 权利金。「收入」列：跨式 = call/put 结算收入；2put = put 结算收入（股票端已并入利润）。
+</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场日</th><th>出场日</th><th>方式</th><th>结构</th><th>入场spot</th><th>出场spot</th><th>波动</th><th>行权价</th><th>put价</th><th>call价</th><th>成本</th><th>收入</th><th>利润</th></tr>
+{detail_html}
+</table>
+</div>
 </div>
 
 <div class="card">
 <h2>现在如何买（基于最新期权数据 {latest_date}）</h2>
 <div class="callout-gold">
 最新 SKHY 现价 <strong class="c-gold">${last_spot:.2f}</strong>，最近到期日 <strong>{near_expiry}</strong>（dte {near_dte} 天）。
-按最优策略 <strong class="c-gold">{best_label} + 跌 {best['down']}% / 涨 {best['up']}%</strong>，现在应这样操作：
+按自适应策略判断，现在应该选 <strong class="c-gold">{now_struct}</strong>：{now_reason}。
 </div>
 <ol style="font-size:14px;padding-left:22px;line-height:2.0;">
-<li><strong>持有 100 股 SKHY</strong>（市值 ${last_spot*100:,.0f}），一直持有不动。</li>
-<li><strong>买入 2 张行权价 ${near_strike:.0f} 的 Put</strong>（现价 ${last_spot:.2f} 最接近的平值档），到期日 {near_expiry}。</li>
-<li>该档 Put 成交量加权价 <strong>${near_vw:.2f}/股</strong>，每张 ${near_vw*100:,.2f}，2 张共 <strong class="c-green">-${cost_2:,.0f}</strong>（占持仓 {cost_2/(last_spot*100)*100:.1f}%）。</li>
-<li><strong>熔断线（不对称）</strong>：开盘价涨到 <strong class="c-red">${up_line:.2f}</strong>（涨 {best['up']}%）或跌到 <strong class="c-green">${dn_line:.2f}</strong>（跌 {best['down']}%）就开盘平仓 put + 重买（盘中不盯盘）。</li>
-<li>没触发熔断就持有到 {near_expiry} 到期，再滚动下一轮 {best_label} put。</li>
+<li>先看 ATM 期权：put <strong>${near_put_vw:.2f}</strong> vs call <strong>{('$%.2f' % near_call_vw) if near_call_vw is not None else '—'}</strong>（行权价 ${near_strike:.0f}）。</li>
+<li>若选<strong>跨式</strong>：买 1 张 call + 1 张 put，成本约 <strong class="c-green">${(near_put_vw+near_call_vw)*100:,.0f}</strong>（{('$%.2f' % near_call_vw) if near_call_vw is not None else '—'} + ${near_put_vw:.2f}）。</li>
+<li>若选<strong>2put+100股</strong>：买 100 股（市值 ${last_spot*100:,.0f}）+ 2 张 put，put 成本 <strong class="c-green">${near_put_vw*200:,.0f}</strong>。</li>
+<li><strong>熔断线（不对称）</strong>：开盘价涨到 <strong class="c-red">${up_line:.2f}</strong>（涨 {best['up']}%）或跌到 <strong class="c-green">${dn_line:.2f}</strong>（跌 {best['down']}%）就开盘平仓 + 重买（盘中不盯盘）。</li>
+<li>没触发熔断就持有到 {near_expiry} 到期，再滚动下一轮。</li>
 </ol>
-<div class="tbl-scroll">
-<table>
-<tr><th>到期日 spot</th><th>涨跌</th><th>股票 P&L</th><th>Put 赔付</th><th>净 P&L</th><th>净收益率</th></tr>
-{scenario_html}
-</table>
-</div>
-<p class="note">净 P&L = 股票 P&L + Put 赔付 − 保费（2 张 ${cost_2:,.0f}）。这是「微笑曲线」：<strong>大涨赚（股票）、大跌也赚（2:1 过度对冲）、只有横盘小波动亏保费</strong>。注意：实际涨跌 {best['up']}%/{best['down']}% 会触发熔断提前平仓，不会真的持有到期。</p>
-</div>
-
-<div class="card">
-<h2>与 DRAM 同期对比（{meta['entry_date']} ~ {meta['exit_date']}，{dram_cmp['days']} 交易日）</h2>
-<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">同一时间窗口（SKHY 上市至今）。SKHY 用其最优参数；DRAM 用原报告策略（7天+15% 对称）<strong>延续滚动</strong>（从 4 月建仓滚到现在，不重新建仓）。资金收益率 = 策略净值变化 ÷ 期初市值（100 股 × 首日收盘价）。</p>
-<div class="tbl-scroll">
-<table>
-<tr><th>指标</th><th>SKHY（最优：{best_label} 跌{best['down']}%/涨{best['up']}%）</th><th>DRAM（7天+15% 对称，延续滚动）</th></tr>
-<tr><td>B&H 资金收益率</td><td class="{pc(bh['total'])}">{bh['total']/(meta['entry_price']*100)*100:+.1f}%</td><td class="{pc(dram_cmp['bh_ret'])}">{dram_cmp['bh_ret']:+.1f}%</td></tr>
-<tr><td>B&H 回撤比例</td><td class="c-green">{bh['mdd_pct']:.1f}%</td><td class="c-green">{dram_cmp['bh_mdd']:.1f}%</td></tr>
-<tr><td><strong>策略资金收益率</strong></td><td class="{pc(skhy_ret)}"><strong>{skhy_ret:+.1f}%</strong></td><td class="{pc(dram_cmp['st_ret'])}">{dram_cmp['st_ret']:+.1f}%</td></tr>
-<tr><td><strong>策略回撤比例</strong></td><td class="c-green"><strong>{best['mdd_pct']:.1f}%</strong></td><td class="c-green">{dram_cmp['st_mdd']:.1f}%</td></tr>
-<tr><td><strong>收益/回撤比</strong></td><td class="{pc(best['ratio'])}"><strong>{best['ratio']:.2f}</strong></td><td class="{pc(dram_cmp['st_ratio'])}">{dram_cmp['st_ratio']:.2f}</td></tr>
-</table>
-</div>
-<div class="callout">
-<strong>同期对比结论</strong>：同样这 {dram_cmp['days']} 个交易日里，<strong>DRAM 跌了 {dram_cmp['bh_ret']:+.1f}%，SKHY 涨了 {bh['total']/(meta['entry_price']*100)*100:+.1f}%</strong>。买 put 对冲在两者身上都赚钱，但幅度不同：
-<ul style="font-size:13px;padding-left:20px;line-height:1.9;">
-<li><strong>SKHY 买 put 大赚</strong>：策略收益率 {skhy_ret:+.1f}%（B&H 仅 +2.0%），回撤从 {bh['mdd_pct']:.1f}% 降到 {best['mdd_pct']:.1f}%——因为次新股波动极大（一周动辄 ±15%），put 频繁赔付、远超保费。</li>
-<li><strong>DRAM 同期买 put 也赚</strong>：策略收益率 {dram_cmp['st_ret']:+.1f}%（B&H {dram_cmp['bh_ret']:+.1f}%），回撤从 {dram_cmp['bh_mdd']:.1f}% 降到 {dram_cmp['st_mdd']:.1f}%——7 月 DRAM 有两波大跌（07-10、07-23 附近），put 赔付超过了保费，把下跌的股票亏损扭转为净赚。</li>
-<li><strong>核心规律</strong>：买 put 对冲的收益，取决于「实际波动 vs 隐含波动」的差。两者这段都正期望，但 SKHY 次新股波动更极端（一周 ±15%），put 赔付幅度更大，所以赚得更多（{skhy_ret:+.1f}% vs {dram_cmp['st_ret']:+.1f}%）。</li>
-</ul>
-</div>
 </div>
 
 <div class="card">
 <h2>数据与结论说明</h2>
 <ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
-<li><strong>⚠️ 数据长度限制</strong>：SKHY 于 2026-07-13 在 Nasdaq 上市（ADR），至今仅 {meta['n_days']} 个交易日（约 6 周）。样本极少，仅 {best['n_rounds']} 轮交易，本报告的参数结论可靠性远低于长周期回测，仅供研究参考。</li>
-<li><strong>真实成交价</strong>：Put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价 + 假设 IV。</li>
-<li><strong>多到期日数据</strong>：SKHY_options_3fri.json 每天含 3 个周五到期日（dte 1-4 / 6-11 / 13-21 天），可真实对比不同周期，无需 BS 外推。</li>
+<li><strong>⚠️ 数据长度限制</strong>：SKHY 于 2026-07-13 在 Nasdaq 上市（ADR），至今仅 {meta['n_days']} 个交易日（约 6 周）。样本极少，仅 {best['n_rounds']} 轮交易，参数结论可靠性远低于长周期回测。</li>
+<li><strong>真实成交价</strong>：call/put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价。</li>
+<li><strong>多到期日数据</strong>：SKHY_options_3fri.json 每天含 3 个周五到期日 + call/put 双边数据，可真实对比不同周期与结构。</li>
 <li><strong>开盘价熔断</strong>：只在美国开盘瞬间判断一次，盘中 low/high 不触发——符合「不盯盘」的实盘操作。</li>
-<li><strong>回撤口径</strong>：逐日净值 = 股票市值 + 累计 Put 现金流，MDD = 峰值到谷底最大回撤。</li>
-<li><strong>不对称扫描</strong>：涨熔断与跌熔断独立扫描（{len(ASYM_MOVES)}×{len(ASYM_MOVES)} 组合），发现 SKHY 最优是「跌 {best['down']}% + 涨 {best['up']}%」，与 DRAM 的对称 15% 不同——两标的最优参数不能通用。</li>
-<li><strong>未计交易摩擦</strong>：实盘佣金 + bid-ask 价差会吃掉部分优势，周期越短越明显。</li>
-<li><strong>结果依赖这段行情</strong>：SKHY 先涨后暴跌（${meta['entry_price']:.2f} → ~${meta['max_price']:.0f} → ${meta['min_price']:.2f}），高波动是策略赚钱的前提。仅供研究，不构成投资建议。</li>
+<li><strong>内在价值结算</strong>：熔断/到期/持有中一律按内在价值结算，消除「开盘价触发 + 全天 vw 结算」的前视偏差。</li>
+<li><strong>结构切换</strong>：每轮入场用 put_vw 与 call_vw 的比较决定结构，这是把 put skew 当择时信号。</li>
+<li><strong>过拟合警示</strong>：最优参数是「孤立尖峰」，高度依赖这段行情节奏，稳定性差，仅供研究，不构成投资建议。</li>
 </ul>
 </div>
 
 </div>
 </body>
 </html>"""
+
     with open(OUT_HTML, "w") as f:
         f.write(html)
-    print(f"最终报告已生成: {OUT_HTML}")
-    print(f"最优: {best_label} + 跌 {best['down']}% / 涨 {best['up']}%, 收益 ${best['total']:+,.0f}, 回撤 {best['mdd_pct']:.1f}%, 比 {best['ratio']:.2f}")
+    print(f"\n最终报告已生成: {OUT_HTML}")
+    print(f"最优: {TARGET_LABELS[best['target']]} + 跌 {best['down']}% / 涨 {best['up']}%, "
+          f"收益 ${best['total']:+,.0f}, 回撤 ${best['mdd']:,.0f}, 比 {best['ratio']:.2f}")
 
 
 if __name__ == "__main__":

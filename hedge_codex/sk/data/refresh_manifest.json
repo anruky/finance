@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "ticker": "SKHY",
+  "source": "https://api.polygon.io",
+  "adjusted": false,
+  "fetched_at_utc": "2026-09-14T03:36:56.347377+00:00",
+  "requested_end": "2026-09-11",
+  "stock_end": "2026-09-11",
+  "stock_start": "2026-07-13",
+  "n_sessions": 44,
+  "n_contracts": 760,
+  "selection_strike_range": [
+    0.75,
+    1.25
+  ],
+  "selection_horizon_days": 35,
+  "price_basis": "daily trade aggregates; not executable NBBO or synchronised closing quotes",
+  "stock_sha256": "70743550844a5bb36d0dce5b2f6591bd2f133060c30d610bc9a26ceb8fe4f046"
+}

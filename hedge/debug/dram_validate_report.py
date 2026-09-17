@@ -14,7 +14,7 @@ DRAM 报告数据验证脚本（只读，不修改任何原始报告/代码）
      周期扫描 3630/3063/2060/1866、盘中 4.32、不对称 1.76/1.85/1.91 等写成“死值”，
      而动态部分随数据更新后，这些死值与动态数字/当前数据互相打架。
 
-输出：debug/validation_report.md + debug/validation_details.json
+输出：debug/dram_validation_report.md + debug/dram_validation_details.json
 本脚本只读取 dram/ 下的源文件与报告，不写入任何 dram/ 路径。
 """
 import importlib.util
@@ -27,6 +27,8 @@ HEDGE = "/Users/gavinz/git/finance/hedge/dram"
 DATA = "/Users/gavinz/git/finance/data"
 REPORT = os.path.join(HEDGE, "dram_final_report.html")
 V10 = os.path.join(HEDGE, "real_options_backtest_v10.py")
+# 验证产物统一输出到 hedge/debug/（与 skhy 验证同目录，避免 dram/ 下再留 debug/）
+DEBUG = "/Users/gavinz/git/finance/hedge/debug"
 
 R = {"checks": []}
 
@@ -328,7 +330,7 @@ for cat in ("dynamic", "internal", "stale"):
     items = [c for c in R["checks"] if c["cat"] == cat]
     R.setdefault("summary", {})[cat] = {"total": len(items), "pass": sum(1 for c in items if c["pass"]),
                                         "fail": sum(1 for c in items if not c["pass"])}
-json.dump(R, open(os.path.join(HEDGE, "debug", "validation_details.json"), "w"), indent=2, ensure_ascii=False)
+json.dump(R, open(os.path.join(DEBUG, "dram_validation_details.json"), "w"), indent=2, ensure_ascii=False)
 
 L = []
 L.append("# DRAM 报告数据验证结果\n")
@@ -376,8 +378,8 @@ L.append("")
 L.append("> 注：韩股相关性若用报告显示（已舍入到 1 位）的归一化序列独立重算，会与 json 存储精确值有约 0.02–0.04 偏差")
 L.append("> （显示序列已舍入所致），故以 json 中存储的精确 corr 为准。")
 
-open(os.path.join(HEDGE, "debug", "validation_report.md"), "w").write("\n".join(L))
+open(os.path.join(DEBUG, "dram_validation_report.md"), "w").write("\n".join(L))
 print("A 动态:", s["dynamic"]["pass"], "/", s["dynamic"]["total"])
 print("B 内部:", s["internal"]["pass"], "/", s["internal"]["total"])
 print("C 硬编码不一致:", s["stale"]["fail"], "处")
-print("详见 debug/validation_report.md")
+print("详见 debug/dram_validation_report.md")

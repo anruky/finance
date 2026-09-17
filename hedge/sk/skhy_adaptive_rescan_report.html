@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>SKHY 自适应策略 —— 熔断参数最优化扫描</title>
+<style>
+:root { --bg:#0f1115; --card:#171a21; --border:#262b36; --text:#e6e8ec; --muted:#9aa3b2;
+  --red:#ff5252; --green:#26c281; --accent:#4da3ff; --gold:#f5c344; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6; padding:32px 20px; }
+.wrap { max-width:1180px; margin:0 auto; }
+h1 { font-size:24px; margin-bottom:6px; }
+h2 { font-size:18px; margin:30px 0 14px; padding-left:10px; border-left:4px solid var(--accent); }
+h3 { font-size:15px; margin:18px 0 8px; }
+.sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:18px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-bottom:18px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .label { color:var(--muted); font-size:13px; font-weight:600; }
+.kpi .value { font-size:24px; font-weight:700; margin-top:4px; }
+.kpi .sub { color:var(--muted); font-size:12px; margin-top:3px; margin-bottom:0; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { background:#1d212a; color:var(--muted); font-weight:600; position:sticky; top:0; }
+th:first-child, td:first-child { text-align:left; }
+.c-red { color:var(--red); font-weight:600; }
+.c-green { color:var(--green); font-weight:600; }
+.c-gray { color:var(--muted); }
+.c-gold { color:var(--gold); font-weight:700; }
+.callout { background:rgba(77,163,255,.08); border:1px solid rgba(77,163,255,.3); border-radius:10px;
+  padding:12px 16px; margin:12px 0; font-size:13px; }
+.note { color:var(--muted); font-size:12px; margin-top:8px; }
+code { background:#20242d; border:1px solid var(--border); border-radius:4px; padding:1px 6px;
+  font-family:"SF Mono",Menlo,Consolas,monospace; font-size:12px; color:var(--gold); }
+.tbl-scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>SKHY 自适应策略 —— 熔断参数最优化扫描</h1>
+<p class="sub">结构切换固定（put 贵→跨式，put 便宜→2put）· 只扫熔断参数 · 周期=最近周五 · 熔断按内在价值结算 · 数据 2026-07-13 ~ 2026-09-11（44 交易日） · 生成于 2026-09-15 04:44（美东 ET）</p>
+
+<div class="kpis">
+<div class="kpi"><div class="label">数据跨度</div><div class="value">44 天</div><div class="sub">2026-07-13 ~ 2026-09-11</div></div>
+<div class="kpi"><div class="label">新最优总收益</div><div class="value"><span class="c-red">$+3,617</span></div><div class="sub">跌15%/涨8%</div></div>
+<div class="kpi"><div class="label">新最优回撤</div><div class="value">$1,829</div><div class="sub">收益/回撤比 1.98</div></div>
+<div class="kpi"><div class="label">总收益最高组合</div><div class="value"><span class="c-red">$+3,617</span></div><div class="sub">跌15%/涨8% · 回撤$1,829</div></div>
+<div class="kpi"><div class="label">当前参数(跌15/涨8)</div><div class="value"><span class="c-red">$+3,617</span></div><div class="sub">回撤$1,829 · 比 1.98</div></div>
+</div>
+
+<div class="callout">
+<strong>结论：</strong>在自适应策略（put 贵→跨式，put 便宜→2put）框架下，扫描 49 组熔断参数后，<strong class="c-gold">最优（收益/回撤比）</strong>为：
+跌熔断 <strong>15%</strong>、涨熔断 <strong>8%</strong>，
+总收益 <strong class="c-red">$+3,617</strong>、回撤 <strong>$1,829</strong>、收益/回撤比 <strong class="c-gold">1.98</strong>。
+<br><br>
+<strong style="color:var(--gold);">⚠️ 但这是一个「孤立的尖峰」</strong>——最优点（跌15%/涨8%）周围一圈参数几乎全是负收益（见下方矩阵）。
+49 组里只有这 1 个点是显著赚钱的，它的邻居（跌15/涨10 → $2,101、跌10/涨8 → $110、跌20/涨8 → −$1,537）要么大幅缩水要么直接转负。
+这意味着最优参数对数据极度敏感，是 44 个交易日里「某几次 +8%~+9% 上涨 + 两次 -16% 大跌」被刚好框住的产物，<strong>换一段行情这个尖峰就会移动甚至消失</strong>，不能当稳定规律。
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">当前参数 vs 新最优</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>参数集</th><th>跌熔断</th><th>涨熔断</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th></tr>
+<tr><td style="color:var(--muted);">当前参数（adaptive 默认）</td><td>15%</td><td>8%</td><td class="c-red">$+3,617</td><td>$1,829</td><td class="c-gold">1.98</td><td>14</td></tr><tr><td style="color:var(--muted);">新最优（收益/回撤比）</td><td>15%</td><td>8%</td><td class="c-red">$+3,617 <span class="c-gold">★最优</span></td><td>$1,829</td><td class="c-gold">1.98</td><td>14</td></tr>
+</table>
+</div>
+<p class="note">当前参数 = 自适应策略默认的跌15%/涨8%。回撤为「累计逐轮盈亏曲线最大回撤」（绝对金额），与 adaptive 报告口径一致。</p>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">Top 10 熔断组合（按收益/回撤比排序）</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>#</th><th>跌熔断</th><th>涨熔断</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th><th>结构分布</th><th>跌触发</th><th>涨触发</th><th>到期</th></tr>
+<tr><td>1</td><td>15%</td><td>8%</td><td class="c-red">$+3,617 <span class="c-gold">★最优</span></td><td>$1,829</td><td class="c-gold">1.98</td><td>14</td><td>跨式6 / 2put8</td><td>2</td><td>6</td><td>5</td></tr>
+<tr><td>2</td><td>15%</td><td>10%</td><td class="c-red">$+2,101</td><td>$2,226</td><td class="c-gold">0.94</td><td>13</td><td>跨式4 / 2put9</td><td>1</td><td>3</td><td>8</td></tr>
+<tr><td>3</td><td>15%</td><td>12%</td><td class="c-red">$+558</td><td>$2,138</td><td class="c-gold">0.26</td><td>11</td><td>跨式4 / 2put7</td><td>1</td><td>2</td><td>7</td></tr>
+<tr><td>4</td><td>15%</td><td>15%</td><td class="c-red">$+558</td><td>$2,138</td><td class="c-gold">0.26</td><td>11</td><td>跨式4 / 2put7</td><td>1</td><td>2</td><td>7</td></tr>
+<tr><td>5</td><td>15%</td><td>20%</td><td class="c-red">$+558</td><td>$2,138</td><td class="c-gold">0.26</td><td>11</td><td>跨式4 / 2put7</td><td>1</td><td>2</td><td>7</td></tr>
+<tr><td>6</td><td>10%</td><td>8%</td><td class="c-red">$+110</td><td>$2,716</td><td class="c-gold">0.04</td><td>15</td><td>跨式8 / 2put7</td><td>3</td><td>6</td><td>5</td></tr>
+<tr><td>7</td><td>12%</td><td>8%</td><td class="c-red">$+110</td><td>$2,716</td><td class="c-gold">0.04</td><td>15</td><td>跨式8 / 2put7</td><td>3</td><td>6</td><td>5</td></tr>
+<tr><td>8</td><td>5%</td><td>12%</td><td class="c-green">$-223</td><td>$2,084</td><td class="c-gold">-0.11</td><td>13</td><td>跨式6 / 2put7</td><td>3</td><td>3</td><td>6</td></tr>
+<tr><td>9</td><td>8%</td><td>12%</td><td class="c-green">$-223</td><td>$2,084</td><td class="c-gold">-0.11</td><td>13</td><td>跨式6 / 2put7</td><td>3</td><td>3</td><td>6</td></tr>
+<tr><td>10</td><td>15%</td><td>5%</td><td class="c-green">$-504</td><td>$2,417</td><td class="c-gold">-0.21</td><td>16</td><td>跨式6 / 2put10</td><td>2</td><td>7</td><td>6</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">熔断比例扫描（不对称矩阵）</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">固定周期=最近周五，扫描跌熔断 × 涨熔断。★ 单元格为全局最优（回撤比口径）。</p>
+<div style="margin-top:6px;"><h3 style="font-size:15px;color:var(--text);margin:18px 0 8px;">熔断矩阵 —— 总收益</h3><table><tr><th>跌\涨</th><th>涨5%</th><th>涨8%</th><th>涨10%</th><th>涨12%</th><th>涨15%</th><th>涨20%</th><th>涨25%</th></tr><tr><td>跌5%</td><td style="background:rgba(38,194,129,0.35439070674546896);">$-4,552</td><td style="background:rgba(38,194,129,0.2376411738824259);">$-1,076</td><td style="background:rgba(38,194,129,0.22938955919512494);">$-831</td><td style="background:rgba(38,194,129,0.2089741347750298);">$-223</td><td style="background:rgba(38,194,129,0.28409647483729983);">$-2,460</td><td style="background:rgba(38,194,129,0.3239606944414902);">$-3,646</td><td style="background:rgba(38,194,129,0.3387415906951021);">$-4,087</td></tr><tr><td>跌8%</td><td style="background:rgba(38,194,129,0.34460014307993564);">$-4,261</td><td style="background:rgba(38,194,129,0.2376411738824259);">$-1,076</td><td style="background:rgba(38,194,129,0.22938955919512494);">$-831</td><td style="background:rgba(38,194,129,0.2089741347750298);">$-223</td><td style="background:rgba(38,194,129,0.28409647483729983);">$-2,460</td><td style="background:rgba(38,194,129,0.3239606944414902);">$-3,646</td><td style="background:rgba(38,194,129,0.3387415906951021);">$-4,087</td></tr><tr><td>跌10%</td><td style="background:rgba(38,194,129,0.3047456636591519);">$-3,074</td><td style="background:rgba(255,82,82,0.26221330553835787);">$+110</td><td style="background:rgba(38,194,129,0.24871206786332828);">$-1,406</td><td style="background:rgba(38,194,129,0.30053051532287584);">$-2,949</td><td style="background:rgba(38,194,129,0.30053051532287584);">$-2,949</td><td style="background:rgba(38,194,129,0.3403947349270662);">$-4,136</td><td style="background:rgba(38,194,129,0.3551756311806782);">$-4,576</td></tr><tr><td>跌12%</td><td style="background:rgba(38,194,129,0.3047456636591519);">$-3,074</td><td style="background:rgba(255,82,82,0.26221330553835787);">$+110</td><td style="background:rgba(38,194,129,0.24871206786332828);">$-1,406</td><td style="background:rgba(38,194,129,0.30053051532287584);">$-2,949</td><td style="background:rgba(38,194,129,0.30053051532287584);">$-2,949</td><td style="background:rgba(38,194,129,0.3403947349270662);">$-4,136</td><td style="background:rgba(38,194,129,0.3551756311806782);">$-4,576</td></tr><tr><td>跌15%</td><td style="background:rgba(38,194,129,0.21842513549490777);">$-504</td><td style="background:rgba(255,82,82,0.38);">$+3,617</td><td style="background:rgba(255,82,82,0.32907462659831377);">$+2,101</td><td style="background:rgba(255,82,82,0.27725617913876627);">$+558</td><td style="background:rgba(255,82,82,0.27725617913876627);">$+558</td><td style="background:rgba(255,82,82,0.27725617913876627);">$+558</td><td style="background:rgba(38,194,129,0.2961961337069682);">$-2,820</td></tr><tr><td>跌20%</td><td style="background:rgba(38,194,129,0.38);">$-5,315</td><td style="background:rgba(38,194,129,0.2531065699216418);">$-1,537</td><td style="background:rgba(38,194,129,0.28470943465512466);">$-2,478</td><td style="background:rgba(38,194,129,0.33652788211467216);">$-4,021</td><td style="background:rgba(38,194,129,0.33652788211467216);">$-4,021</td><td style="background:rgba(38,194,129,0.33652788211467216);">$-4,021</td><td style="background:rgba(38,194,129,0.3513087783682841);">$-4,461</td></tr><tr><td>跌25%</td><td style="background:rgba(38,194,129,0.38);">$-5,315</td><td style="background:rgba(38,194,129,0.2531065699216418);">$-1,537</td><td style="background:rgba(38,194,129,0.28470943465512466);">$-2,478</td><td style="background:rgba(38,194,129,0.33652788211467216);">$-4,021</td><td style="background:rgba(38,194,129,0.33652788211467216);">$-4,021</td><td style="background:rgba(38,194,129,0.33652788211467216);">$-4,021</td><td style="background:rgba(38,194,129,0.3513087783682841);">$-4,461</td></tr></table></div>
+<div style="margin-top:6px;"><h3 style="font-size:15px;color:var(--text);margin:18px 0 8px;">熔断矩阵 —— 收益/回撤比</h3><table><tr><th>跌\涨</th><th>涨5%</th><th>涨8%</th><th>涨10%</th><th>涨12%</th><th>涨15%</th><th>涨20%</th><th>涨25%</th></tr><tr><td>跌5%</td><td style="background:rgba(245,195,68,0.06);">-0.94</td><td style="background:rgba(245,195,68,0.11570125352315244);">-0.40</td><td style="background:rgba(245,195,68,0.12472280981556642);">-0.31</td><td style="background:rgba(245,195,68,0.1454879673810791);">-0.11</td><td style="background:rgba(245,195,68,0.08139597260381373);">-0.73</td><td style="background:rgba(245,195,68,0.0741503766257085);">-0.80</td><td style="background:rgba(245,195,68,0.07233841963170523);">-0.82</td></tr><tr><td>跌8%</td><td style="background:rgba(245,195,68,0.060410481793838094);">-0.93</td><td style="background:rgba(245,195,68,0.11570125352315244);">-0.40</td><td style="background:rgba(245,195,68,0.12472280981556642);">-0.31</td><td style="background:rgba(245,195,68,0.1454879673810791);">-0.11</td><td style="background:rgba(245,195,68,0.08139597260381373);">-0.73</td><td style="background:rgba(245,195,68,0.0741503766257085);">-0.80</td><td style="background:rgba(245,195,68,0.07233841963170523);">-0.82</td></tr><tr><td>跌10%</td><td style="background:rgba(245,195,68,0.08641164535147629);">-0.68</td><td style="background:rgba(245,195,68,0.16067194045606464);">0.04</td><td style="background:rgba(245,195,68,0.10271946546488597);">-0.52</td><td style="background:rgba(245,195,68,0.07375353951328267);">-0.80</td><td style="background:rgba(245,195,68,0.07375353951328267);">-0.80</td><td style="background:rgba(245,195,68,0.06881997162975231);">-0.85</td><td style="background:rgba(245,195,68,0.06755276447851613);">-0.86</td></tr><tr><td>跌12%</td><td style="background:rgba(245,195,68,0.08641164535147629);">-0.68</td><td style="background:rgba(245,195,68,0.16067194045606464);">0.04</td><td style="background:rgba(245,195,68,0.10271946546488597);">-0.52</td><td style="background:rgba(245,195,68,0.07375353951328267);">-0.80</td><td style="background:rgba(245,195,68,0.07375353951328267);">-0.80</td><td style="background:rgba(245,195,68,0.06881997162975231);">-0.85</td><td style="background:rgba(245,195,68,0.06755276447851613);">-0.86</td></tr><tr><td>跌15%</td><td style="background:rgba(245,195,68,0.135020995329307);">-0.21</td><td style="background:rgba(245,195,68,0.36);">1.98</td><td style="background:rgba(245,195,68,0.25364563199076484);">0.94</td><td style="background:rgba(245,195,68,0.183365607173413);">0.26</td><td style="background:rgba(245,195,68,0.183365607173413);">0.26</td><td style="background:rgba(245,195,68,0.183365607173413);">0.26</td><td style="background:rgba(245,195,68,0.07448941983660587);">-0.80</td></tr><tr><td>跌20%</td><td style="background:rgba(245,195,68,0.07315122199368693);">-0.81</td><td style="background:rgba(245,195,68,0.10759578681937895);">-0.48</td><td style="background:rgba(245,195,68,0.07704998992435064);">-0.77</td><td style="background:rgba(245,195,68,0.06919032004213387);">-0.85</td><td style="background:rgba(245,195,68,0.06919032004213387);">-0.85</td><td style="background:rgba(245,195,68,0.06919032004213387);">-0.85</td><td style="background:rgba(245,195,68,0.06786348376467996);">-0.86</td></tr><tr><td>跌25%</td><td style="background:rgba(245,195,68,0.07315122199368693);">-0.81</td><td style="background:rgba(245,195,68,0.10759578681937895);">-0.48</td><td style="background:rgba(245,195,68,0.07704998992435064);">-0.77</td><td style="background:rgba(245,195,68,0.06919032004213387);">-0.85</td><td style="background:rgba(245,195,68,0.06919032004213387);">-0.85</td><td style="background:rgba(245,195,68,0.06919032004213387);">-0.85</td><td style="background:rgba(245,195,68,0.06786348376467996);">-0.86</td></tr></table></div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">涨熔断敏感性（固定跌熔断 15%）</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">只改涨熔断，看收益如何随涨熔断变化。★ = 全局最优点。关键：涨熔断从 8% 抬到 10%，收益从 $3,617 掉到 $2,101；抬到 25% 直接 −$2,820。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>涨熔断</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th><th>结构分布</th><th>跌触发</th><th>涨触发</th><th>到期</th></tr>
+<tr><td>5%</td><td class="c-green">$-504</td><td>$2,417</td><td class="c-gold">-0.21</td><td>16</td><td>跨式6 / 2put10</td><td>2</td><td>7</td><td>6</td></tr>
+<tr><td>8%</td><td class="c-red">$+3,617 <span class="c-gold">★</span></td><td>$1,829</td><td class="c-gold">1.98</td><td>14</td><td>跨式6 / 2put8</td><td>2</td><td>6</td><td>5</td></tr>
+<tr><td>10%</td><td class="c-red">$+2,101</td><td>$2,226</td><td class="c-gold">0.94</td><td>13</td><td>跨式4 / 2put9</td><td>1</td><td>3</td><td>8</td></tr>
+<tr><td>12%</td><td class="c-red">$+558</td><td>$2,138</td><td class="c-gold">0.26</td><td>11</td><td>跨式4 / 2put7</td><td>1</td><td>2</td><td>7</td></tr>
+<tr><td>15%</td><td class="c-red">$+558</td><td>$2,138</td><td class="c-gold">0.26</td><td>11</td><td>跨式4 / 2put7</td><td>1</td><td>2</td><td>7</td></tr>
+<tr><td>20%</td><td class="c-red">$+558</td><td>$2,138</td><td class="c-gold">0.26</td><td>11</td><td>跨式4 / 2put7</td><td>1</td><td>2</td><td>7</td></tr>
+<tr><td>25%</td><td class="c-green">$-2,820</td><td>$3,539</td><td class="c-gold">-0.80</td><td>11</td><td>跨式3 / 2put8</td><td>1</td><td>0</td><td>9</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">跌熔断敏感性（固定涨熔断 8%）</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">只改跌熔断。★ = 全局最优点。关键：跌熔断从 15% 降到 10% 或升到 20%，收益都从 +$3,617 崩到 $110 或 −$1,537。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>跌熔断</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th><th>结构分布</th><th>跌触发</th><th>涨触发</th><th>到期</th></tr>
+<tr><td>5%</td><td class="c-green">$-1,076</td><td>$2,716</td><td class="c-gold">-0.40</td><td>16</td><td>跨式9 / 2put7</td><td>4</td><td>6</td><td>5</td></tr>
+<tr><td>8%</td><td class="c-green">$-1,076</td><td>$2,716</td><td class="c-gold">-0.40</td><td>16</td><td>跨式9 / 2put7</td><td>4</td><td>6</td><td>5</td></tr>
+<tr><td>10%</td><td class="c-red">$+110</td><td>$2,716</td><td class="c-gold">0.04</td><td>15</td><td>跨式8 / 2put7</td><td>3</td><td>6</td><td>5</td></tr>
+<tr><td>12%</td><td class="c-red">$+110</td><td>$2,716</td><td class="c-gold">0.04</td><td>15</td><td>跨式8 / 2put7</td><td>3</td><td>6</td><td>5</td></tr>
+<tr><td>15%</td><td class="c-red">$+3,617 <span class="c-gold">★</span></td><td>$1,829</td><td class="c-gold">1.98</td><td>14</td><td>跨式6 / 2put8</td><td>2</td><td>6</td><td>5</td></tr>
+<tr><td>20%</td><td class="c-green">$-1,537</td><td>$3,235</td><td class="c-gold">-0.48</td><td>13</td><td>跨式5 / 2put8</td><td>0</td><td>5</td><td>7</td></tr>
+<tr><td>25%</td><td class="c-green">$-1,537</td><td>$3,235</td><td class="c-gold">-0.48</td><td>13</td><td>跨式5 / 2put8</td><td>0</td><td>5</td><td>7</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">新最优组合逐轮明细</h2>
+<p class="note" style="margin-top:0;margin-bottom:10px;">跌15%/涨8%。结构：<span class="c-gold">跨式</span>=1call+1put（put贵时），<span class="c-red">2put</span>=2put+100股（put便宜时）。方式：到期 / 上涨再平衡 / 下跌止盈 / 持有中。</p>
+<div class="tbl-scroll">
+<table>
+<tr><th>入场日</th><th>出场日</th><th>方式</th><th>结构</th><th>入场spot</th><th>出场spot</th><th>行权价</th><th>put价</th><th>call价</th><th>成本</th><th>收入</th><th>利润</th></tr>
+<tr><td>2026-09-11</td><td>2026-09-18 到期</td><td>持有中</td><td><span class='c-gold'>跨式</span></td><td>$192.9</td><td>$190.1</td><td>$195</td><td>$9.31</td><td>$4.42</td><td class="c-green">$1,374</td><td class="c-red">$+493</td><td class="c-green">$-881</td></tr>
+<tr><td>2026-09-04</td><td>2026-09-11</td><td>上涨再平衡</td><td><span class='c-gold'>跨式</span></td><td>$177.0</td><td>$192.9</td><td>$175</td><td>$8.32</td><td>$3.09</td><td class="c-green">$1,140</td><td class="c-red">$+1,794</td><td class="c-red">$+654</td></tr>
+<tr><td>2026-08-28</td><td>2026-09-04</td><td>到期</td><td><span class='c-red'>2put</span></td><td>$161.0</td><td>$177.0</td><td>$160</td><td>$4.66</td><td>$6.59</td><td class="c-green">$933</td><td class="c-red">$+1,596</td><td class="c-red">$+663</td></tr>
+<tr><td>2026-08-21</td><td>2026-08-28</td><td>到期</td><td><span class='c-red'>2put</span></td><td>$163.4</td><td>$161.0</td><td>$162.5</td><td>$5.42</td><td>$7.45</td><td class="c-green">$1,084</td><td class="c-red">$+55</td><td class="c-green">$-1,029</td></tr>
+<tr><td>2026-08-14</td><td>2026-08-21</td><td>到期</td><td><span class='c-gold'>跨式</span></td><td>$169.3</td><td>$163.4</td><td>$170</td><td>$8.76</td><td>$5.83</td><td class="c-green">$1,459</td><td class="c-red">$+659</td><td class="c-green">$-800</td></tr>
+<tr><td>2026-08-12</td><td>2026-08-14</td><td>上涨再平衡</td><td><span class='c-red'>2put</span></td><td>$150.7</td><td>$169.3</td><td>$150</td><td>$4.44</td><td>$6.09</td><td class="c-green">$887</td><td class="c-red">$+1,862</td><td class="c-red">$+974</td></tr>
+<tr><td>2026-08-07</td><td>2026-08-12</td><td>上涨再平衡</td><td><span class='c-gold'>跨式</span></td><td>$137.9</td><td>$150.7</td><td>$140</td><td>$8.31</td><td>$5.50</td><td class="c-green">$1,381</td><td class="c-red">$+1,070</td><td class="c-green">$-311</td></tr>
+<tr><td>2026-07-31</td><td>2026-08-07</td><td>到期</td><td><span class='c-gold'>跨式</span></td><td>$159.9</td><td>$137.9</td><td>$160</td><td>$13.17</td><td>$6.61</td><td class="c-green">$1,978</td><td class="c-red">$+2,209</td><td class="c-red">$+231</td></tr>
+<tr><td>2026-07-29</td><td>2026-07-31</td><td>上涨再平衡</td><td><span class='c-red'>2put</span></td><td>$129.9</td><td>$159.9</td><td>$130</td><td>$5.58</td><td>$6.07</td><td class="c-green">$1,115</td><td class="c-red">$+2,993</td><td class="c-red">$+1,877</td></tr>
+<tr><td>2026-07-24</td><td>2026-07-29</td><td>下跌止盈</td><td><span class='c-red'>2put</span></td><td>$154.6</td><td>$129.9</td><td>$155</td><td>$10.73</td><td>$11.11</td><td class="c-green">$2,147</td><td class="c-red">$+2,548</td><td class="c-red">$+401</td></tr>
+<tr><td>2026-07-23</td><td>2026-07-24</td><td>到期</td><td><span class='c-red'>2put</span></td><td>$170.7</td><td>$154.6</td><td>$170</td><td>$4.25</td><td>$6.36</td><td class="c-green">$849</td><td class="c-red">$+1,472</td><td class="c-red">$+622</td></tr>
+<tr><td>2026-07-17</td><td>2026-07-23</td><td>上涨再平衡</td><td><span class='c-red'>2put</span></td><td>$152.1</td><td>$170.7</td><td>$152.5</td><td>$10.43</td><td>$12.59</td><td class="c-green">$2,086</td><td class="c-red">$+1,860</td><td class="c-green">$-226</td></tr>
+<tr><td>2026-07-15</td><td>2026-07-17</td><td>下跌止盈</td><td><span class='c-gold'>跨式</span></td><td>$181.8</td><td>$152.1</td><td>$180</td><td>$9.56</td><td>$6.96</td><td class="c-green">$1,652</td><td class="c-red">$+2,789</td><td class="c-red">$+1,137</td></tr>
+<tr><td>2026-07-14</td><td>2026-07-15</td><td>上涨再平衡</td><td><span class='c-red'>2put</span></td><td>$168.1</td><td>$181.8</td><td>$170</td><td>$5.33</td><td>$12.03</td><td class="c-green">$1,067</td><td class="c-red">$+1,370</td><td class="c-red">$+303</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0;">说明</h2>
+<ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
+<li><strong>结构切换规则固定</strong>：每轮入场看 ATM put 权利金 vs call 权利金，put 贵→跨式（1call+1put），put 便宜/相等→2put+100股。本次只优化熔断参数，不改结构规则。</li>
+<li><strong>结算口径</strong>：熔断/到期/持有中一律按<strong>内在价值</strong>结算（2026-09-15 修正前视偏差）。涨熔断时 put 虚值归零。</li>
+<li><strong>回撤口径</strong>：统一用「累计逐轮盈亏曲线最大回撤」（绝对金额），与 adaptive 报告内部口径一致。</li>
+<li><strong>本程序为临时扫描</strong>（<code>rescan_skhy_adaptive.py</code>），不改动 final 程序/报告。</li>
+<li><strong>过拟合警示</strong>：SKHY 仅 44 个交易日，样本短、波动大，参数稳定性低，仅供研究，不构成投资建议。</li>
+<li><strong>关于最优参数的可靠性</strong>：本次最优（跌15%/涨8%）在 49 组里是唯一显著为正的「孤立尖峰」，周围邻居大多转负。这是参数对样本过拟合的典型特征——它精准命中了 44 天里「两次 -16% 大跌 + 若干次 +8%~+9% 上涨」的节奏，但换一段行情（比如没有那两次大跌、或上涨幅度普遍超过 10%）这个点就会失效。建议把它当作「这段行情的事后最优」，而非「可外推的规律」。</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

@@ -24,7 +24,7 @@
 |:---:|---|---|:---:|:---:|
 | **① KV 缓存压缩（软件）** | Google **TurboQuant**（PolarQuant+QJL）、NVIDIA **KVTC**、Microsoft **IndexMem**、DeepSeek **MLA**、KIVI | TurboQuant 压到 3-bit，KV 缓存内存降 **~6 倍**（最高口径 10 倍），推理提速 **8 倍**，近零精度损失 | ★★★ | 已发布，待大规模商用 |
 | **② 内存分层 / 池化** | **CXL 3.1** 池化内存、NVIDIA **CMX**（BlueField-4 DPU）、学术 **EVICPress** | 把 KV 缓存放到 HBM→DRAM→SSD 分层，按重要性调度；CMX 用 DPU 卸载 HBM 负载 | ★★ | 工程化推进中 |
-| **③ 新型硬件架构** | **Groq LPU**（片上 SRAM 替代 HBM）、**存算一体 CIM/PIM**（Samsung HBM-PIM、UPMEM） | Groq 3 LPU：150 TB/s 片上 SRAM（约 Rubin 的 7 倍）；NVIDIA 已于 2025/12 收购 Groq，量产预期 Q3 2026 | ★★ | 2026 下半年起 |
+| **③ 新型硬件架构** | **Cerebras WSE 晶圆级引擎**、**Groq LPU**（片上 SRAM 替代 HBM）、**存算一体 CIM/PIM**（Samsung HBM-PIM、UPMEM） | Cerebras 单芯片=整片晶圆、片上超大 SRAM，推理免外部 HBM，CS-4 组件减 50%；Groq 3 LPU：150 TB/s 片上 SRAM（约 Rubin 的 7 倍），量产预期 Q3 2026 | ★★ | 2026 下半年起 |
 | **④ 模型架构革新** | **MoE 稀疏化**、Google **Titans**（神经长期记忆）、蒸馏/路由 | MiniMax M2（230B）仅激活 100B，显存降 60%；Titans 把记忆压进参数而非 KV 缓存，支持 200 万 token 上下文 | ★★ | 持续演进 |
 | **⑤ 新型存储材料** | **MRAM**（STT/SOT）、**ReRAM**、**PCM/SOM** | 非易失、低功耗，主攻边缘/车规/嵌入式缓存；数据中心 HBM 替代仍早 | ★ | 中长期（3–5 年+） |
 | **⑥ 系统层优化** | **FlashAttention-3/4**、持续批处理、投机解码 | 减少显存占用与访存，已是生产基线（vLLM/SGLang） | ★ | 已落地 |
@@ -60,6 +60,12 @@
 ### 2.6 新型存储（MRAM/ReRAM/PCM）
 - 铠侠 2026 VLSI 综述：四类新兴非易失存储（STT-MRAM、FeRAM、ReRAM、PCM/SOM）主攻**边缘/车规/缓存层**，填补 DRAM 与 NAND 之间的 SCM 空白。
 - 结论：**未来 3–5 年 HBM 仍主导数据中心高端场景**，新型存储先做缓存/边缘渗透，存算一体才可能在中长期成为主流架构。
+
+### 2.7 Cerebras WSE 晶圆级引擎（晶圆即芯片，直接免 HBM）
+- **原理**：一颗芯片就是一整片晶圆（Wafer-Scale Engine），把超大容量 SRAM 直接做在片上，推理时数据不离开芯片，从物理层绕开外部 HBM 的带宽墙。
+- **最新进展**：2026/8 发布 CS-4 系统（3 颗餐盘大小 WSE-3 Turbo），组件减少 50%，省电、低延迟；2027 年再推下一代。
+- **关键订单**：OpenAI 已签约，到 2028 年采购最多 750 兆瓦算力、金额超 100 亿美元，主要用于更快推理。
+- **市场信号**：木头姐 Cathie Wood 明确看多，ARK 通过 ARKK/ARKW 持续加仓 CBRS（两周约 2800 万美元），与 Groq 并列为"推理免 HBM"核心标的。
 
 ---
 
@@ -109,6 +115,7 @@ TurboQuant 省下的 5 倍内存，大概率**不会让 GPU 闲置**，而是用
 | **摩根士丹利** | 芯片通胀持续多年，DDR4 Q3 +50%、Q4 +10%；拐点看 2026Q4–2027H1 |
 | **韩国 iM 证券** | 前 15 巨头存储采购占 capex 37%（去年 15%），成本压力倒逼优化 |
 | **联博 / 交银国际** | 回调提供布局机会；AI 景气延续至 2027 底（长期成长确定、短期波动加大） |
+| **Cathie Wood（ARK）** | 明确看空存储：HBM 是半导体链中"最周期、最商品化"的一环，价格涨 3–10 倍非正常状态、是负面信号；押注 Cerebras/Groq"片上 SRAM 免 HBM"的推理路线，类比特斯拉去钴"工程化剔除需求"。ARK 卖 AMD、两周加仓 Cerebras 约 2800 万美元 |
 
 ---
 
@@ -119,6 +126,7 @@ TurboQuant 省下的 5 倍内存，大概率**不会让 GPU 闲置**，而是用
 | 持续 | TurboQuant 官方代码 / vLLM·TensorRT-LLM 集成进展 | ★★★ 决定看空逻辑能否兑现 |
 | 持续 | NVIDIA KVTC 一手验证与商用时间表 | ★★★ |
 | 2026 Q3 | Groq 3 LPU 量产可用性 | ★★ 硬件替代关键节点 |
+| 2026 Q3 | Cerebras CS-4 可用性（OpenAI 已锁 750MW 算力采购） | ★★ 晶圆级免 HBM 路线验证 |
 | 2026 H2 | DeepSeek MLA 类架构在主流模型的渗透率 | ★★ |
 | 2026 H2 | CXL 3.1 池化内存在云厂的部署 | ★ |
 | 2027+ | MRAM/ReRAM 在数据中心 SCM 的突破 | ★ 中长期 |

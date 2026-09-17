@@ -19,12 +19,16 @@ import math
 import argparse
 import time
 import requests
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 API_KEY = "8MCOdzsVgnUaFCzn4yqZHckAvTJKbh6D"
 BASE = "https://api.polygon.io"
 OUT_DIR = "/Users/gavinz/git/finance/data"
+
+# 美股交易日统一用美国东部时间（ET）
+ET = ZoneInfo("America/New_York")
 
 SESSION = requests.Session()
 SESSION.headers.update({"User-Agent": "Mozilla/5.0"})
@@ -43,7 +47,7 @@ def pull_stock(ticker, start, end):
             if r.status_code == 200:
                 d = r.json()
                 for res in d.get('results', []):
-                    ts = datetime.fromtimestamp(res['t'] / 1000, tz=timezone.utc)
+                    ts = datetime.fromtimestamp(res['t'] / 1000, tz=ET)
                     date_str = ts.strftime('%Y-%m-%d')
                     rows.append([date_str, res['o'], res['h'], res['l'], res['c'], res['v']])
                 return rows
