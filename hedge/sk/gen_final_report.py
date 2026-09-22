@@ -152,6 +152,17 @@ def build_indicator_board(stock):
 def main():
     data, day_map = load_3fri()
     stock, closes, bars = load_stock()
+
+    # 早盘快照：报告「现在如何买」用开盘价（9:30 ET）替代全天 vw
+    # （SKHY 全天 vw 被盘中暴涨暴跌污染；期权无分时数据，最接近早盘=开盘价）
+    snap = None
+    _snap_path = os.path.join(DATA, "SKHY_intraday_snapshot.json")
+    if os.path.exists(_snap_path):
+        try:
+            snap = json.load(open(_snap_path))
+        except Exception:
+            snap = None
+
     stock_entry = closes[stock[0][0]]
     stock_exit = closes[stock[-1][0]]
     meta = dict(entry_date=stock[0][0], entry_price=stock_entry,
@@ -280,31 +291,134 @@ def main():
     last_day = data[-1]
     latest_date = last_day["date"]
     last_spot = closes[stock[-1][0]]  # 用最新收盘价
-    near_f = min([f for f in last_day["fridays"] if f["dte"] > 0], key=lambda f: abs(f["dte"] - best["target"]))
-    near_atm_put = min(near_f["puts"], key=lambda p: abs(p["strike"] - last_spot))
-    near_strike = near_atm_put["strike"]
-    near_put_vw = near_atm_put["vw"]
-    near_call = next((x for x in near_f.get("calls", []) if abs(x["strike"] - near_strike) < 1e-9), None)
-    near_call_vw = near_call["vw"] if near_call else None
+    # 选「有 put 成交」且 dte>0 的周五里，dte 最接近最优周期的那个
+    # （SKHY 次新股 ADR 期权流动性差，近期周度期权常无成交，需降级）
+    cand_f = [f for f in last_day["fridays"] if f["dte"] > 0 and f.get("puts")]
+    if cand_f:
+        near_f = min(cand_f, key=lambda f: abs(f["dte"] - best["target"]))
+    else:
+        near_f = min([f for f in last_day["fridays"] if f["dte"] > 0], key=lambda f: abs(f["dte"] - best["target"]))
     near_expiry = near_f["expiry"]
     near_dte = near_f["dte"]
 
-    if near_call_vw is not None:
-        if near_put_vw > near_call_vw:
+    # 早盘价口径：期权用「开盘价（9:30 ET）」替代全天 vw；parity 用开盘价 spot
+    # （json 序列化把 float key 转成字符串，这里统一转回 float 以便与 strike 匹配）
+    snap_puts = {float(k): v for k, v in snap.get("puts", {}).items()} if snap else {}
+    snap_calls = {float(k): v for k, v in snap.get("calls", {}).items()} if snap else {}
+    snap_spot_open = snap.get("spot_open") if snap else None
+    snap_spot_1000 = snap.get("spot_1000") if snap else None
+    px_spot = snap_spot_open if snap_spot_open is not None else last_spot  # parity 用开盘价（与期权 open 同口径）
+    # 主现货价：优先 10:00 ET 分钟价（最接近用户早盘下单时点），否则开盘价，否则收盘价
+    px_now = snap_spot_1000 if snap_spot_1000 is not None else px_spot
+
+    # 现货上下最近的两个行权价档（SKHY 期权 2.5 间距，现货附近通常一上一下两档）
+    all_strikes = sorted({p["strike"] for p in near_f.get("puts", [])})
+    below = [k for k in all_strikes if k <= px_now]
+    above = [k for k in all_strikes if k > px_now]
+    strike_below = max(below) if below else None
+    strike_above = min(above) if above else None
+
+    def build_leg(k):
+        """对单个行权价档，返回 put/call 的开盘价（call 缺档用 put-call parity 推算）。"""
+        p_orig = next((p for p in near_f.get("puts", []) if abs(p["strike"] - k) < 1e-9), None)
+        c_orig = next((c for c in near_f.get("calls", []) if abs(c["strike"] - k) < 1e-9), None)
+        put_px = snap_puts.get(k)
+        if put_px is None:
+            put_px = p_orig.get("vw") if p_orig else None  # 快照缺档回退全天 vw
+        put_vw = p_orig.get("vw") if p_orig else None
+        call_px = snap_calls.get(k)
+        call_approx = False
+        if call_px is None:
+            # 同档 call 无成交 → put-call parity 推算（C = P + S - K），不能用相邻档跨档比
+            call_px = (put_px + px_spot - k) if put_px is not None else None
+            call_approx = True
+        call_vw = c_orig.get("vw") if c_orig else None
+        return dict(strike=k, put_px=put_px, call_px=call_px, call_approx=call_approx,
+                    put_vw=put_vw, call_vw=call_vw)
+
+    legs = [build_leg(k) for k in (strike_below, strike_above) if k is not None]
+
+    # ATM 档 = 离主现货价最近的那档（自适应策略的信号基准）
+    atm_leg = min(legs, key=lambda g: abs(g["strike"] - px_now)) if legs else None
+    near_strike = atm_leg["strike"] if atm_leg else None
+    near_put_px = atm_leg["put_px"] if atm_leg else None
+    near_call_px = atm_leg["call_px"] if atm_leg else None
+    near_call_approx = atm_leg["call_approx"] if atm_leg else False
+    near_call_strike = near_strike
+
+    if near_put_px is not None and near_call_px is not None:
+        if near_put_px > near_call_px:
             now_struct = "跨式（1 call + 1 put）"
-            now_cost = (near_put_vw + near_call_vw) * 100
-            now_reason = f'put ${near_put_vw:.2f} &gt; call ${near_call_vw:.2f}，put 更贵 → 买便宜 call 抓波动'
+            now_cost = (near_put_px + near_call_px) * 100
+            now_reason = f'ATM 档（行权价 {near_strike:g}）put ${near_put_px:.2f} &gt; call ${near_call_px:.2f}，put 更贵 → 买便宜 call 抓波动'
         else:
             now_struct = "2 put + 100 股"
-            now_cost = near_put_vw * 200
-            now_reason = f'put ${near_put_vw:.2f} ≤ call ${near_call_vw:.2f}，put 更便宜 → 用便宜 put 对冲 + 股票吃慢牛'
+            now_cost = near_put_px * 200
+            now_reason = f'ATM 档（行权价 {near_strike:g}）put ${near_put_px:.2f} ≤ call ${near_call_px:.2f}，put 更便宜 → 用便宜 put 对冲 + 股票吃慢牛'
     else:
-        now_struct = "数据缺 call，无法判断"
-        now_cost = near_put_vw * 200
-        now_reason = "最新期权链缺同档 call 数据"
+        now_struct = "近期周度期权无成交，暂无结构判断"
+        now_cost = None
+        now_reason = "最新交易日近月周度期权无成交量，需等流动性恢复后再判断"
 
     up_line = last_spot * (1 + best["up"] / 100.0)
     dn_line = last_spot * (1 - best["down"] / 100.0)
+
+    # 期权链快照（早盘价口径：开盘价 9:30 ET，对比全天 vw，透明展示差异）
+    chain_rows = []
+    if near_f.get("puts") or near_f.get("calls"):
+        local_puts = {p["strike"]: p for p in near_f.get("puts", [])}
+        local_calls = {c["strike"]: c for c in near_f.get("calls", [])}
+        for k in sorted(set(local_puts) | set(local_calls)):
+            if abs(k - last_spot) > last_spot * 0.10:
+                continue
+            lp = local_puts.get(k); lc = local_calls.get(k)
+            po = snap_puts.get(k) if (snap and snap_puts.get(k) is not None) else (lp["vw"] if lp else None)
+            co = snap_calls.get(k) if (snap and snap_calls.get(k) is not None) else (lc["vw"] if lc else None)
+            pvw = lp["vw"] if lp else None
+            cvw = lc["vw"] if lc else None
+            if po is None and co is None:
+                continue
+            if po is not None and co is not None:
+                note = '<span class="c-red">call贵</span>' if co > po else '<span class="c-green">put贵</span>'
+            elif co is None:
+                note = '<span class="note">call无成交</span>'
+            else:
+                note = '<span class="note">put无成交</span>'
+            chain_rows.append(f'<tr><td>{k:g}</td>'
+                              f'<td>{("$%.2f" % po) if po is not None else "—"}</td>'
+                              f'<td>{("$%.2f" % pvw) if pvw is not None else "—"}</td>'
+                              f'<td>{("$%.2f" % co) if co is not None else "—"}</td>'
+                              f'<td>{("$%.2f" % cvw) if cvw is not None else "—"}</td>'
+                              f'<td>{note}</td></tr>')
+    chain_snapshot_html = "\n".join(chain_rows)
+
+    # 现货上下两档对比（每档都列 put + call 两个价格）
+    legs_html = []
+    for g in legs:
+        k = g["strike"]
+        rel = "下方" if k <= px_now else "上方"
+        if g["put_px"] is not None and g["call_px"] is not None:
+            if g["put_px"] > g["call_px"]:
+                who = '<span class="c-green">put贵</span>'
+                sugg = '<span class="c-gold">跨式（1call+1put）</span>'
+            elif g["call_px"] > g["put_px"]:
+                who = '<span class="c-red">call贵</span>'
+                sugg = '<span class="c-red">2put+100股</span>'
+            else:
+                who = '<span class="note">持平</span>'
+                sugg = '<span class="note">任意</span>'
+        else:
+            who = '<span class="note">—</span>'
+            sugg = '<span class="note">—</span>'
+        call_cell = ("$%.2f" % g["call_px"]) if g["call_px"] is not None else "—"
+        if g["call_approx"]:
+            call_cell += ' <span class="note">(parity推算)</span>'
+        legs_html.append(
+            f'<tr><td><strong>K={k:g}</strong></td><td>{rel}</td>'
+            f'<td>{("$%.2f" % g["put_px"]) if g["put_px"] is not None else "—"}</td>'
+            f'<td>{call_cell}</td>'
+            f'<td>{who}</td><td>{sugg}</td></tr>')
+    legs_html = "\n".join(legs_html)
 
     # 技术指标
     indic = build_indicator_board(stock)
@@ -394,8 +508,8 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 <tr><th>指标</th><th>最新值</th><th>信号解读</th></tr>
 <tr><td>现价</td><td class="c-red">${ind['close']:.2f}</td><td>{_price_vs_ma20} MA20（{ind['ma20']:.2f}）</td></tr>
 <tr><td>均线 MA20</td><td class="c-red">{ind['ma20']:.2f}</td><td>{_trend}（现价{_price_vs_ma20}均线）</td></tr>
-<tr><td>ATM Put（现价档）</td><td>${near_put_vw:.2f}/股</td><td>行权价 ${near_strike:.0f} · 到期 {near_expiry}（dte {near_dte}）</td></tr>
-<tr><td>ATM Call（同档）</td><td>{('$%.2f/股' % near_call_vw) if near_call_vw is not None else '—'}</td><td>put/call 贵贱 → 决定结构</td></tr>
+<tr><td>ATM Put（现价档·开盘价）</td><td>{('$%.2f/股' % near_put_px) if near_put_px is not None else '—'}</td><td>行权价 {('%g' % near_strike) if near_strike is not None else '—'} · 到期 {near_expiry}（dte {near_dte}）</td></tr>
+<tr><td>ATM Call（开盘价）</td><td>{('$%.2f/股' % near_call_px) if near_call_px is not None else '—'}</td><td>{('同档行权价 %g（真实成交）' % near_strike) if (near_call_px is not None and not near_call_approx) else (('同档 %g（put-call parity 推算，该档无成交）' % near_call_strike) if near_call_px is not None else '—')}</td></tr>
 </table>
 </div>
 <p class="note">说明：SKHY 上市仅 {meta['n_days']} 个交易日，MA20 样本偏短、信号仅供参考。</p>
@@ -483,23 +597,43 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 <div class="card">
 <h2>现在如何买（基于最新期权数据 {latest_date}）</h2>
 <div class="callout-gold">
-最新 SKHY 现价 <strong class="c-gold">${last_spot:.2f}</strong>，最近到期日 <strong>{near_expiry}</strong>（dte {near_dte} 天）。
+主现货价 <strong class="c-gold">${px_now:.2f}</strong>（10:00 ET）{('，9:30 开盘价 $%.2f' % px_spot) if snap_spot_open is not None else ''}{('，收盘 $%.2f' % last_spot) if snap_spot_1000 is None else ''}，最近到期日 <strong>{near_expiry}</strong>（dte {near_dte} 天）。
+下方期权价格均为<strong>早盘开盘价（9:30 ET）</strong>，非全天加权价。<br>
 按自适应策略判断，现在应该选 <strong class="c-gold">{now_struct}</strong>：{now_reason}。
 </div>
+
+<h3 style="margin:14px 0 6px;">现货上下最近两档 · put / call 各自价格（现价 ${px_now:.2f}）</h3>
+<div class="tbl-scroll">
+<table>
+<tr><th>行权价</th><th>相对现价</th><th>Put（开盘价）</th><th>Call（开盘价）</th><th>同档谁贵</th><th>结构建议</th></tr>
+{legs_html}
+</table>
+</div>
+<p class="note">SKHY 期权是 2.5 间距，现价 ${px_now:.2f} 附近最近的两档是 <strong>K={('%g' % strike_below) if strike_below is not None else '—'}</strong>（下方）和 <strong>K={('%g' % strike_above) if strike_above is not None else '—'}</strong>（上方）。call 同档无成交时用 put-call parity（C=P+S−K）推算。注意：<strong>两档的「谁贵」可能相反</strong>——低于现价的档 call 有内在价值所以贵、高于现价的档 put 有内在价值所以贵，这是期权平价（parity）的自然结果，不是 skew。</p>
+
 <ol style="font-size:14px;padding-left:22px;line-height:2.0;">
-<li>先看 ATM 期权：put <strong>${near_put_vw:.2f}</strong> vs call <strong>{('$%.2f' % near_call_vw) if near_call_vw is not None else '—'}</strong>（行权价 ${near_strike:.0f}）。</li>
-<li>若选<strong>跨式</strong>：买 1 张 call + 1 张 put，成本约 <strong class="c-green">${(near_put_vw+near_call_vw)*100:,.0f}</strong>（{('$%.2f' % near_call_vw) if near_call_vw is not None else '—'} + ${near_put_vw:.2f}）。</li>
-<li>若选<strong>2put+100股</strong>：买 100 股（市值 ${last_spot*100:,.0f}）+ 2 张 put，put 成本 <strong class="c-green">${near_put_vw*200:,.0f}</strong>。</li>
+<li><strong>结构选择见上表</strong>：每档里 put 贵 → 跨式（1call+1put）；call 贵 → 2put+100股。策略信号基准取<strong>离现价最近的 ATM 档</strong>（这里是 K={('%g' % near_strike) if near_strike is not None else '—'}）。</li>
+<li>若选<strong>跨式</strong>：买 1 张 call + 1 张 put，成本 = call + put（两档各自价格见上表）。</li>
+<li>若选<strong>2put+100股</strong>：买 100 股（市值 ${px_now*100:,.0f}）+ 2 张 put，put 成本 = 2 × put 开盘价。</li>
 <li><strong>熔断线（不对称）</strong>：开盘价涨到 <strong class="c-red">${up_line:.2f}</strong>（涨 {best['up']}%）或跌到 <strong class="c-green">${dn_line:.2f}</strong>（跌 {best['down']}%）就开盘平仓 + 重买（盘中不盯盘）。</li>
 <li>没触发熔断就持有到 {near_expiry} 到期，再滚动下一轮。</li>
 </ol>
+<h3 style="margin:14px 0 6px;">{near_expiry} 到期 · {latest_date} 当天期权链快照（开盘价 vs 全天vw，现价 ${last_spot:.2f}）</h3>
+<div class="tbl-scroll">
+<table>
+<tr><th>行权价</th><th>Put 开盘价</th><th>Put 全天vw</th><th>Call 开盘价</th><th>Call 全天vw</th><th>同档对比</th></tr>
+{chain_snapshot_html}
+</table>
+</div>
+<p class="note" style="margin-top:6px;">「开盘价」= 9:30 ET 开盘价，「全天vw」= 全天成交量加权价。同一行权价下 call 贵还是 put 贵，主要由「行权价 vs 现价」决定（低于现价的档 call 有内在价值所以贵、高于现价的档 put 有内在价值所以贵），这是期权平价（put-call parity）的自然结果，<strong>不是</strong> skew。真正衡量 skew 应看等距虚值的 put vs call。SKHY 期权流动性差，ATM 档（现价上下最近的档）常只有单边成交。</p>
 </div>
 
 <div class="card">
 <h2>数据与结论说明</h2>
 <ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
 <li><strong>⚠️ 数据长度限制</strong>：SKHY 于 2026-07-13 在 Nasdaq 上市（ADR），至今仅 {meta['n_days']} 个交易日（约 6 周）。样本极少，仅 {best['n_rounds']} 轮交易，参数结论可靠性远低于长周期回测。</li>
-<li><strong>真实成交价</strong>：call/put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价。</li>
+<li><strong>回测历史成本</strong>：逐轮回测的 call/put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价。</li>
+<li><strong>「现在如何买」早盘价</strong>：报告末尾「现在如何买」的 put/call 改用<strong>开盘价（9:30 ET）</strong>替代全天 vw——SKHY 盘中暴涨暴跌会污染全天加权价，而实盘在早盘下单；Polygon 期权无分时数据，开盘价是最接近早盘、最干净的可取价（同档 call 无成交时用 put-call parity 推算）。</li>
 <li><strong>多到期日数据</strong>：SKHY_options_3fri.json 每天含 3 个周五到期日 + call/put 双边数据，可真实对比不同周期与结构。</li>
 <li><strong>开盘价熔断</strong>：只在美国开盘瞬间判断一次，盘中 low/high 不触发——符合「不盯盘」的实盘操作。</li>
 <li><strong>内在价值结算</strong>：熔断/到期/持有中一律按内在价值结算，消除「开盘价触发 + 全天 vw 结算」的前视偏差。</li>

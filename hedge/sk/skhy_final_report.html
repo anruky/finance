@@ -44,7 +44,7 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 <body>
 <div class="wrap">
 <h1>SKHY 对冲策略最终报告 <span style="color:var(--muted);font-size:15px;">（自适应结构切换 · put贵→跨式 / put便宜→2put）</span></h1>
-<p class="sub">数据源：SKHY_stock.json（44 交易日）+ SKHY_options_3fri.json（真实 3 周五到期日期权链，含 call/put） · 生成于 2026-09-15 04:56（美东 ET）</p>
+<p class="sub">数据源：SKHY_stock.json（50 交易日）+ SKHY_options_3fri.json（真实 3 周五到期日期权链，含 call/put） · 生成于 2026-09-22 05:42（美东 ET）</p>
 
 <div class="card">
 <h2 style="margin-top:0;">行情与技术指标</h2>
@@ -59,115 +59,127 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 <text x="47" y="70.0" fill="#9aa3b2" font-size="10" text-anchor="end">$180</text>
 <line x1="54" y1="18.0" x2="668" y2="18.0" stroke="rgba(154,163,178,0.10)"/>
 <text x="47" y="22.0" fill="#9aa3b2" font-size="10" text-anchor="end">$200</text>
-<line x1="61.0" y1="108.5" x2="61.0" y2="134.9" stroke="#26c281" stroke-width="1"/>
-<rect x="56.0" y="131.7" width="10" height="1.2" fill="#26c281"/>
-<line x1="74.9" y1="30.5" x2="74.9" y2="100.8" stroke="#E24B4A" stroke-width="1"/>
-<rect x="69.9" y="32.6" width="10" height="61.9" fill="#E24B4A"/>
-<line x1="88.9" y1="46.9" x2="88.9" y2="98.4" stroke="#26c281" stroke-width="1"/>
-<rect x="83.9" y="61.7" width="10" height="12.8" fill="#26c281"/>
-<line x1="102.8" y1="94.3" x2="102.8" y2="134.7" stroke="#26c281" stroke-width="1"/>
-<rect x="97.8" y="99.8" width="10" height="32.6" fill="#26c281"/>
-<line x1="116.8" y1="96.3" x2="116.8" y2="148.6" stroke="#E24B4A" stroke-width="1"/>
-<rect x="111.8" y="128.3" width="10" height="4.6" fill="#E24B4A"/>
-<line x1="130.8" y1="105.8" x2="130.8" y2="138.6" stroke="#26c281" stroke-width="1"/>
-<rect x="125.8" y="105.8" width="10" height="29.4" fill="#26c281"/>
-<line x1="144.7" y1="82.3" x2="144.7" y2="112.7" stroke="#E24B4A" stroke-width="1"/>
-<rect x="139.7" y="85.3" width="10" height="24.5" fill="#E24B4A"/>
-<line x1="158.7" y1="89.8" x2="158.7" y2="109.2" stroke="#E24B4A" stroke-width="1"/>
-<rect x="153.7" y="101.4" width="10" height="7.5" fill="#E24B4A"/>
-<line x1="172.6" y1="71.0" x2="172.6" y2="97.2" stroke="#26c281" stroke-width="1"/>
-<rect x="167.6" y="88.3" width="10" height="2.9" fill="#26c281"/>
-<line x1="186.6" y1="103.9" x2="186.6" y2="130.6" stroke="#26c281" stroke-width="1"/>
-<rect x="181.6" y="104.6" width="10" height="22.4" fill="#26c281"/>
-<line x1="200.5" y1="114.7" x2="200.5" y2="164.4" stroke="#26c281" stroke-width="1"/>
-<rect x="195.5" y="114.7" width="10" height="40.0" fill="#26c281"/>
-<line x1="214.5" y1="170.4" x2="214.5" y2="190.1" stroke="#26c281" stroke-width="1"/>
-<rect x="209.5" y="171.8" width="10" height="13.8" fill="#26c281"/>
-<line x1="228.4" y1="168.7" x2="228.4" y2="198.5" stroke="#26c281" stroke-width="1"/>
-<rect x="223.4" y="186.1" width="10" height="7.6" fill="#26c281"/>
-<line x1="242.4" y1="137.1" x2="242.4" y2="175.2" stroke="#E24B4A" stroke-width="1"/>
-<rect x="237.4" y="140.4" width="10" height="30.0" fill="#E24B4A"/>
-<line x1="256.3" y1="107.6" x2="256.3" y2="153.6" stroke="#26c281" stroke-width="1"/>
-<rect x="251.3" y="114.3" width="10" height="38.7" fill="#26c281"/>
-<line x1="270.3" y1="152.0" x2="270.3" y2="175.0" stroke="#E24B4A" stroke-width="1"/>
-<rect x="265.3" y="155.5" width="10" height="6.7" fill="#E24B4A"/>
-<line x1="284.2" y1="124.9" x2="284.2" y2="145.9" stroke="#E24B4A" stroke-width="1"/>
-<rect x="279.2" y="127.5" width="10" height="10.1" fill="#E24B4A"/>
-<line x1="298.2" y1="123.7" x2="298.2" y2="138.4" stroke="#E24B4A" stroke-width="1"/>
-<rect x="293.2" y="135.5" width="10" height="1.9" fill="#E24B4A"/>
-<line x1="312.2" y1="144.6" x2="312.2" y2="167.5" stroke="#E24B4A" stroke-width="1"/>
-<rect x="307.2" y="153.5" width="10" height="10.9" fill="#E24B4A"/>
-<line x1="326.1" y1="153.2" x2="326.1" y2="176.9" stroke="#26c281" stroke-width="1"/>
-<rect x="321.1" y="153.6" width="10" height="13.4" fill="#26c281"/>
-<line x1="340.1" y1="164.2" x2="340.1" y2="175.7" stroke="#E24B4A" stroke-width="1"/>
-<rect x="335.1" y="173.3" width="10" height="1.2" fill="#E24B4A"/>
-<line x1="354.0" y1="157.5" x2="354.0" y2="168.4" stroke="#E24B4A" stroke-width="1"/>
-<rect x="349.0" y="158.0" width="10" height="5.8" fill="#E24B4A"/>
-<line x1="368.0" y1="125.6" x2="368.0" y2="144.6" stroke="#E24B4A" stroke-width="1"/>
-<rect x="363.0" y="127.4" width="10" height="8.9" fill="#E24B4A"/>
-<line x1="381.9" y1="93.6" x2="381.9" y2="129.8" stroke="#E24B4A" stroke-width="1"/>
-<rect x="376.9" y="100.4" width="10" height="27.7" fill="#E24B4A"/>
-<line x1="395.9" y1="86.2" x2="395.9" y2="105.0" stroke="#26c281" stroke-width="1"/>
-<rect x="390.9" y="91.6" width="10" height="7.2" fill="#26c281"/>
-<line x1="409.8" y1="69.8" x2="409.8" y2="91.0" stroke="#26c281" stroke-width="1"/>
-<rect x="404.8" y="83.8" width="10" height="2.9" fill="#26c281"/>
-<line x1="423.8" y1="104.7" x2="423.8" y2="127.1" stroke="#26c281" stroke-width="1"/>
-<rect x="418.8" y="109.7" width="10" height="14.8" fill="#26c281"/>
-<line x1="437.8" y1="104.9" x2="437.8" y2="124.5" stroke="#26c281" stroke-width="1"/>
-<rect x="432.8" y="107.3" width="10" height="15.9" fill="#26c281"/>
-<line x1="451.7" y1="98.7" x2="451.7" y2="113.7" stroke="#E24B4A" stroke-width="1"/>
-<rect x="446.7" y="106.6" width="10" height="2.4" fill="#E24B4A"/>
-<line x1="465.7" y1="96.1" x2="465.7" y2="107.8" stroke="#26c281" stroke-width="1"/>
-<rect x="460.7" y="97.1" width="10" height="8.7" fill="#26c281"/>
-<line x1="479.6" y1="119.9" x2="479.6" y2="134.4" stroke="#26c281" stroke-width="1"/>
-<rect x="474.6" y="120.3" width="10" height="4.8" fill="#26c281"/>
-<line x1="493.6" y1="111.1" x2="493.6" y2="123.0" stroke="#26c281" stroke-width="1"/>
-<rect x="488.6" y="114.2" width="10" height="1.2" fill="#26c281"/>
-<line x1="507.5" y1="111.1" x2="507.5" y2="119.8" stroke="#26c281" stroke-width="1"/>
-<rect x="502.5" y="117.3" width="10" height="1.4" fill="#26c281"/>
-<line x1="521.5" y1="102.6" x2="521.5" y2="117.3" stroke="#26c281" stroke-width="1"/>
-<rect x="516.5" y="104.7" width="10" height="5.4" fill="#26c281"/>
-<line x1="535.4" y1="105.5" x2="535.4" y2="118.9" stroke="#E24B4A" stroke-width="1"/>
-<rect x="530.4" y="111.5" width="10" height="4.4" fill="#E24B4A"/>
-<line x1="549.4" y1="101.8" x2="549.4" y2="112.8" stroke="#E24B4A" stroke-width="1"/>
-<rect x="544.4" y="103.0" width="10" height="9.2" fill="#E24B4A"/>
-<line x1="563.3" y1="104.3" x2="563.3" y2="117.6" stroke="#26c281" stroke-width="1"/>
-<rect x="558.3" y="110.4" width="10" height="1.7" fill="#26c281"/>
-<line x1="577.3" y1="100.9" x2="577.3" y2="117.2" stroke="#E24B4A" stroke-width="1"/>
-<rect x="572.3" y="102.0" width="10" height="12.5" fill="#E24B4A"/>
-<line x1="591.2" y1="102.9" x2="591.2" y2="119.4" stroke="#E24B4A" stroke-width="1"/>
-<rect x="586.2" y="105.2" width="10" height="6.9" fill="#E24B4A"/>
-<line x1="605.2" y1="71.5" x2="605.2" y2="102.9" stroke="#E24B4A" stroke-width="1"/>
-<rect x="600.2" y="73.2" width="10" height="29.7" fill="#E24B4A"/>
-<line x1="619.2" y1="42.4" x2="619.2" y2="56.5" stroke="#E24B4A" stroke-width="1"/>
-<rect x="614.2" y="52.7" width="10" height="2.1" fill="#E24B4A"/>
-<line x1="633.1" y1="18.3" x2="633.1" y2="47.9" stroke="#E24B4A" stroke-width="1"/>
-<rect x="628.1" y="21.3" width="10" height="25.3" fill="#E24B4A"/>
-<line x1="647.1" y1="33.5" x2="647.1" y2="48.8" stroke="#26c281" stroke-width="1"/>
-<rect x="642.1" y="43.4" width="10" height="2.7" fill="#26c281"/>
-<line x1="661.0" y1="34.9" x2="661.0" y2="49.2" stroke="#26c281" stroke-width="1"/>
-<rect x="656.0" y="34.9" width="10" height="6.9" fill="#26c281"/>
-<polyline points="326.1,130.3 340.1,132.4 354.0,138.7 368.0,141.3 381.9,139.7 395.9,138.2 409.8,135.8 423.8,137.8 437.8,138.9 451.7,139.6 465.7,138.6 479.6,137.1 493.6,133.6 507.5,129.8 521.5,128.3 535.4,126.2 549.4,123.6 563.3,122.8 577.3,121.2 591.2,118.7 605.2,114.0 619.2,108.0 633.1,101.2 647.1,97.1 661.0,94.2" fill="none" stroke="#c792ea" stroke-width="1.6"/>
+<line x1="60.1" y1="108.5" x2="60.1" y2="134.9" stroke="#26c281" stroke-width="1"/>
+<rect x="55.1" y="131.7" width="10" height="1.2" fill="#26c281"/>
+<line x1="72.4" y1="30.5" x2="72.4" y2="100.8" stroke="#E24B4A" stroke-width="1"/>
+<rect x="67.4" y="32.6" width="10" height="61.9" fill="#E24B4A"/>
+<line x1="84.7" y1="46.9" x2="84.7" y2="98.4" stroke="#26c281" stroke-width="1"/>
+<rect x="79.7" y="61.7" width="10" height="12.8" fill="#26c281"/>
+<line x1="97.0" y1="94.3" x2="97.0" y2="134.7" stroke="#26c281" stroke-width="1"/>
+<rect x="92.0" y="99.8" width="10" height="32.6" fill="#26c281"/>
+<line x1="109.3" y1="96.3" x2="109.3" y2="148.6" stroke="#E24B4A" stroke-width="1"/>
+<rect x="104.3" y="128.3" width="10" height="4.6" fill="#E24B4A"/>
+<line x1="121.5" y1="105.8" x2="121.5" y2="138.6" stroke="#26c281" stroke-width="1"/>
+<rect x="116.5" y="105.8" width="10" height="29.4" fill="#26c281"/>
+<line x1="133.8" y1="82.3" x2="133.8" y2="112.7" stroke="#E24B4A" stroke-width="1"/>
+<rect x="128.8" y="85.3" width="10" height="24.5" fill="#E24B4A"/>
+<line x1="146.1" y1="89.8" x2="146.1" y2="109.2" stroke="#E24B4A" stroke-width="1"/>
+<rect x="141.1" y="101.4" width="10" height="7.5" fill="#E24B4A"/>
+<line x1="158.4" y1="71.0" x2="158.4" y2="97.2" stroke="#26c281" stroke-width="1"/>
+<rect x="153.4" y="88.3" width="10" height="2.9" fill="#26c281"/>
+<line x1="170.7" y1="103.9" x2="170.7" y2="130.6" stroke="#26c281" stroke-width="1"/>
+<rect x="165.7" y="104.6" width="10" height="22.4" fill="#26c281"/>
+<line x1="182.9" y1="114.7" x2="182.9" y2="164.4" stroke="#26c281" stroke-width="1"/>
+<rect x="177.9" y="114.7" width="10" height="40.0" fill="#26c281"/>
+<line x1="195.2" y1="170.4" x2="195.2" y2="190.1" stroke="#26c281" stroke-width="1"/>
+<rect x="190.2" y="171.8" width="10" height="13.8" fill="#26c281"/>
+<line x1="207.5" y1="168.7" x2="207.5" y2="198.5" stroke="#26c281" stroke-width="1"/>
+<rect x="202.5" y="186.1" width="10" height="7.6" fill="#26c281"/>
+<line x1="219.8" y1="137.1" x2="219.8" y2="175.2" stroke="#E24B4A" stroke-width="1"/>
+<rect x="214.8" y="140.4" width="10" height="30.0" fill="#E24B4A"/>
+<line x1="232.1" y1="107.6" x2="232.1" y2="153.6" stroke="#26c281" stroke-width="1"/>
+<rect x="227.1" y="114.3" width="10" height="38.7" fill="#26c281"/>
+<line x1="244.3" y1="152.0" x2="244.3" y2="175.0" stroke="#E24B4A" stroke-width="1"/>
+<rect x="239.3" y="155.5" width="10" height="6.7" fill="#E24B4A"/>
+<line x1="256.6" y1="124.9" x2="256.6" y2="145.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="251.6" y="127.5" width="10" height="10.1" fill="#E24B4A"/>
+<line x1="268.9" y1="123.7" x2="268.9" y2="138.4" stroke="#E24B4A" stroke-width="1"/>
+<rect x="263.9" y="135.5" width="10" height="1.9" fill="#E24B4A"/>
+<line x1="281.2" y1="144.6" x2="281.2" y2="167.5" stroke="#E24B4A" stroke-width="1"/>
+<rect x="276.2" y="153.5" width="10" height="10.9" fill="#E24B4A"/>
+<line x1="293.5" y1="153.2" x2="293.5" y2="176.9" stroke="#26c281" stroke-width="1"/>
+<rect x="288.5" y="153.6" width="10" height="13.4" fill="#26c281"/>
+<line x1="305.7" y1="164.2" x2="305.7" y2="175.7" stroke="#E24B4A" stroke-width="1"/>
+<rect x="300.7" y="173.3" width="10" height="1.2" fill="#E24B4A"/>
+<line x1="318.0" y1="157.5" x2="318.0" y2="168.4" stroke="#E24B4A" stroke-width="1"/>
+<rect x="313.0" y="158.0" width="10" height="5.8" fill="#E24B4A"/>
+<line x1="330.3" y1="125.6" x2="330.3" y2="144.6" stroke="#E24B4A" stroke-width="1"/>
+<rect x="325.3" y="127.4" width="10" height="8.9" fill="#E24B4A"/>
+<line x1="342.6" y1="93.6" x2="342.6" y2="129.8" stroke="#E24B4A" stroke-width="1"/>
+<rect x="337.6" y="100.4" width="10" height="27.7" fill="#E24B4A"/>
+<line x1="354.9" y1="86.2" x2="354.9" y2="105.0" stroke="#26c281" stroke-width="1"/>
+<rect x="349.9" y="91.6" width="10" height="7.2" fill="#26c281"/>
+<line x1="367.1" y1="69.8" x2="367.1" y2="91.0" stroke="#26c281" stroke-width="1"/>
+<rect x="362.1" y="83.8" width="10" height="2.9" fill="#26c281"/>
+<line x1="379.4" y1="104.7" x2="379.4" y2="127.1" stroke="#26c281" stroke-width="1"/>
+<rect x="374.4" y="109.7" width="10" height="14.8" fill="#26c281"/>
+<line x1="391.7" y1="104.9" x2="391.7" y2="124.5" stroke="#26c281" stroke-width="1"/>
+<rect x="386.7" y="107.3" width="10" height="15.9" fill="#26c281"/>
+<line x1="404.0" y1="98.7" x2="404.0" y2="113.7" stroke="#E24B4A" stroke-width="1"/>
+<rect x="399.0" y="106.6" width="10" height="2.4" fill="#E24B4A"/>
+<line x1="416.3" y1="96.1" x2="416.3" y2="107.8" stroke="#26c281" stroke-width="1"/>
+<rect x="411.3" y="97.1" width="10" height="8.7" fill="#26c281"/>
+<line x1="428.5" y1="119.9" x2="428.5" y2="134.4" stroke="#26c281" stroke-width="1"/>
+<rect x="423.5" y="120.3" width="10" height="4.8" fill="#26c281"/>
+<line x1="440.8" y1="111.1" x2="440.8" y2="123.0" stroke="#26c281" stroke-width="1"/>
+<rect x="435.8" y="114.2" width="10" height="1.2" fill="#26c281"/>
+<line x1="453.1" y1="111.1" x2="453.1" y2="119.8" stroke="#26c281" stroke-width="1"/>
+<rect x="448.1" y="117.3" width="10" height="1.4" fill="#26c281"/>
+<line x1="465.4" y1="102.6" x2="465.4" y2="117.3" stroke="#26c281" stroke-width="1"/>
+<rect x="460.4" y="104.7" width="10" height="5.4" fill="#26c281"/>
+<line x1="477.7" y1="105.5" x2="477.7" y2="118.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="472.7" y="111.5" width="10" height="4.4" fill="#E24B4A"/>
+<line x1="489.9" y1="101.8" x2="489.9" y2="112.8" stroke="#E24B4A" stroke-width="1"/>
+<rect x="484.9" y="103.0" width="10" height="9.2" fill="#E24B4A"/>
+<line x1="502.2" y1="104.3" x2="502.2" y2="117.6" stroke="#26c281" stroke-width="1"/>
+<rect x="497.2" y="110.4" width="10" height="1.7" fill="#26c281"/>
+<line x1="514.5" y1="100.9" x2="514.5" y2="117.2" stroke="#E24B4A" stroke-width="1"/>
+<rect x="509.5" y="102.0" width="10" height="12.5" fill="#E24B4A"/>
+<line x1="526.8" y1="102.9" x2="526.8" y2="119.4" stroke="#E24B4A" stroke-width="1"/>
+<rect x="521.8" y="105.2" width="10" height="6.9" fill="#E24B4A"/>
+<line x1="539.1" y1="71.5" x2="539.1" y2="102.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="534.1" y="73.2" width="10" height="29.7" fill="#E24B4A"/>
+<line x1="551.3" y1="42.4" x2="551.3" y2="56.5" stroke="#E24B4A" stroke-width="1"/>
+<rect x="546.3" y="52.7" width="10" height="2.1" fill="#E24B4A"/>
+<line x1="563.6" y1="18.3" x2="563.6" y2="47.9" stroke="#E24B4A" stroke-width="1"/>
+<rect x="558.6" y="21.3" width="10" height="25.3" fill="#E24B4A"/>
+<line x1="575.9" y1="33.5" x2="575.9" y2="48.8" stroke="#26c281" stroke-width="1"/>
+<rect x="570.9" y="43.4" width="10" height="2.7" fill="#26c281"/>
+<line x1="588.2" y1="34.9" x2="588.2" y2="49.2" stroke="#26c281" stroke-width="1"/>
+<rect x="583.2" y="34.9" width="10" height="6.9" fill="#26c281"/>
+<line x1="600.5" y1="66.2" x2="600.5" y2="79.0" stroke="#E24B4A" stroke-width="1"/>
+<rect x="595.5" y="76.5" width="10" height="1.7" fill="#E24B4A"/>
+<line x1="612.7" y1="62.9" x2="612.7" y2="84.6" stroke="#26c281" stroke-width="1"/>
+<rect x="607.7" y="67.8" width="10" height="10.6" fill="#26c281"/>
+<line x1="625.0" y1="64.4" x2="625.0" y2="83.3" stroke="#26c281" stroke-width="1"/>
+<rect x="620.0" y="65.2" width="10" height="13.1" fill="#26c281"/>
+<line x1="637.3" y1="53.2" x2="637.3" y2="63.0" stroke="#E24B4A" stroke-width="1"/>
+<rect x="632.3" y="58.8" width="10" height="2.4" fill="#E24B4A"/>
+<line x1="649.6" y1="37.2" x2="649.6" y2="59.3" stroke="#E24B4A" stroke-width="1"/>
+<rect x="644.6" y="48.0" width="10" height="6.2" fill="#E24B4A"/>
+<line x1="661.9" y1="41.4" x2="661.9" y2="51.8" stroke="#E24B4A" stroke-width="1"/>
+<rect x="656.9" y="44.7" width="10" height="1.3" fill="#E24B4A"/>
+<polyline points="293.5,130.3 305.7,132.4 318.0,138.7 330.3,141.3 342.6,139.7 354.9,138.2 367.1,135.8 379.4,137.8 391.7,138.9 404.0,139.6 416.3,138.6 428.5,137.1 440.8,133.6 453.1,129.8 465.4,128.3 477.7,126.2 489.9,123.6 502.2,122.8 514.5,121.2 526.8,118.7 539.1,114.0 551.3,108.0 563.6,101.2 575.9,97.1 588.2,94.2 600.5,93.1 612.7,92.7 625.0,90.3 637.3,87.1 649.6,84.2 661.9,81.1" fill="none" stroke="#c792ea" stroke-width="1.6"/>
 <text x="54" y="32" fill="#e6e8ec" font-size="12" font-weight="600">SKHY · K线 + 均线(MA20)</text>
 <circle cx="668" cy="28" r="3" fill="#c792ea"/><text x="674" y="32" fill="#9aa3b2" font-size="10">MA20</text>
-<text x="61.0" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">07-13</text>
-<text x="158.7" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">07-22</text>
-<text x="256.3" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">07-31</text>
-<text x="354.0" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">08-11</text>
-<text x="451.7" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">08-20</text>
-<text x="549.4" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">08-31</text>
-<text x="647.1" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">09-10</text>
+<text x="60.1" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">07-13</text>
+<text x="158.4" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">07-23</text>
+<text x="256.6" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">08-04</text>
+<text x="354.9" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">08-14</text>
+<text x="453.1" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">08-26</text>
+<text x="551.3" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">09-08</text>
+<text x="649.6" y="228" fill="#9aa3b2" font-size="10" text-anchor="middle">09-18</text>
 </svg></div>
 <div class="tbl-scroll">
 <table>
 <tr><th>指标</th><th>最新值</th><th>信号解读</th></tr>
-<tr><td>现价</td><td class="c-red">$190.07</td><td>站上 MA20（168.26）</td></tr>
-<tr><td>均线 MA20</td><td class="c-red">168.26</td><td>多头（现价站上均线）</td></tr>
-<tr><td>ATM Put（现价档）</td><td>$6.42/股</td><td>行权价 $190 · 到期 2026-09-18（dte 7）</td></tr>
-<tr><td>ATM Call（同档）</td><td>$6.43/股</td><td>put/call 贵贱 → 决定结构</td></tr>
+<tr><td>现价</td><td class="c-red">$188.86</td><td>站上 MA20（173.69）</td></tr>
+<tr><td>均线 MA20</td><td class="c-red">173.69</td><td>多头（现价站上均线）</td></tr>
+<tr><td>ATM Put（现价档·开盘价）</td><td>$5.16/股</td><td>行权价 187.5 · 到期 2026-09-25（dte 4）</td></tr>
+<tr><td>ATM Call（开盘价）</td><td>$5.97/股</td><td>同档 187.5（put-call parity 推算，该档无成交）</td></tr>
 </table>
 </div>
-<p class="note">说明：SKHY 上市仅 44 个交易日，MA20 样本偏短、信号仅供参考。</p>
+<p class="note">说明：SKHY 上市仅 50 个交易日，MA20 样本偏短、信号仅供参考。</p>
 </div>
 
 <div class="card">
@@ -189,16 +201,16 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 <h2>核心结论</h2>
 <div class="callout-gold">
 <strong>最优组合：最近周五(1-4天) + 跌 15% / 涨 8% 熔断（自适应结构切换）。</strong><br>
-总收益 <span class="c-red">$+3,617</span>（B&H 为 $+3,772，自适应<strong>少赚 $-155</strong>，但这是用"放弃部分上涨"换来的），
+总收益 <span class="c-red">$+3,874</span>（B&H 为 $+3,651，自适应<strong>少赚 $+223</strong>，但这是用"放弃部分上涨"换来的），
 回撤从 B&H 的 <span class="c-green">$6,713</span> 降到 <strong>$1,829</strong>，
-收益/回撤比 <strong class="c-gold">1.98</strong>（B&H 仅 0.56），是 B&H 的 <strong class="c-gold">3.5 倍</strong>。
+收益/回撤比 <strong class="c-gold">2.12</strong>（B&H 仅 0.54），是 B&H 的 <strong class="c-gold">3.9 倍</strong>。
 </div>
 <div class="kpis" style="margin-top:14px;">
-<div class="kpi"><div class="label">自适应总收益</div><div class="value"><span class="c-red">$+3,617</span></div><div class="sub">共 14 轮</div></div>
-<div class="kpi"><div class="label">回撤(逐轮累计)</div><div class="value">$1,829</div><div class="sub">收益/回撤比 1.98</div></div>
+<div class="kpi"><div class="label">自适应总收益</div><div class="value"><span class="c-red">$+3,874</span></div><div class="sub">共 14 轮</div></div>
+<div class="kpi"><div class="label">回撤(逐轮累计)</div><div class="value">$1,829</div><div class="sub">收益/回撤比 2.12</div></div>
 <div class="kpi"><div class="label">结构分布</div><div class="value">6 : 8</div><div class="sub">跨式 43% / 2put 57%</div></div>
-<div class="kpi"><div class="label">触发统计</div><div class="value">跌2 / 涨6 / 到期5</div><div class="sub"></div></div>
-<div class="kpi"><div class="label">B&H 收益</div><div class="value"><span class="c-red">$+3,772</span></div><div class="sub">回撤 $6,713 · 比 0.56</div></div>
+<div class="kpi"><div class="label">触发统计</div><div class="value">跌2 / 涨6 / 到期6</div><div class="sub"></div></div>
+<div class="kpi"><div class="label">B&H 收益</div><div class="value"><span class="c-red">$+3,651</span></div><div class="sub">回撤 $6,713 · 比 0.54</div></div>
 </div>
 <div class="callout-warn">
 <strong>⚠️ 但这是一个「孤立的尖峰」</strong>——见下方熔断矩阵，最优点（跌15%/涨8%）周围一圈参数几乎全是负收益，49 组里只有这 1 个点显著赚钱。
@@ -211,7 +223,7 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 <div class="tbl-scroll">
 <table>
 <tr><th>策略</th><th>总收益</th><th>回撤(绝对金额)</th><th>收益/回撤比</th><th>说明</th></tr>
-<tr><td>自适应（put贵→跨式，put便宜→2put） <span class="c-gold">★最优</span></td><td class="c-red">$+3,617</td><td>$1,829</td><td class="c-gold">1.98</td><td>14 轮 · 跨式6 / 2put8</td></tr><tr><td>固定 2put（100股+2put）</td><td class="c-red">$+1,231</td><td>$2,624</td><td class="c-gold">0.47</td><td>14 轮</td></tr><tr><td>固定 跨式（1call+1put）</td><td class="c-red">$+1,932</td><td>$1,942</td><td class="c-gold">1.00</td><td>14 轮</td></tr><tr><td>B&H（持有100股）</td><td class="c-red">$+3,772</td><td>$6,713</td><td class="c-gold">0.56</td><td>44 交易日</td></tr>
+<tr><td>自适应（put贵→跨式，put便宜→2put） <span class="c-gold">★最优</span></td><td class="c-red">$+3,874</td><td>$1,829</td><td class="c-gold">2.12</td><td>14 轮 · 跨式6 / 2put8</td></tr><tr><td>固定 2put（100股+2put）</td><td class="c-red">$+588</td><td>$3,266</td><td class="c-gold">0.18</td><td>15 轮</td></tr><tr><td>固定 跨式（1call+1put）</td><td class="c-red">$+1,555</td><td>$1,971</td><td class="c-gold">0.79</td><td>15 轮</td></tr><tr><td>B&H（持有100股）</td><td class="c-red">$+3,651</td><td>$6,713</td><td class="c-gold">0.54</td><td>50 交易日</td></tr>
 </table>
 </div>
 <p class="note">回撤 = 累计逐轮盈亏曲线的最大回撤（绝对金额），四种口径统一，可直接对比。B&H 逐轮盈亏 = 每日收盘价相对首日收盘价的涨跌 ×100 股。</p>
@@ -220,8 +232,8 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 <div class="card">
 <h2>熔断比例扫描（不对称矩阵，周期=最近周五）</h2>
 <p class="note" style="margin-top:0;margin-bottom:10px;">★ = 全局最优（回撤比口径）。行 = 跌熔断，列 = 涨熔断。</p>
-<div style="margin-top:6px;"><h3 style="font-size:15px;color:var(--text);margin:18px 0 8px;">熔断矩阵 —— 总收益（周期=最近周五）</h3><table><tr><th>跌\涨</th><th>涨5%</th><th>涨8%</th><th>涨10%</th><th>涨12%</th><th>涨15%</th><th>涨20%</th><th>涨25%</th></tr><tr><td>5%</td><td class="c-green">$-4,552</td><td class="c-green">$-1,076</td><td class="c-green">$-831</td><td class="c-green">$-223</td><td class="c-green">$-2,460</td><td class="c-green">$-3,646</td><td class="c-green">$-4,087</td></tr><tr><td>8%</td><td class="c-green">$-4,261</td><td class="c-green">$-1,076</td><td class="c-green">$-831</td><td class="c-green">$-223</td><td class="c-green">$-2,460</td><td class="c-green">$-3,646</td><td class="c-green">$-4,087</td></tr><tr><td>10%</td><td class="c-green">$-3,074</td><td class="c-red">$+110</td><td class="c-green">$-1,406</td><td class="c-green">$-2,949</td><td class="c-green">$-2,949</td><td class="c-green">$-4,136</td><td class="c-green">$-4,576</td></tr><tr><td>12%</td><td class="c-green">$-3,074</td><td class="c-red">$+110</td><td class="c-green">$-1,406</td><td class="c-green">$-2,949</td><td class="c-green">$-2,949</td><td class="c-green">$-4,136</td><td class="c-green">$-4,576</td></tr><tr><td>15%</td><td class="c-green">$-504</td><td class="c-gold">$+3,617 ★</td><td class="c-red">$+2,101</td><td class="c-red">$+558</td><td class="c-red">$+558</td><td class="c-red">$+558</td><td class="c-green">$-2,820</td></tr><tr><td>20%</td><td class="c-green">$-5,315</td><td class="c-green">$-1,537</td><td class="c-green">$-2,478</td><td class="c-green">$-4,021</td><td class="c-green">$-4,021</td><td class="c-green">$-4,021</td><td class="c-green">$-4,461</td></tr><tr><td>25%</td><td class="c-green">$-5,315</td><td class="c-green">$-1,537</td><td class="c-green">$-2,478</td><td class="c-green">$-4,021</td><td class="c-green">$-4,021</td><td class="c-green">$-4,021</td><td class="c-green">$-4,461</td></tr></table></div>
-<div style="margin-top:6px;"><h3 style="font-size:15px;color:var(--text);margin:18px 0 8px;">熔断矩阵 —— 收益/回撤比（周期=最近周五）</h3><table><tr><th>跌\涨</th><th>涨5%</th><th>涨8%</th><th>涨10%</th><th>涨12%</th><th>涨15%</th><th>涨20%</th><th>涨25%</th></tr><tr><td>5%</td><td class="">-0.94</td><td class="">-0.40</td><td class="">-0.31</td><td class="">-0.11</td><td class="">-0.73</td><td class="">-0.80</td><td class="">-0.82</td></tr><tr><td>8%</td><td class="">-0.93</td><td class="">-0.40</td><td class="">-0.31</td><td class="">-0.11</td><td class="">-0.73</td><td class="">-0.80</td><td class="">-0.82</td></tr><tr><td>10%</td><td class="">-0.68</td><td class="">0.04</td><td class="">-0.52</td><td class="">-0.80</td><td class="">-0.80</td><td class="">-0.85</td><td class="">-0.86</td></tr><tr><td>12%</td><td class="">-0.68</td><td class="">0.04</td><td class="">-0.52</td><td class="">-0.80</td><td class="">-0.80</td><td class="">-0.85</td><td class="">-0.86</td></tr><tr><td>15%</td><td class="">-0.21</td><td class="c-gold">1.98 ★</td><td class="">0.94</td><td class="">0.26</td><td class="">0.26</td><td class="">0.26</td><td class="">-0.80</td></tr><tr><td>20%</td><td class="">-0.81</td><td class="">-0.48</td><td class="">-0.77</td><td class="">-0.85</td><td class="">-0.85</td><td class="">-0.85</td><td class="">-0.86</td></tr><tr><td>25%</td><td class="">-0.81</td><td class="">-0.48</td><td class="">-0.77</td><td class="">-0.85</td><td class="">-0.85</td><td class="">-0.85</td><td class="">-0.86</td></tr></table></div>
+<div style="margin-top:6px;"><h3 style="font-size:15px;color:var(--text);margin:18px 0 8px;">熔断矩阵 —— 总收益（周期=最近周五）</h3><table><tr><th>跌\涨</th><th>涨5%</th><th>涨8%</th><th>涨10%</th><th>涨12%</th><th>涨15%</th><th>涨20%</th><th>涨25%</th></tr><tr><td>5%</td><td class="c-green">$-2,251</td><td class="c-red">$+1,239</td><td class="c-red">$+1,471</td><td class="c-red">$+2,079</td><td class="c-green">$-158</td><td class="c-green">$-1,345</td><td class="c-green">$-1,785</td></tr><tr><td>8%</td><td class="c-green">$-4,018</td><td class="c-red">$+1,239</td><td class="c-green">$-588</td><td class="c-red">$+20</td><td class="c-green">$-2,217</td><td class="c-green">$-3,403</td><td class="c-green">$-3,844</td></tr><tr><td>10%</td><td class="c-green">$-2,831</td><td class="c-red">$+367</td><td class="c-green">$-1,163</td><td class="c-green">$-2,706</td><td class="c-green">$-2,706</td><td class="c-green">$-3,893</td><td class="c-green">$-4,333</td></tr><tr><td>12%</td><td class="c-green">$-2,831</td><td class="c-red">$+367</td><td class="c-green">$-1,163</td><td class="c-green">$-2,706</td><td class="c-green">$-2,706</td><td class="c-green">$-3,893</td><td class="c-green">$-4,333</td></tr><tr><td>15%</td><td class="c-green">$-261</td><td class="c-gold">$+3,874 ★</td><td class="c-red">$+2,344</td><td class="c-red">$+801</td><td class="c-red">$+801</td><td class="c-red">$+801</td><td class="c-green">$-2,577</td></tr><tr><td>20%</td><td class="c-green">$-5,072</td><td class="c-green">$-1,280</td><td class="c-green">$-2,235</td><td class="c-green">$-3,778</td><td class="c-green">$-3,778</td><td class="c-green">$-3,778</td><td class="c-green">$-4,218</td></tr><tr><td>25%</td><td class="c-green">$-5,072</td><td class="c-green">$-1,280</td><td class="c-green">$-2,235</td><td class="c-green">$-3,778</td><td class="c-green">$-3,778</td><td class="c-green">$-3,778</td><td class="c-green">$-4,218</td></tr></table></div>
+<div style="margin-top:6px;"><h3 style="font-size:15px;color:var(--text);margin:18px 0 8px;">熔断矩阵 —— 收益/回撤比（周期=最近周五）</h3><table><tr><th>跌\涨</th><th>涨5%</th><th>涨8%</th><th>涨10%</th><th>涨12%</th><th>涨15%</th><th>涨20%</th><th>涨25%</th></tr><tr><td>5%</td><td class="">-0.53</td><td class="">0.46</td><td class="">0.60</td><td class="">1.14</td><td class="">-0.05</td><td class="">-0.31</td><td class="">-0.38</td></tr><tr><td>8%</td><td class="">-0.93</td><td class="">0.46</td><td class="">-0.24</td><td class="">0.01</td><td class="">-0.71</td><td class="">-0.79</td><td class="">-0.81</td></tr><tr><td>10%</td><td class="">-0.66</td><td class="">0.14</td><td class="">-0.48</td><td class="">-0.79</td><td class="">-0.79</td><td class="">-0.84</td><td class="">-0.86</td></tr><tr><td>12%</td><td class="">-0.66</td><td class="">0.14</td><td class="">-0.48</td><td class="">-0.79</td><td class="">-0.79</td><td class="">-0.84</td><td class="">-0.86</td></tr><tr><td>15%</td><td class="">-0.11</td><td class="c-gold">2.12 ★</td><td class="">1.18</td><td class="">0.37</td><td class="">0.37</td><td class="">0.37</td><td class="">-0.78</td></tr><tr><td>20%</td><td class="">-0.80</td><td class="">-0.40</td><td class="">-0.75</td><td class="">-0.84</td><td class="">-0.84</td><td class="">-0.84</td><td class="">-0.85</td></tr><tr><td>25%</td><td class="">-0.80</td><td class="">-0.40</td><td class="">-0.75</td><td class="">-0.84</td><td class="">-0.84</td><td class="">-0.84</td><td class="">-0.85</td></tr></table></div>
 </div>
 
 <div class="card">
@@ -230,10 +242,10 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 <div class="tbl-scroll">
 <table>
 <tr><th>周期</th><th>总收益</th><th>回撤</th><th>收益/回撤比</th><th>轮数</th><th>结构分布</th></tr>
-<tr><td>最近周五(1-4天)</td><td class="c-red">$+3,617 <span class="c-gold">★</span></td><td>$1,829</td><td class="c-gold">1.98</td><td>14</td><td>跨式6 / 2put8</td></tr>
-<tr><td>7天(6-11天)</td><td class="c-green">$-907</td><td>$1,829</td><td class="c-gold">-0.50</td><td>11</td><td>跨式6 / 2put5</td></tr>
-<tr><td>14天(13-18天)</td><td class="c-green">$-3,103</td><td>$3,103</td><td class="c-gold">-1.00</td><td>8</td><td>跨式4 / 2put4</td></tr>
-<tr><td>21天(20-21天)</td><td class="c-green">$-7,318</td><td>$7,318</td><td class="c-gold">-1.00</td><td>8</td><td>跨式5 / 2put3</td></tr>
+<tr><td>最近周五(1-4天)</td><td class="c-red">$+3,874 <span class="c-gold">★</span></td><td>$1,829</td><td class="c-gold">2.12</td><td>14</td><td>跨式6 / 2put8</td></tr>
+<tr><td>7天(6-11天)</td><td class="c-green">$-650</td><td>$1,829</td><td class="c-gold">-0.36</td><td>11</td><td>跨式6 / 2put5</td></tr>
+<tr><td>14天(13-18天)</td><td class="c-green">$-3,224</td><td>$3,224</td><td class="c-gold">-1.00</td><td>8</td><td>跨式4 / 2put4</td></tr>
+<tr><td>21天(20-21天)</td><td class="c-green">$-7,211</td><td>$7,211</td><td class="c-gold">-1.00</td><td>8</td><td>跨式5 / 2put3</td></tr>
 </table>
 </div>
 </div>
@@ -247,7 +259,7 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 <div class="tbl-scroll">
 <table>
 <tr><th>入场日</th><th>出场日</th><th>方式</th><th>结构</th><th>入场spot</th><th>出场spot</th><th>波动</th><th>行权价</th><th>put价</th><th>call价</th><th>成本</th><th>收入</th><th>利润</th></tr>
-<tr><td>2026-09-11</td><td>2026-09-18 到期</td><td>持有中</td><td><span class='c-gold'>跨式</span></td><td>$192.9</td><td>$190.1</td><td class="c-green">-1.5%</td><td>$195</td><td>$9.31</td><td>$4.42</td><td class="c-green">$1,374</td><td class="c-red">$+493</td><td class="c-green">$-881</td></tr>
+<tr><td>2026-09-11</td><td>2026-09-18</td><td>到期</td><td><span class='c-gold'>跨式</span></td><td>$192.9</td><td>$187.5</td><td class="c-green">-2.8%</td><td>$195</td><td>$9.31</td><td>$4.42</td><td class="c-green">$1,374</td><td class="c-red">$+750</td><td class="c-green">$-624</td></tr>
 <tr><td>2026-09-04</td><td>2026-09-11</td><td>上涨再平衡</td><td><span class='c-gold'>跨式</span></td><td>$177.0</td><td>$192.9</td><td class="c-red">+9.0%</td><td>$175</td><td>$8.32</td><td>$3.09</td><td class="c-green">$1,140</td><td class="c-red">$+1,794</td><td class="c-red">$+654</td></tr>
 <tr><td>2026-08-28</td><td>2026-09-04</td><td>到期</td><td><span class='c-red'>2put</span></td><td>$161.0</td><td>$177.0</td><td class="c-red">+9.9%</td><td>$160</td><td>$4.66</td><td>$6.59</td><td class="c-green">$933</td><td class="c-red">$+1,596</td><td class="c-red">$+663</td></tr>
 <tr><td>2026-08-21</td><td>2026-08-28</td><td>到期</td><td><span class='c-red'>2put</span></td><td>$163.4</td><td>$161.0</td><td class="c-green">-1.5%</td><td>$162.5</td><td>$5.42</td><td>$7.45</td><td class="c-green">$1,084</td><td class="c-red">$+55</td><td class="c-green">$-1,029</td></tr>
@@ -266,25 +278,51 @@ code { background:#20242d; border:1px solid var(--border); border-radius:4px; pa
 </div>
 
 <div class="card">
-<h2>现在如何买（基于最新期权数据 2026-09-11）</h2>
+<h2>现在如何买（基于最新期权数据 2026-09-21）</h2>
 <div class="callout-gold">
-最新 SKHY 现价 <strong class="c-gold">$190.07</strong>，最近到期日 <strong>2026-09-18</strong>（dte 7 天）。
-按自适应策略判断，现在应该选 <strong class="c-gold">2 put + 100 股</strong>：put $6.42 ≤ call $6.43，put 更便宜 → 用便宜 put 对冲 + 股票吃慢牛。
+主现货价 <strong class="c-gold">$188.28</strong>（10:00 ET），9:30 开盘价 $188.31，最近到期日 <strong>2026-09-25</strong>（dte 4 天）。
+下方期权价格均为<strong>早盘开盘价（9:30 ET）</strong>，非全天加权价。<br>
+按自适应策略判断，现在应该选 <strong class="c-gold">2 put + 100 股</strong>：ATM 档（行权价 187.5）put $5.16 ≤ call $5.97，put 更便宜 → 用便宜 put 对冲 + 股票吃慢牛。
 </div>
+
+<h3 style="margin:14px 0 6px;">现货上下最近两档 · put / call 各自价格（现价 $188.28）</h3>
+<div class="tbl-scroll">
+<table>
+<tr><th>行权价</th><th>相对现价</th><th>Put（开盘价）</th><th>Call（开盘价）</th><th>同档谁贵</th><th>结构建议</th></tr>
+<tr><td><strong>K=187.5</strong></td><td>下方</td><td>$5.16</td><td>$5.97 <span class="note">(parity推算)</span></td><td><span class="c-red">call贵</span></td><td><span class="c-red">2put+100股</span></td></tr>
+<tr><td><strong>K=190</strong></td><td>上方</td><td>$5.45</td><td>$3.76 <span class="note">(parity推算)</span></td><td><span class="c-green">put贵</span></td><td><span class="c-gold">跨式（1call+1put）</span></td></tr>
+</table>
+</div>
+<p class="note">SKHY 期权是 2.5 间距，现价 $188.28 附近最近的两档是 <strong>K=187.5</strong>（下方）和 <strong>K=190</strong>（上方）。call 同档无成交时用 put-call parity（C=P+S−K）推算。注意：<strong>两档的「谁贵」可能相反</strong>——低于现价的档 call 有内在价值所以贵、高于现价的档 put 有内在价值所以贵，这是期权平价（parity）的自然结果，不是 skew。</p>
+
 <ol style="font-size:14px;padding-left:22px;line-height:2.0;">
-<li>先看 ATM 期权：put <strong>$6.42</strong> vs call <strong>$6.43</strong>（行权价 $190）。</li>
-<li>若选<strong>跨式</strong>：买 1 张 call + 1 张 put，成本约 <strong class="c-green">$1,286</strong>（$6.43 + $6.42）。</li>
-<li>若选<strong>2put+100股</strong>：买 100 股（市值 $19,007）+ 2 张 put，put 成本 <strong class="c-green">$1,285</strong>。</li>
-<li><strong>熔断线（不对称）</strong>：开盘价涨到 <strong class="c-red">$205.28</strong>（涨 8%）或跌到 <strong class="c-green">$161.56</strong>（跌 15%）就开盘平仓 + 重买（盘中不盯盘）。</li>
-<li>没触发熔断就持有到 2026-09-18 到期，再滚动下一轮。</li>
+<li><strong>结构选择见上表</strong>：每档里 put 贵 → 跨式（1call+1put）；call 贵 → 2put+100股。策略信号基准取<strong>离现价最近的 ATM 档</strong>（这里是 K=187.5）。</li>
+<li>若选<strong>跨式</strong>：买 1 张 call + 1 张 put，成本 = call + put（两档各自价格见上表）。</li>
+<li>若选<strong>2put+100股</strong>：买 100 股（市值 $18,828）+ 2 张 put，put 成本 = 2 × put 开盘价。</li>
+<li><strong>熔断线（不对称）</strong>：开盘价涨到 <strong class="c-red">$203.97</strong>（涨 8%）或跌到 <strong class="c-green">$160.53</strong>（跌 15%）就开盘平仓 + 重买（盘中不盯盘）。</li>
+<li>没触发熔断就持有到 2026-09-25 到期，再滚动下一轮。</li>
 </ol>
+<h3 style="margin:14px 0 6px;">2026-09-25 到期 · 2026-09-21 当天期权链快照（开盘价 vs 全天vw，现价 $188.86）</h3>
+<div class="tbl-scroll">
+<table>
+<tr><th>行权价</th><th>Put 开盘价</th><th>Put 全天vw</th><th>Call 开盘价</th><th>Call 全天vw</th><th>同档对比</th></tr>
+<tr><td>170</td><td>$0.64</td><td>$0.46</td><td>—</td><td>—</td><td><span class="note">call无成交</span></td></tr>
+<tr><td>185</td><td>$3.94</td><td>$3.59</td><td>$6.61</td><td>$6.61</td><td><span class="c-red">call贵</span></td></tr>
+<tr><td>187.5</td><td>$5.16</td><td>$4.77</td><td>—</td><td>—</td><td><span class="note">call无成交</span></td></tr>
+<tr><td>190</td><td>$5.45</td><td>$5.40</td><td>—</td><td>—</td><td><span class="note">call无成交</span></td></tr>
+<tr><td>192.5</td><td>$7.06</td><td>$7.78</td><td>$3.25</td><td>$3.25</td><td><span class="c-green">put贵</span></td></tr>
+<tr><td>195</td><td>—</td><td>—</td><td>$2.78</td><td>$2.46</td><td><span class="note">put无成交</span></td></tr>
+</table>
+</div>
+<p class="note" style="margin-top:6px;">「开盘价」= 9:30 ET 开盘价，「全天vw」= 全天成交量加权价。同一行权价下 call 贵还是 put 贵，主要由「行权价 vs 现价」决定（低于现价的档 call 有内在价值所以贵、高于现价的档 put 有内在价值所以贵），这是期权平价（put-call parity）的自然结果，<strong>不是</strong> skew。真正衡量 skew 应看等距虚值的 put vs call。SKHY 期权流动性差，ATM 档（现价上下最近的档）常只有单边成交。</p>
 </div>
 
 <div class="card">
 <h2>数据与结论说明</h2>
 <ul style="font-size:13px;color:var(--text);padding-left:20px;line-height:1.9;">
-<li><strong>⚠️ 数据长度限制</strong>：SKHY 于 2026-07-13 在 Nasdaq 上市（ADR），至今仅 44 个交易日（约 6 周）。样本极少，仅 14 轮交易，参数结论可靠性远低于长周期回测。</li>
-<li><strong>真实成交价</strong>：call/put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价。</li>
+<li><strong>⚠️ 数据长度限制</strong>：SKHY 于 2026-07-13 在 Nasdaq 上市（ADR），至今仅 50 个交易日（约 6 周）。样本极少，仅 14 轮交易，参数结论可靠性远低于长周期回测。</li>
+<li><strong>回测历史成本</strong>：逐轮回测的 call/put 成本用每日期权链的成交量加权价（vw），不是 Black-Scholes 理论价。</li>
+<li><strong>「现在如何买」早盘价</strong>：报告末尾「现在如何买」的 put/call 改用<strong>开盘价（9:30 ET）</strong>替代全天 vw——SKHY 盘中暴涨暴跌会污染全天加权价，而实盘在早盘下单；Polygon 期权无分时数据，开盘价是最接近早盘、最干净的可取价（同档 call 无成交时用 put-call parity 推算）。</li>
 <li><strong>多到期日数据</strong>：SKHY_options_3fri.json 每天含 3 个周五到期日 + call/put 双边数据，可真实对比不同周期与结构。</li>
 <li><strong>开盘价熔断</strong>：只在美国开盘瞬间判断一次，盘中 low/high 不触发——符合「不盯盘」的实盘操作。</li>
 <li><strong>内在价值结算</strong>：熔断/到期/持有中一律按内在价值结算，消除「开盘价触发 + 全天 vw 结算」的前视偏差。</li>

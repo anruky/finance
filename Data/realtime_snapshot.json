@@ -1,54 +1,6 @@
 {
-  "asof": "2026-09-13 23:23 (美东 ET)",
+  "asof": "2026-09-21 23:35 (美东 ET)",
   "note": "Polygon 标准行情，约 15 分钟延迟",
-  "today": "2026-09-13",
-  "expiry": "2026-09-18",
-  "DRAM": {
-    "spot": 58.97,
-    "prev_close": 58.56,
-    "chg_pct": 0.92,
-    "chg": 0.54,
-    "ma20": 57.35,
-    "vs_ma20": 2.83,
-    "last_close": 59.1,
-    "last_close_date": "2026-09-11",
-    "atm_strike": 59,
-    "expiry": "2026-09-18",
-    "put_vw": 1.63,
-    "put_last": 1.61,
-    "put_volume": 842,
-    "cost_ratio": 5.54
-  },
-  "SKHY": {
-    "spot": 190.38,
-    "prev_close": 188.3,
-    "chg_pct": 1.1,
-    "chg": 2.08,
-    "ma20": 168.26,
-    "vs_ma20": 13.15,
-    "last_close": 190.07,
-    "last_close_date": "2026-09-11",
-    "atm_strike": 190,
-    "expiry": "2026-09-18",
-    "put_vw": 6.01,
-    "put_last": 5.9,
-    "put_volume": 1383,
-    "cost_ratio": 6.32
-  },
-  "SNDK": {
-    "spot": 1631.99,
-    "prev_close": 1692.59,
-    "chg_pct": -3.58,
-    "chg": -60.6,
-    "ma20": 1602.13,
-    "vs_ma20": 1.86,
-    "last_close": 1633.35,
-    "last_close_date": "2026-09-11",
-    "atm_strike": 1630,
-    "expiry": "2026-09-18",
-    "put_vw": 54.94,
-    "put_last": 51.16,
-    "put_volume": 647,
-    "cost_ratio": 6.73
-  }
+  "today": "2026-09-21",
+  "expiry": "2026-09-25"
 }

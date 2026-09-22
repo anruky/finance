@@ -240,7 +240,9 @@ def _ma(arr, k):
     return sum(arr[-k:]) / k
 
 ind = {}
-rt_mode = RT is not None
+# 实时快照模式：只有当三标的快照全部齐全时才启用；否则（如周末/快照接口失败）
+# 整体降级到已收盘日线数据，避免 ind 缺键导致 KeyError。
+rt_mode = RT is not None and all(k in RT for k in ["DRAM", "SKHY", "SNDK"])
 if rt_mode:
     # 用实时快照数据（现在这个时点）
     for key in ["DRAM", "SKHY", "SNDK"]:

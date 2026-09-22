@@ -46,6 +46,10 @@ echo "== [3/4] 拉取实时技术指标快照 =="
 $PY "$FIN/hedge/fetch_realtime.py"
 
 echo ""
+echo "== [3.5/4] 拉取 SKHY 早盘快照（final 报告「现在如何买」用开盘价替代全天 vw） =="
+$PY "$FIN/hedge/sk/fetch_intraday_snapshot.py"
+
+echo ""
 echo "== [4/4] 生成汇总报告 =="
 $PY "$FIN/hedge/gen_summary_report.py"
 
