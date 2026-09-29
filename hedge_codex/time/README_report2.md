@@ -1,11 +1,10 @@
-# 报告2：1 Call＋1 Put
+# 报告2最新数据复现
 
-沿用报告1七个周期、ATM行权价和截至2026-09-16的数据区间。股票不持仓，仅为涨跌幅参考。两腿必须在10:00之后同一股票成交分钟均有成交，以分钟开盘价估算入场。共同分钟比报告1更晚时，明确记录，不伪造10:00成交。
+当前行情截至美东2026-09-23，共8轮，其中7轮已到期。每轮1 Call+1 Put，原入场与费用口径不变。
 
-复现：
-```sh
-python3 -B fetch_report2.py
-python3 -B generate_report2.py
-```
+下载最新行情：python3 -B refresh_latest.py
+重算报告2及优化报告3：python3 -B recompute_latest.py
 
-行情文件为report2_market_data.json；计算账本为skhy_report2_cycles.json。HTML默认7/31周期。所有损益未扣佣金和价差，不保证成交；到期用经济内在价值，不模拟实物交割。报告1的gav复盘仅保留为参考。
+不刷新行情只重建报告2：python3 -B generate_report2.py
+
+原报告1维持旧数据。旧fetch_report2.py基于原报告1的旧行情文件，当前更新采用refresh_latest.py的增量流程。

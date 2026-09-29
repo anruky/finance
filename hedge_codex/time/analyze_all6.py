@@ -39,18 +39,18 @@ def rule_name(r):
  if r['type']=='hold':s='持有到期'
  elif r['type']=='decay':s=f"时间递减：初始涨{r['up']}%/跌{r['down']}%，{r['schedule']['name']}"
  elif r['type']=='target':s=f"涨侧盈利{r['up']}% / 跌侧盈利{r['down']}%止盈"
- elif r['type']=='move':s=f"股价涨{r['up']}% / 跌{r['down']}%且净盈利离场"
+ elif r['type']=='move':s=f"股价涨{r['up']}% / 跌{r['down']}%且毛盈利离场"
  else:s=f"涨侧盈利{r['up']}% / 跌侧盈利{r['down']}%后启动回撤{r['trail']}个百分点止盈"
  return s+('；止损'+str(r['stop'])+'%' if r.get('stop') else '')+('；'+{4:'周二',5:'周三',6:'周四'}[r['cut']]+'15:30离场' if r.get('cut') else '')+'；'+gate
 
-def evaluate(pre,r,slip=.02,age_limit=10,extra_delay=1):
- c,f=pre['c'],pre['f'];cost=c['capital']*(1+slip)+1.30;gate=r.get('gate')
+def evaluate(pre,r,slip=0,age_limit=10,extra_delay=1):
+ c,f=pre['c'],pre['f'];cost=c['capital'];gate=r.get('gate')
  if gate:
   metric=f['pretrade_pct'] if gate[0]=='premium' else f['expensiveness']
   if metric is None or metric>gate[1]:return dict(id=c['id'],skipped=True,pnl=0.,gross=0.,cost=0.,roi=None,reason='入场报价不足' if metric is None else '权利金过贵',signal=None,exit=None,closed=True)
  def result(value,closed,exit,reason,signal=None,delay=None,fill=None):
-  fee=0 if reason=='到期结算' else 1.30
-  val=value*(1-slip) if reason!='到期结算' else value
+  fee=0
+  val=value
   pnl=val-fee-cost
   return dict(id=c['id'],skipped=False,pnl=pnl,gross=value-c['capital'],cost=cost,roi=100*pnl/cost,reason=reason,signal=signal,exit=exit,delay=delay,closed=closed,exit_value=value,fill=fill)
  peak=-1e9;armed=False;trigger=None
@@ -60,7 +60,7 @@ def evaluate(pre,r,slip=.02,age_limit=10,extra_delay=1):
   if r['type']=='hold':continue
   reason=None
   if fresh:
-   roi=100*((c['capital']+p['pnl'])*(1-slip)-1.3-cost)/cost;peak=max(peak,roi);direction='up' if p['stock_return_pct']>=0 else 'down';target=r[direction]
+   roi=100*p['pnl']/cost;peak=max(peak,roi);direction='up' if p['stock_return_pct']>=0 else 'down';target=r[direction]
    if r['type']=='decay':
     stage='fri' if row['day']>=7 else 'thu' if row['day']>=6 else 'wed' if row['day']>=5 else None
     if stage:
@@ -122,8 +122,9 @@ for up in [5,10,20,40,60,100,150]:
      for gate in [None,('premium',8),('premium',10),('premium',12),('premium',14)]:rules.append(dict(type='decay',up=up,down=down,schedule=schedule,stop=stop,cut=cut,gate=gate))
 for i,r in enumerate(rules):r['id']=f'A{i:05d}';r['name']=rule_name(r)
 completed=[i for i,c in enumerate(cycles) if c['completed']]
-assert completed==list(range(6)), 'This report is explicitly a six-completed-cycle study'
-print('All-six training; rules:',len(rules),flush=True)
+N=len(completed)
+assert completed==list(range(N)) and N>=6
+print('All-completed-cycle training; rules:',len(rules),flush=True)
 results={r['id']:[evaluate(p,r) for p in prepared] for r in rules}
 groups={
  'baseline':lambda r:r['type']=='hold' and not r['gate'],
@@ -140,18 +141,18 @@ groups={
 selected={k:choose(completed,[r for r in rules if match(r)]) for k,match in groups.items()}
 profiles=[]
 for schedule in schedules:
- r=choose(completed,[r for r in rules if r['type']=='decay' and r['schedule']['name']==schedule['name']]);profiles.append(dict(schedule=schedule,rule=r,stats=stats(results[r['id']][:6]),results=results[r['id']]))
+ r=choose(completed,[r for r in rules if r['type']=='decay' and r['schedule']['name']==schedule['name']]);profiles.append(dict(schedule=schedule,rule=r,stats=stats(results[r['id']][:N]),results=results[r['id']]))
 # Isolate time lowering: change schedule only, retain fixed best rule's entry gate and risk parameters.
 fixed=selected['asymmetric'];ablation=[]
 for schedule in schedules:
- r=dict(fixed,type='decay',schedule=schedule);r['name']=rule_name(r);rr=[evaluate(p,r) for p in prepared];ablation.append(dict(rule=r,stats=stats(rr[:6]),results=rr))
+ r=dict(fixed,type='decay',schedule=schedule);r['name']=rule_name(r);rr=[evaluate(p,r) for p in prepared];ablation.append(dict(rule=r,stats=stats(rr[:N]),results=rr))
 selected_results={k:results[r['id']] for k,r in selected.items()}
-summaries=[dict(rule=r,full=stats(results[r['id']][:6])) for r in rules]
-leader=selected['all_best'];leader_pnl=stats(results[leader['id']][:6])['pnl'];ties=[r for r in rules if abs(stats(results[r['id']][:6])['pnl']-leader_pnl)<1e-7]
+summaries=[dict(rule=r,full=stats(results[r['id']][:N])) for r in rules]
+leader=selected['all_best'];leader_pnl=stats(results[leader['id']][:N])['pnl'];ties=[r for r in rules if abs(stats(results[r['id']][:N])['pnl']-leader_pnl)<1e-7]
 stress=[]
 for key in ['asymmetric','decay_asymmetric','all_best']:
- for slip,age in [(0,10),(.01,10),(.02,10),(.05,10),(.02,5),(.02,30)]:
-  rr=[evaluate(p,selected[key],slip,age) for p in prepared];stress.append(dict(key=key,slip=slip,age=age,stats=stats(rr[:6]),results=rr))
+ for slip,age in [(0,10),(0,5),(0,30)]:
+  rr=[evaluate(p,selected[key],slip,age) for p in prepared];stress.append(dict(key=key,slip=slip,age=age,stats=stats(rr[:N]),results=rr))
 # Time value is observed option market price minus contemporaneous intrinsic value, not an extra cost to deduct.
 time_value=[]
 for c in cycles:
@@ -162,7 +163,7 @@ for c in cycles:
   point=min(eligible,key=lambda p:abs(int(p['et'][11:13])*60+int(p['et'][14:16])-600));value=100*(point['call']+point['put']);intrinsic=100*abs(point['stock']-c['strike'])
   rows.append(dict(et=point['et'],value=value,intrinsic=intrinsic,extrinsic=value-intrinsic,call_age=point['call_age'],put_age=point['put_age']))
  time_value.append(dict(id=c['id'],entry_extrinsic=c['capital']-100*abs(c['stock_entry']-c['strike']),rows=rows))
-payload=dict(metadata=data['metadata'],cycles=cycles,features=features,selected=selected,selected_results=selected_results,comparison={k:stats(v[:6]) for k,v in selected_results.items()},rules_count=len(rules),training_ids=completed,validation_ids=[],profiles=profiles,ablation=ablation,stress=stress,time_value=time_value,ties_count=len(ties),ties=ties[:30],ranking=sorted(summaries,key=lambda x:x['full']['pnl'],reverse=True)[:30],input_hashes={n:hashlib.sha256((ROOT/n).read_bytes()).hexdigest() for n in ['skhy_report2_cycles.json','report2_market_data.json']})
+payload=dict(return_basis='gross; no fees or slippage',metadata=data['metadata'],cycles=cycles,features=features,selected=selected,selected_results=selected_results,comparison={k:stats(v[:N]) for k,v in selected_results.items()},rules_count=len(rules),training_ids=completed,validation_ids=[],profiles=profiles,ablation=ablation,stress=stress,time_value=time_value,ties_count=len(ties),ties=ties[:30],ranking=sorted(summaries,key=lambda x:x['full']['pnl'],reverse=True)[:30],input_hashes={n:hashlib.sha256((ROOT/n).read_bytes()).hexdigest() for n in ['skhy_report2_cycles.json','report2_market_data.json']})
 (OUT/'all6_optimization.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2,allow_nan=False))
 (OUT/'all6_rule_scores.json').write_text(json.dumps(summaries,ensure_ascii=False,indent=2))
 for k,r in selected.items():print(k,r['name'],payload['comparison'][k],flush=True)
