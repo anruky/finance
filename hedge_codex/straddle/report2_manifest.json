@@ -1,0 +1,11 @@
+{
+  "generate_report2.py": "b1758eac1ed2f92985a43cdf6da9ea6928934c9f9ac703b6e40659aa5b230995",
+  "report2_template.html": "6915e02786286728058a3c200720503f337015fb48dd7190aa44408658c710f2",
+  "report2_market_data.json": "eea2a3a971fa5fdf93b6a6aede0d242c6a41f2189307706b854d7ea5b8f1f4b1",
+  "skhy_report2_cycles.json": "5aca8a40724161731d9d1802701c114d1dbc1ca64ea694e8ac02078dc6d617c7",
+  "skhy_report2_straddle.html": "936fd46e22ead708df7adce9bea8584ce1039bab09e054c83b95412d644fe43e",
+  "skhy_report2_straddle.md": "cdf7d77cb5276c1a297ef240aa3fb1beb062c64d89f60e4994d32ec1162389cd",
+  "README_report2.md": "9bf6580474659778bd00b002e0c2b24c400cd71b155ef6b8d2899d08ec14010d",
+  "refresh_latest.py": "7b8e595cf07c6c33c42028e1972596831082f72774ac905d190cf6fc43df98be",
+  "recompute_latest.py": "54be234aa6d5d6ba20bb3109a273468ca6888309bdb4fa200b0f747b94dae6d2"
+}
