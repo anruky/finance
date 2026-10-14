@@ -1,0 +1,10 @@
+{
+  "requested_end": "2026-10-12",
+  "stock_end": "2026-10-12",
+  "checked_at_utc": "2026-10-13T05:58:06.210282+00:00",
+  "provider_coverage": {
+    "Massive": "2026-10-09",
+    "Yahoo Finance": "2026-10-12"
+  },
+  "note": "截至10/9为Massive历史成交；10/12补充Yahoo Finance公开分钟行情，并与Investing.com收盘期权链核对。策略与原选优结果不变。"
+}

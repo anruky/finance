@@ -1,0 +1,20 @@
+[
+  {
+    "check": "option_chain_snapshot",
+    "http_status": 403,
+    "status": "NOT_AUTHORIZED",
+    "error": null,
+    "message": "You are not entitled to this data. Please upgrade your plan at https://massive.com/pricing",
+    "result_count": 0,
+    "fetched_at": "2026-10-13T06:46:09.523684+00:00"
+  },
+  {
+    "check": "historical_option_quote",
+    "http_status": 403,
+    "status": "NOT_AUTHORIZED",
+    "error": null,
+    "message": "You are not entitled to this data. Please upgrade your plan at https://massive.com/pricing",
+    "result_count": 0,
+    "fetched_at": "2026-10-13T06:46:10.501143+00:00"
+  }
+]

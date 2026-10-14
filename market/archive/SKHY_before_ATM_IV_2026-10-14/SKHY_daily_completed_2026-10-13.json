@@ -1,0 +1,3187 @@
+{
+  "ticker": "SKHY",
+  "fetched_at": "2026-10-13T08:06:53.902478+00:00",
+  "rows": [
+    {
+      "date": "2026-08-18",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 22821889.05741,
+        "vw": 158.4663,
+        "o": 161.78,
+        "c": 155.62,
+        "h": 163.88,
+        "l": 154.5302,
+        "t": 1787025600000,
+        "n": 402033
+      },
+      "stock_close": 155.62,
+      "change_percent": -9.195938849340646,
+      "nextweek_expiry": "2026-08-28",
+      "dte": 10,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260828P00155000",
+          "strike": 155,
+          "premium": 7.3,
+          "price_date": "2026-08-18"
+        },
+        "call": {
+          "ticker": "O:SKHY260828C00157500",
+          "strike": 157.5,
+          "premium": 6.7,
+          "price_date": "2026-08-18"
+        }
+      },
+      "pc_volume_ratio": 1.4909120651423171,
+      "option_volume_totals": {
+        "put": 82027.0,
+        "call": 55018.0,
+        "contracts": 1087
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 1.1458388847135423,
+      "rv20": 1.087220548325893,
+      "put_iv7": 0.7696828418968951,
+      "call_iv7": 0.8002302313201591,
+      "atm_iv7": 0.7789760201076091,
+      "skew7_pp": -3.054738942326407,
+      "iv7_minus_rv5_pp": -36.68628646059332,
+      "atm_iv30": 0.7631865018374768,
+      "iv7_minus_iv30_pp": 1.5789518270132308,
+      "adr_premium": 0.3225546139640212,
+      "adr_inputs": {
+        "ADR_price": 155.62,
+        "ADR_reference_time": "2026-08-18T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1662000.0,
+        "KRX_date": "2026-08-18",
+        "KRX_close_time": "2026-08-18T15:30:00+09:00",
+        "USDKRW": 1412.469970703125,
+        "FX_hour_end": "2026-08-18T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-17"
+    },
+    {
+      "date": "2026-08-19",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 33980112.803336,
+        "vw": 159.6672,
+        "o": 162.78,
+        "c": 156.16,
+        "h": 163.7999,
+        "l": 155.62,
+        "t": 1787112000000,
+        "n": 576316
+      },
+      "stock_close": 156.16,
+      "change_percent": 0.34699910037270243,
+      "nextweek_expiry": "2026-08-28",
+      "dte": 9,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260828P00155000",
+          "strike": 155,
+          "premium": 6.7,
+          "price_date": "2026-08-19"
+        },
+        "call": {
+          "ticker": "O:SKHY260828C00157500",
+          "strike": 157.5,
+          "premium": 6.79,
+          "price_date": "2026-08-19"
+        }
+      },
+      "pc_volume_ratio": 1.4713843526523642,
+      "option_volume_totals": {
+        "put": 68927.0,
+        "call": 46845.0,
+        "contracts": 927
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.9771840427399974,
+      "rv20": 1.0797727809654352,
+      "put_iv7": 0.7409737105427824,
+      "call_iv7": 0.7974579536609716,
+      "atm_iv7": 0.7666761360326861,
+      "skew7_pp": -5.648424311818923,
+      "iv7_minus_rv5_pp": -21.050790670731125,
+      "atm_iv30": 0.7116730830073358,
+      "iv7_minus_iv30_pp": 5.500305302535036,
+      "adr_premium": 0.44517756041666656,
+      "adr_inputs": {
+        "ADR_price": 156.16,
+        "ADR_reference_time": "2026-08-19T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1500000.0,
+        "KRX_date": "2026-08-19",
+        "KRX_close_time": "2026-08-19T15:30:00+09:00",
+        "USDKRW": 1388.1700439453125,
+        "FX_hour_end": "2026-08-19T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-18"
+    },
+    {
+      "date": "2026-08-20",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 21693022.40294,
+        "vw": 162.9401,
+        "o": 162.073,
+        "c": 163.08,
+        "h": 166.39,
+        "l": 160.13,
+        "t": 1787198400000,
+        "n": 364527
+      },
+      "stock_close": 163.08,
+      "change_percent": 4.431352459016402,
+      "nextweek_expiry": "2026-08-28",
+      "dte": 8,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260828P00162500",
+          "strike": 162.5,
+          "premium": 6.7,
+          "price_date": "2026-08-20"
+        },
+        "call": {
+          "ticker": "O:SKHY260828C00165000",
+          "strike": 165,
+          "premium": 6.49,
+          "price_date": "2026-08-20"
+        }
+      },
+      "pc_volume_ratio": 1.1203975087012272,
+      "option_volume_totals": {
+        "put": 48930.0,
+        "call": 43672.0,
+        "contracts": 905
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.8716002170722538,
+      "rv20": 1.0878956841233858,
+      "put_iv7": 0.7413497904276709,
+      "call_iv7": 0.7642225045055427,
+      "atm_iv7": 0.7359903321389335,
+      "skew7_pp": -2.2872714077871836,
+      "iv7_minus_rv5_pp": -13.560988493332026,
+      "atm_iv30": 0.7396735259100438,
+      "iv7_minus_iv30_pp": -0.368319377111026,
+      "adr_premium": 0.34412251689782325,
+      "adr_inputs": {
+        "ADR_price": 163.08,
+        "ADR_reference_time": "2026-08-20T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1691000.0,
+        "KRX_date": "2026-08-20",
+        "KRX_close_time": "2026-08-20T15:30:00+09:00",
+        "USDKRW": 1393.739990234375,
+        "FX_hour_end": "2026-08-20T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-19"
+    },
+    {
+      "date": "2026-08-21",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 15475656.806079,
+        "vw": 165.0624,
+        "o": 167.05,
+        "c": 163.41,
+        "h": 167.46,
+        "l": 162.57,
+        "t": 1787284800000,
+        "n": 262116
+      },
+      "stock_close": 163.41,
+      "change_percent": 0.20235467255333983,
+      "nextweek_expiry": "2026-08-28",
+      "dte": 7,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260828P00162500",
+          "strike": 162.5,
+          "premium": 5.3,
+          "price_date": "2026-08-21"
+        },
+        "call": {
+          "ticker": "O:SKHY260828C00165000",
+          "strike": 165,
+          "premium": 5.6,
+          "price_date": "2026-08-21"
+        }
+      },
+      "pc_volume_ratio": 0.9203144057460361,
+      "option_volume_totals": {
+        "put": 47537.0,
+        "call": 51653.0,
+        "contracts": 902
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.8707033451961076,
+      "rv20": 1.0342854602818234,
+      "put_iv7": 0.6675008953476192,
+      "call_iv7": 0.7052180617121612,
+      "atm_iv7": 0.652855297625065,
+      "skew7_pp": -3.771716636454192,
+      "iv7_minus_rv5_pp": -21.784804757104258,
+      "atm_iv30": 0.7110061183622629,
+      "iv7_minus_iv30_pp": -5.815082073719791,
+      "adr_premium": 0.3079695150774475,
+      "adr_inputs": {
+        "ADR_price": 163.41,
+        "ADR_reference_time": "2026-08-21T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1730000.0,
+        "KRX_date": "2026-08-21",
+        "KRX_close_time": "2026-08-21T15:30:00+09:00",
+        "USDKRW": 1384.72998046875,
+        "FX_hour_end": "2026-08-21T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-20"
+    },
+    {
+      "date": "2026-08-24",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 16711141.321143,
+        "vw": 155.0794,
+        "o": 157.37,
+        "c": 155.37,
+        "h": 157.552,
+        "l": 151.5,
+        "t": 1787544000000,
+        "n": 301160
+      },
+      "stock_close": 155.37,
+      "change_percent": -4.920139526344769,
+      "nextweek_expiry": "2026-09-04",
+      "dte": 11,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260904P00155000",
+          "strike": 155,
+          "premium": 7.3,
+          "price_date": "2026-08-24"
+        },
+        "call": {
+          "ticker": "O:SKHY260904C00157500",
+          "strike": 157.5,
+          "premium": 6.97,
+          "price_date": "2026-08-24"
+        }
+      },
+      "pc_volume_ratio": 1.0996448022732654,
+      "option_volume_totals": {
+        "put": 46438.0,
+        "call": 42230.0,
+        "contracts": 931
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.8630712979940833,
+      "rv20": 1.0104520661993168,
+      "put_iv7": 0.7661756347662727,
+      "call_iv7": 0.7860394871676941,
+      "atm_iv7": 0.757610713017967,
+      "skew7_pp": -1.9863852401421411,
+      "iv7_minus_rv5_pp": -10.546058497611632,
+      "atm_iv30": 0.7269649207450447,
+      "iv7_minus_iv30_pp": 3.06457922729223,
+      "adr_premium": 0.2855356253112027,
+      "adr_inputs": {
+        "ADR_price": 155.37,
+        "ADR_reference_time": "2026-08-24T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1671000.0,
+        "KRX_date": "2026-08-24",
+        "KRX_close_time": "2026-08-24T15:30:00+09:00",
+        "USDKRW": 1382.5899658203125,
+        "FX_hour_end": "2026-08-24T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-21"
+    },
+    {
+      "date": "2026-08-25",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 12287274.474166,
+        "vw": 158.743,
+        "o": 159.9,
+        "c": 159.53,
+        "h": 161.2,
+        "l": 156.24,
+        "t": 1787630400000,
+        "n": 222396
+      },
+      "stock_close": 159.53,
+      "change_percent": 2.6774795649095795,
+      "nextweek_expiry": "2026-09-04",
+      "dte": 10,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260904P00157500",
+          "strike": 157.5,
+          "premium": 6.7,
+          "price_date": "2026-08-25"
+        },
+        "call": {
+          "ticker": "O:SKHY260904C00160000",
+          "strike": 160,
+          "premium": 7.2,
+          "price_date": "2026-08-25"
+        }
+      },
+      "pc_volume_ratio": 1.1721294319561304,
+      "option_volume_totals": {
+        "put": 28001.0,
+        "call": 23889.0,
+        "contracts": 746
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.5621828690816278,
+      "rv20": 0.9433124649834335,
+      "put_iv7": 0.7504960818446413,
+      "call_iv7": 0.7112041197508295,
+      "atm_iv7": 0.7212720569411569,
+      "skew7_pp": 3.9291962093811805,
+      "iv7_minus_rv5_pp": 15.908918785952908,
+      "atm_iv30": null,
+      "iv7_minus_iv30_pp": null,
+      "adr_premium": 0.3139168687349849,
+      "adr_inputs": {
+        "ADR_price": 159.53,
+        "ADR_reference_time": "2026-08-25T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1678000.0,
+        "KRX_date": "2026-08-25",
+        "KRX_close_time": "2026-08-25T15:30:00+09:00",
+        "USDKRW": 1382.030029296875,
+        "FX_hour_end": "2026-08-25T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-24"
+    },
+    {
+      "date": "2026-08-26",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 10327401.522809,
+        "vw": 159.816,
+        "o": 158.605,
+        "c": 158.02,
+        "h": 161.21,
+        "l": 157.59,
+        "t": 1787716800000,
+        "n": 184336
+      },
+      "stock_close": 158.02,
+      "change_percent": -0.9465304331473634,
+      "nextweek_expiry": "2026-09-04",
+      "dte": 9,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260904P00157500",
+          "strike": 157.5,
+          "premium": 7.09,
+          "price_date": "2026-08-26"
+        },
+        "call": {
+          "ticker": "O:SKHY260904C00160000",
+          "strike": 160,
+          "premium": 6.55,
+          "price_date": "2026-08-26"
+        }
+      },
+      "pc_volume_ratio": 2.2926903641749434,
+      "option_volume_totals": {
+        "put": 52631.0,
+        "call": 22956.0,
+        "contracts": 733
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.5718252564642863,
+      "rv20": 0.9365569392442381,
+      "put_iv7": 0.7443014001523774,
+      "call_iv7": 0.7789311928219314,
+      "atm_iv7": 0.7572187289877222,
+      "skew7_pp": -3.4629792669553905,
+      "iv7_minus_rv5_pp": 18.539347252343596,
+      "atm_iv30": null,
+      "iv7_minus_iv30_pp": null,
+      "adr_premium": 0.29628820954092316,
+      "adr_inputs": {
+        "ADR_price": 158.02,
+        "ADR_reference_time": "2026-08-26T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1688000.0,
+        "KRX_date": "2026-08-26",
+        "KRX_close_time": "2026-08-26T15:30:00+09:00",
+        "USDKRW": 1384.719970703125,
+        "FX_hour_end": "2026-08-26T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-25"
+    },
+    {
+      "date": "2026-08-27",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 13393960.061523,
+        "vw": 161.7446,
+        "o": 163.875,
+        "c": 161.61,
+        "h": 164.73,
+        "l": 158.61,
+        "t": 1787803200000,
+        "n": 226099
+      },
+      "stock_close": 161.61,
+      "change_percent": 2.271864320972039,
+      "nextweek_expiry": "2026-09-04",
+      "dte": 8,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260904P00160000",
+          "strike": 160,
+          "premium": 5.26,
+          "price_date": "2026-08-27"
+        },
+        "call": {
+          "ticker": "O:SKHY260904C00162500",
+          "strike": 162.5,
+          "premium": 5.8,
+          "price_date": "2026-08-27"
+        }
+      },
+      "pc_volume_ratio": 0.8450738977028794,
+      "option_volume_totals": {
+        "put": 34250.0,
+        "call": 40529.0,
+        "contracts": 875
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.4909849037883402,
+      "rv20": 0.7523578186509099,
+      "put_iv7": 0.6680400594151339,
+      "call_iv7": 0.6453771397000753,
+      "atm_iv7": 0.6875711649261217,
+      "skew7_pp": 2.2662919715058627,
+      "iv7_minus_rv5_pp": 19.658626113778148,
+      "atm_iv30": 0.642645801613858,
+      "iv7_minus_iv30_pp": 4.492536331226371,
+      "adr_premium": 0.29056329685806537,
+      "adr_inputs": {
+        "ADR_price": 161.61,
+        "ADR_reference_time": "2026-08-27T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1730000.0,
+        "KRX_date": "2026-08-27",
+        "KRX_close_time": "2026-08-27T15:30:00+09:00",
+        "USDKRW": 1381.52001953125,
+        "FX_hour_end": "2026-08-27T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-26"
+    },
+    {
+      "date": "2026-08-28",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 11711980.192552,
+        "vw": 161.0589,
+        "o": 159.2,
+        "c": 161.04,
+        "h": 163.56,
+        "l": 157.97,
+        "t": 1787889600000,
+        "n": 184965
+      },
+      "stock_close": 161.04,
+      "change_percent": -0.3527009467236053,
+      "nextweek_expiry": "2026-09-04",
+      "dte": 7,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260904P00160000",
+          "strike": 160,
+          "premium": 4.64,
+          "price_date": "2026-08-28"
+        },
+        "call": {
+          "ticker": "O:SKHY260904C00162500",
+          "strike": 162.5,
+          "premium": 4.7,
+          "price_date": "2026-08-28"
+        }
+      },
+      "pc_volume_ratio": 1.5335953842263752,
+      "option_volume_totals": {
+        "put": 66716.0,
+        "call": 43503.0,
+        "contracts": 915
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.4898356235335001,
+      "rv20": 0.7381129338620896,
+      "put_iv7": 0.5871059566644845,
+      "call_iv7": 0.5968930389924295,
+      "atm_iv7": 0.5738888898491858,
+      "skew7_pp": -0.9787082327945007,
+      "iv7_minus_rv5_pp": 8.405326631568578,
+      "atm_iv30": 0.6079487748258664,
+      "iv7_minus_iv30_pp": -3.4059884976680554,
+      "adr_premium": 0.3429644768744329,
+      "adr_inputs": {
+        "ADR_price": 161.04,
+        "ADR_reference_time": "2026-08-28T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1653000.0,
+        "KRX_date": "2026-08-28",
+        "KRX_close_time": "2026-08-28T15:30:00+09:00",
+        "USDKRW": 1378.489990234375,
+        "FX_hour_end": "2026-08-28T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-27"
+    },
+    {
+      "date": "2026-08-31",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 12183251.571413,
+        "vw": 163.4283,
+        "o": 160.745,
+        "c": 164.58,
+        "h": 165.07,
+        "l": 160.5,
+        "t": 1788148800000,
+        "n": 190709
+      },
+      "stock_close": 164.58,
+      "change_percent": 2.1982116244411376,
+      "nextweek_expiry": "2026-09-11",
+      "dte": 11,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260911P00162500",
+          "strike": 162.5,
+          "premium": 5.74,
+          "price_date": "2026-08-31"
+        },
+        "call": {
+          "ticker": "O:SKHY260911C00165000",
+          "strike": 165,
+          "premium": 7,
+          "price_date": "2026-08-31"
+        }
+      },
+      "pc_volume_ratio": 1.5309188540744338,
+      "option_volume_totals": {
+        "put": 53599.0,
+        "call": 35011.0,
+        "contracts": 837
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.26507049991723625,
+      "rv20": 0.738599343067225,
+      "put_iv7": 0.6438345628200755,
+      "call_iv7": 0.6256652514739413,
+      "atm_iv7": 0.6577298277555286,
+      "skew7_pp": 1.8169311346134198,
+      "iv7_minus_rv5_pp": 39.265932783829236,
+      "atm_iv30": 0.6198085891086742,
+      "iv7_minus_iv30_pp": 3.792123864685437,
+      "adr_premium": 0.34417810854894726,
+      "adr_inputs": {
+        "ADR_price": 164.58,
+        "ADR_reference_time": "2026-08-31T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1674000.0,
+        "KRX_date": "2026-08-31",
+        "KRX_close_time": "2026-08-31T15:30:00+09:00",
+        "USDKRW": 1367.2099609375,
+        "FX_hour_end": "2026-08-31T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-28"
+    },
+    {
+      "date": "2026-09-01",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 10875746.949541,
+        "vw": 161.0105,
+        "o": 161.495,
+        "c": 160.78,
+        "h": 164.035,
+        "l": 158.52,
+        "t": 1788235200000,
+        "n": 192863
+      },
+      "stock_close": 160.78,
+      "change_percent": -2.3089075221776723,
+      "nextweek_expiry": "2026-09-11",
+      "dte": 10,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260911P00160000",
+          "strike": 160,
+          "premium": 5.95,
+          "price_date": "2026-09-01"
+        },
+        "call": {
+          "ticker": "O:SKHY260911C00162500",
+          "strike": 162.5,
+          "premium": 4.7,
+          "price_date": "2026-09-01"
+        }
+      },
+      "pc_volume_ratio": 1.4393040868819662,
+      "option_volume_totals": {
+        "put": 40289.0,
+        "call": 27992.0,
+        "contracts": 830
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.31886423902020794,
+      "rv20": 0.6952282706099107,
+      "put_iv7": 0.6365773852041334,
+      "call_iv7": 0.5938895207728805,
+      "atm_iv7": 0.6218766350924705,
+      "skew7_pp": 4.268786443125294,
+      "iv7_minus_rv5_pp": 30.301239607226254,
+      "atm_iv30": 0.6078661997448074,
+      "iv7_minus_iv30_pp": 1.4010435347663108,
+      "adr_premium": 0.30429335673603175,
+      "adr_inputs": {
+        "ADR_price": 160.78,
+        "ADR_reference_time": "2026-09-01T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1693000.0,
+        "KRX_date": "2026-09-01",
+        "KRX_close_time": "2026-09-01T15:30:00+09:00",
+        "USDKRW": 1373.4100341796875,
+        "FX_hour_end": "2026-09-01T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-08-31"
+    },
+    {
+      "date": "2026-09-02",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 11261939.056503,
+        "vw": 162.3286,
+        "o": 159.765,
+        "c": 164.98,
+        "h": 165.47,
+        "l": 158.67,
+        "t": 1788321600000,
+        "n": 172062
+      },
+      "stock_close": 164.98,
+      "change_percent": 2.612265207115305,
+      "nextweek_expiry": "2026-09-11",
+      "dte": 9,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260911P00162500",
+          "strike": 162.5,
+          "premium": 4.65,
+          "price_date": "2026-09-02"
+        },
+        "call": {
+          "ticker": "O:SKHY260911C00165000",
+          "strike": 165,
+          "premium": 6,
+          "price_date": "2026-09-02"
+        }
+      },
+      "pc_volume_ratio": 1.360226704450742,
+      "option_volume_totals": {
+        "put": 32640.0,
+        "call": 23996.0,
+        "contracts": 846
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.3394539857860723,
+      "rv20": 0.6940438106715359,
+      "put_iv7": 0.5970515421282427,
+      "call_iv7": 0.5823313149566157,
+      "atm_iv7": 0.5812809761640905,
+      "skew7_pp": 1.472022717162702,
+      "iv7_minus_rv5_pp": 24.182699037801818,
+      "atm_iv30": null,
+      "iv7_minus_iv30_pp": null,
+      "adr_premium": 0.3903937582490167,
+      "adr_inputs": {
+        "ADR_price": 164.98,
+        "ADR_reference_time": "2026-09-02T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1613000.0,
+        "KRX_date": "2026-09-02",
+        "KRX_close_time": "2026-09-02T15:30:00+09:00",
+        "USDKRW": 1359.3800048828125,
+        "FX_hour_end": "2026-09-02T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-01"
+    },
+    {
+      "date": "2026-09-03",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 14757656.645933,
+        "vw": 160.9047,
+        "o": 160.815,
+        "c": 163.68,
+        "h": 164.6252,
+        "l": 157.73,
+        "t": 1788408000000,
+        "n": 240938
+      },
+      "stock_close": 163.68,
+      "change_percent": -0.7879742999151285,
+      "nextweek_expiry": "2026-09-11",
+      "dte": 8,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260911P00162500",
+          "strike": 162.5,
+          "premium": 4.61,
+          "price_date": "2026-09-03"
+        },
+        "call": {
+          "ticker": "O:SKHY260911C00165000",
+          "strike": 165,
+          "premium": 4.6,
+          "price_date": "2026-09-03"
+        }
+      },
+      "pc_volume_ratio": 0.9943244387971198,
+      "option_volume_totals": {
+        "put": 46952.0,
+        "call": 47220.0,
+        "contracts": 929
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.32976743476979636,
+      "rv20": 0.6647174470180384,
+      "put_iv7": 0.5486605672540004,
+      "call_iv7": 0.5617708665173468,
+      "atm_iv7": 0.5358860594099265,
+      "skew7_pp": -1.3110299263346392,
+      "iv7_minus_rv5_pp": 20.611862464013015,
+      "atm_iv30": 0.5551247476115875,
+      "iv7_minus_iv30_pp": -1.923868820166097,
+      "adr_premium": 0.3911363809915416,
+      "adr_inputs": {
+        "ADR_price": 163.68,
+        "ADR_reference_time": "2026-09-03T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1596000.0,
+        "KRX_date": "2026-09-03",
+        "KRX_close_time": "2026-09-03T15:30:00+09:00",
+        "USDKRW": 1356.4599609375,
+        "FX_hour_end": "2026-09-03T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-02"
+    },
+    {
+      "date": "2026-09-04",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 20803242.041327,
+        "vw": 171.635,
+        "o": 164.61,
+        "c": 177,
+        "h": 177.6999,
+        "l": 164.61,
+        "t": 1788494400000,
+        "n": 332695
+      },
+      "stock_close": 177,
+      "change_percent": 8.137829912023452,
+      "nextweek_expiry": "2026-09-11",
+      "dte": 7,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260911P00175000",
+          "strike": 175,
+          "premium": 4.78,
+          "price_date": "2026-09-04"
+        },
+        "call": {
+          "ticker": "O:SKHY260911C00177500",
+          "strike": 177.5,
+          "premium": 5.8,
+          "price_date": "2026-09-04"
+        }
+      },
+      "pc_volume_ratio": 0.6536637931034482,
+      "option_volume_totals": {
+        "put": 84924.0,
+        "call": 129920.0,
+        "contracts": 1129
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.6189558492986167,
+      "rv20": 0.6870362513949875,
+      "put_iv7": 0.5965585466588036,
+      "call_iv7": 0.6444057371626962,
+      "atm_iv7": 0.6071869903802873,
+      "skew7_pp": -4.784719050389263,
+      "iv7_minus_rv5_pp": -1.176885891832935,
+      "atm_iv30": 0.623205617767722,
+      "iv7_minus_iv30_pp": -1.6018627387434647,
+      "adr_premium": 0.44639199067551805,
+      "adr_inputs": {
+        "ADR_price": 177,
+        "ADR_reference_time": "2026-09-04T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1647000.0,
+        "KRX_date": "2026-09-04",
+        "KRX_close_time": "2026-09-04T15:30:00+09:00",
+        "USDKRW": 1345.8800048828125,
+        "FX_hour_end": "2026-09-04T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-03"
+    },
+    {
+      "date": "2026-09-08",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 23156303.408552,
+        "vw": 186.2966,
+        "o": 184.67,
+        "c": 185.55,
+        "h": 189.815,
+        "l": 183.96,
+        "t": 1788840000000,
+        "n": 378988
+      },
+      "stock_close": 185.55,
+      "change_percent": 4.830508474576267,
+      "nextweek_expiry": "2026-09-18",
+      "dte": 10,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260918P00185000",
+          "strike": 185,
+          "premium": 7.84,
+          "price_date": "2026-09-08"
+        },
+        "call": {
+          "ticker": "O:SKHY260918C00187500",
+          "strike": 187.5,
+          "premium": 7.15,
+          "price_date": "2026-09-08"
+        }
+      },
+      "pc_volume_ratio": 0.9722838031988278,
+      "option_volume_totals": {
+        "put": 102188.0,
+        "call": 105101.0,
+        "contracts": 1158
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.6517789622067647,
+      "rv20": 0.6868577676033883,
+      "put_iv7": 0.6702804806895242,
+      "call_iv7": 0.6954744051663779,
+      "atm_iv7": 0.6748810118028158,
+      "skew7_pp": -2.5193924476853757,
+      "iv7_minus_rv5_pp": 2.310204959605111,
+      "atm_iv30": 0.6850318645419106,
+      "iv7_minus_iv30_pp": -1.0150852739094773,
+      "adr_premium": 0.3876408228110948,
+      "adr_inputs": {
+        "ADR_price": 185.55,
+        "ADR_reference_time": "2026-09-08T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1793000.0,
+        "KRX_date": "2026-09-08",
+        "KRX_close_time": "2026-09-08T15:30:00+09:00",
+        "USDKRW": 1340.9000244140625,
+        "FX_hour_end": "2026-09-08T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-04"
+    },
+    {
+      "date": "2026-09-09",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 30460289.329491,
+        "vw": 195.2448,
+        "o": 188.08,
+        "c": 198.63,
+        "h": 199.865,
+        "l": 187.53,
+        "t": 1788926400000,
+        "n": 434442
+      },
+      "stock_close": 198.63,
+      "change_percent": 7.049312853678247,
+      "nextweek_expiry": "2026-09-18",
+      "dte": 9,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260918P00197500",
+          "strike": 197.5,
+          "premium": null,
+          "price_date": "2026-09-09"
+        },
+        "call": {
+          "ticker": "O:SKHY260918C00200000",
+          "strike": 200,
+          "premium": 8.43,
+          "price_date": "2026-09-09"
+        }
+      },
+      "pc_volume_ratio": 0.7021311883240733,
+      "option_volume_totals": {
+        "put": 101604.0,
+        "call": 144708.0,
+        "contracts": 1238
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.5485118578427959,
+      "rv20": 0.7040655354788109,
+      "put_iv7": 0.707832503572597,
+      "call_iv7": 0.758102723958721,
+      "atm_iv7": 0.7232239565380916,
+      "skew7_pp": -5.027022038612405,
+      "iv7_minus_rv5_pp": 17.47120986952957,
+      "atm_iv30": 0.68369937479496,
+      "iv7_minus_iv30_pp": 3.952458174313156,
+      "adr_premium": 0.4340636409496439,
+      "adr_inputs": {
+        "ADR_price": 198.63,
+        "ADR_reference_time": "2026-09-09T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1856000.0,
+        "KRX_date": "2026-09-09",
+        "KRX_close_time": "2026-09-09T15:30:00+09:00",
+        "USDKRW": 1339.989990234375,
+        "FX_hour_end": "2026-09-09T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-08"
+    },
+    {
+      "date": "2026-09-10",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 22099444.114835,
+        "vw": 190.2353,
+        "o": 189.43,
+        "c": 188.3,
+        "h": 193.5466,
+        "l": 187.17,
+        "t": 1789012800000,
+        "n": 317467
+      },
+      "stock_close": 188.3,
+      "change_percent": -5.200624276292598,
+      "nextweek_expiry": "2026-09-18",
+      "dte": 8,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260918P00187500",
+          "strike": 187.5,
+          "premium": 6.41,
+          "price_date": "2026-09-10"
+        },
+        "call": {
+          "ticker": "O:SKHY260918C00190000",
+          "strike": 190,
+          "premium": 6.15,
+          "price_date": "2026-09-10"
+        }
+      },
+      "pc_volume_ratio": 1.1826223761747698,
+      "option_volume_totals": {
+        "put": 85694.0,
+        "call": 72461.0,
+        "contracts": 1074
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.8840532685590017,
+      "rv20": 0.6961023678770191,
+      "put_iv7": 0.62789117163687,
+      "call_iv7": 0.6400404315743304,
+      "atm_iv7": 0.6264620437356659,
+      "skew7_pp": -1.214925993746041,
+      "iv7_minus_rv5_pp": -25.759122482333574,
+      "atm_iv30": 0.6229209571145319,
+      "iv7_minus_iv30_pp": 0.35410866211340597,
+      "adr_premium": 0.3702407416947391,
+      "adr_inputs": {
+        "ADR_price": 188.3,
+        "ADR_reference_time": "2026-09-10T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1853000.0,
+        "KRX_date": "2026-09-10",
+        "KRX_close_time": "2026-09-10T15:30:00+09:00",
+        "USDKRW": 1348.4100341796875,
+        "FX_hour_end": "2026-09-10T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-09"
+    },
+    {
+      "date": "2026-09-11",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 14934632.369765,
+        "vw": 190.2522,
+        "o": 192.94,
+        "c": 190.07,
+        "h": 192.94,
+        "l": 187,
+        "t": 1789099200000,
+        "n": 231555
+      },
+      "stock_close": 190.07,
+      "change_percent": 0.9399893786510738,
+      "nextweek_expiry": "2026-09-18",
+      "dte": 7,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260918P00190000",
+          "strike": 190,
+          "premium": 5.9,
+          "price_date": "2026-09-11"
+        },
+        "call": {
+          "ticker": "O:SKHY260918C00192500",
+          "strike": 192.5,
+          "premium": null,
+          "price_date": "2026-09-11"
+        }
+      },
+      "pc_volume_ratio": 0.7238831037957676,
+      "option_volume_totals": {
+        "put": 64650.0,
+        "call": 89310.0,
+        "contracts": 1002
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.8496095463770672,
+      "rv20": 0.6584846397974841,
+      "put_iv7": 0.5761785164505254,
+      "call_iv7": 0.5900003790196717,
+      "atm_iv7": 0.5704814812541008,
+      "skew7_pp": -1.3821862569146304,
+      "iv7_minus_rv5_pp": -27.91280651229664,
+      "atm_iv30": 0.6030386952275856,
+      "iv7_minus_iv30_pp": -3.2557213973484767,
+      "adr_premium": 0.4074515872643747,
+      "adr_inputs": {
+        "ADR_price": 190.07,
+        "ADR_reference_time": "2026-09-11T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1812000.0,
+        "KRX_date": "2026-09-11",
+        "KRX_close_time": "2026-09-11T15:30:00+09:00",
+        "USDKRW": 1341.77001953125,
+        "FX_hour_end": "2026-09-11T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-10"
+    },
+    {
+      "date": "2026-09-14",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 20965177.911109,
+        "vw": 176.5043,
+        "o": 174.93,
+        "c": 175.63,
+        "h": 179.9,
+        "l": 174.59,
+        "t": 1789358400000,
+        "n": 368857
+      },
+      "stock_close": 175.63,
+      "change_percent": -7.59720103119903,
+      "nextweek_expiry": "2026-09-25",
+      "dte": 11,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260925P00175000",
+          "strike": 175,
+          "premium": 6.8,
+          "price_date": "2026-09-14"
+        },
+        "call": {
+          "ticker": "O:SKHY260925C00177500",
+          "strike": 177.5,
+          "premium": 6.3,
+          "price_date": "2026-09-14"
+        }
+      },
+      "pc_volume_ratio": 0.8433449048644374,
+      "option_volume_totals": {
+        "put": 57576.0,
+        "call": 68271.0,
+        "contracts": 1072
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 1.0051380798052478,
+      "rv20": 0.7257757692572053,
+      "put_iv7": 0.6193759602282416,
+      "call_iv7": 0.6307696769974538,
+      "atm_iv7": 0.6045999313971515,
+      "skew7_pp": -1.1393716769212192,
+      "iv7_minus_rv5_pp": -40.05381484080963,
+      "atm_iv30": 0.6001678686021849,
+      "iv7_minus_iv30_pp": 0.44320627949666624,
+      "adr_premium": 0.3942352198171981,
+      "adr_inputs": {
+        "ADR_price": 175.63,
+        "ADR_reference_time": "2026-09-14T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1697000.0,
+        "KRX_date": "2026-09-14",
+        "KRX_close_time": "2026-09-14T15:30:00+09:00",
+        "USDKRW": 1347.1600341796875,
+        "FX_hour_end": "2026-09-14T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-11"
+    },
+    {
+      "date": "2026-09-15",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 14158637.882245,
+        "vw": 176.2314,
+        "o": 179.25,
+        "c": 174.83,
+        "h": 181.29,
+        "l": 172.23,
+        "t": 1789444800000,
+        "n": 210602
+      },
+      "stock_close": 174.83,
+      "change_percent": -0.45550304617660853,
+      "nextweek_expiry": "2026-09-25",
+      "dte": 10,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260925P00172500",
+          "strike": 172.5,
+          "premium": 5.92,
+          "price_date": "2026-09-15"
+        },
+        "call": {
+          "ticker": "O:SKHY260925C00175000",
+          "strike": 175,
+          "premium": 7.04,
+          "price_date": "2026-09-15"
+        }
+      },
+      "pc_volume_ratio": 0.6316721066562738,
+      "option_volume_totals": {
+        "put": 38899.0,
+        "call": 61581.0,
+        "contracts": 830
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.9096980701983212,
+      "rv20": 0.7189307706748204,
+      "put_iv7": 0.6510372454606533,
+      "call_iv7": 0.6013733997283804,
+      "atm_iv7": 0.635109159097225,
+      "skew7_pp": 4.966384573227289,
+      "iv7_minus_rv5_pp": -27.45889111010962,
+      "atm_iv30": 0.6000019740862059,
+      "iv7_minus_iv30_pp": 3.510718501101906,
+      "adr_premium": 0.409409149559969,
+      "adr_inputs": {
+        "ADR_price": 174.83,
+        "ADR_reference_time": "2026-09-15T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1690000.0,
+        "KRX_date": "2026-09-15",
+        "KRX_close_time": "2026-09-15T15:30:00+09:00",
+        "USDKRW": 1362.4100341796875,
+        "FX_hour_end": "2026-09-15T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-14"
+    },
+    {
+      "date": "2026-09-16",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 15889443.664388,
+        "vw": 177.3965,
+        "o": 180.34,
+        "c": 174.87,
+        "h": 180.66,
+        "l": 172.78,
+        "t": 1789531200000,
+        "n": 250966
+      },
+      "stock_close": 174.87,
+      "change_percent": 0.02287936852942707,
+      "nextweek_expiry": "2026-09-25",
+      "dte": 9,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260925P00172500",
+          "strike": 172.5,
+          "premium": 5.5,
+          "price_date": "2026-09-16"
+        },
+        "call": {
+          "ticker": "O:SKHY260925C00175000",
+          "strike": 175,
+          "premium": 6.55,
+          "price_date": "2026-09-16"
+        }
+      },
+      "pc_volume_ratio": 0.5920358765356355,
+      "option_volume_totals": {
+        "put": 40529.0,
+        "call": 68457.0,
+        "contracts": 858
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.6126416901586469,
+      "rv20": 0.6202276404855365,
+      "put_iv7": 0.6457429005839582,
+      "call_iv7": 0.6271939046476764,
+      "atm_iv7": 0.6169198161787014,
+      "skew7_pp": 1.8548995936281787,
+      "iv7_minus_rv5_pp": 0.4278126020054507,
+      "atm_iv30": 0.6002417099475861,
+      "iv7_minus_iv30_pp": 1.667810623111532,
+      "adr_premium": 0.37023922652807895,
+      "adr_inputs": {
+        "ADR_price": 174.87,
+        "ADR_reference_time": "2026-09-16T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1759000.0,
+        "KRX_date": "2026-09-16",
+        "KRX_close_time": "2026-09-16T15:30:00+09:00",
+        "USDKRW": 1378.31005859375,
+        "FX_hour_end": "2026-09-16T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-15"
+    },
+    {
+      "date": "2026-09-17",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 16880663.749792,
+        "vw": 183.0104,
+        "o": 181.98,
+        "c": 182.99,
+        "h": 185.3342,
+        "l": 181.26,
+        "t": 1789617600000,
+        "n": 253301
+      },
+      "stock_close": 182.99,
+      "change_percent": 4.643449419568824,
+      "nextweek_expiry": "2026-09-25",
+      "dte": 8,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260925P00182500",
+          "strike": 182.5,
+          "premium": 5.75,
+          "price_date": "2026-09-17"
+        },
+        "call": {
+          "ticker": "O:SKHY260925C00185000",
+          "strike": 185,
+          "premium": 5.3,
+          "price_date": "2026-09-17"
+        }
+      },
+      "pc_volume_ratio": 0.5380603964347479,
+      "option_volume_totals": {
+        "put": 40446.0,
+        "call": 75170.0,
+        "contracts": 887
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.7208474694844728,
+      "rv20": 0.635764412190056,
+      "put_iv7": 0.573065678811833,
+      "call_iv7": 0.572558305991421,
+      "atm_iv7": 0.5730215723026166,
+      "skew7_pp": 0.0507372820412022,
+      "iv7_minus_rv5_pp": -14.782589718185612,
+      "atm_iv30": 0.5715187708139687,
+      "iv7_minus_iv30_pp": 0.1502801488647898,
+      "adr_premium": 0.44772885456773825,
+      "adr_inputs": {
+        "ADR_price": 182.99,
+        "ADR_reference_time": "2026-09-17T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1745000.0,
+        "KRX_date": "2026-09-17",
+        "KRX_close_time": "2026-09-17T15:30:00+09:00",
+        "USDKRW": 1380.56005859375,
+        "FX_hour_end": "2026-09-17T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-16"
+    },
+    {
+      "date": "2026-09-18",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 71104163.443245,
+        "vw": 187.1917,
+        "o": 184.91,
+        "c": 187.5,
+        "h": 192.01,
+        "l": 182.8,
+        "t": 1789704000000,
+        "n": 357826
+      },
+      "stock_close": 187.5,
+      "change_percent": 2.4646155527624503,
+      "nextweek_expiry": "2026-09-25",
+      "dte": 7,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY260925P00185000",
+          "strike": 185,
+          "premium": 4.35,
+          "price_date": "2026-09-18"
+        },
+        "call": {
+          "ticker": "O:SKHY260925C00190000",
+          "strike": 190,
+          "premium": 4.7,
+          "price_date": "2026-09-18"
+        }
+      },
+      "pc_volume_ratio": 0.6269897039503834,
+      "option_volume_totals": {
+        "put": 82088.0,
+        "call": 130924.0,
+        "contracts": 906
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.7479485595626304,
+      "rv20": 0.6252051005193741,
+      "put_iv7": 0.5500440119792573,
+      "call_iv7": 0.5679163182003687,
+      "atm_iv7": 0.5489077544212342,
+      "skew7_pp": -1.7872306221111356,
+      "iv7_minus_rv5_pp": -19.904080514139622,
+      "atm_iv30": 0.5766260729720164,
+      "iv7_minus_iv30_pp": -2.7718318550782217,
+      "adr_premium": 0.39885910108131806,
+      "adr_inputs": {
+        "ADR_price": 187.5,
+        "ADR_reference_time": "2026-09-18T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1857000.0,
+        "KRX_date": "2026-09-18",
+        "KRX_close_time": "2026-09-18T15:30:00+09:00",
+        "USDKRW": 1385.4300537109375,
+        "FX_hour_end": "2026-09-18T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-17"
+    },
+    {
+      "date": "2026-09-21",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 20475213.084912,
+        "vw": 188.0595,
+        "o": 188.31,
+        "c": 188.86,
+        "h": 190.25,
+        "l": 185.9065,
+        "t": 1789963200000,
+        "n": 295646
+      },
+      "stock_close": 188.86,
+      "change_percent": 0.7253333333333334,
+      "nextweek_expiry": "2026-10-02",
+      "dte": 11,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261002P00187500",
+          "strike": 187.5,
+          "premium": 7.15,
+          "price_date": "2026-09-21"
+        },
+        "call": {
+          "ticker": "O:SKHY261002C00190000",
+          "strike": 190,
+          "premium": 7.81,
+          "price_date": "2026-09-21"
+        }
+      },
+      "pc_volume_ratio": 1.003537172865761,
+      "option_volume_totals": {
+        "put": 46245.0,
+        "call": 46082.0,
+        "contracts": 959
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.3244706087082533,
+      "rv20": 0.6249308666548842,
+      "put_iv7": 0.6392717428131262,
+      "call_iv7": 0.6130481557513824,
+      "atm_iv7": 0.6305820931412145,
+      "skew7_pp": 2.622358706174377,
+      "iv7_minus_rv5_pp": 30.61114844329612,
+      "atm_iv30": 0.5952032588500934,
+      "iv7_minus_iv30_pp": 3.5378834291121097,
+      "adr_premium": 0.39043627349396104,
+      "adr_inputs": {
+        "ADR_price": 188.86,
+        "ADR_reference_time": "2026-09-21T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1868000.0,
+        "KRX_date": "2026-09-21",
+        "KRX_close_time": "2026-09-21T15:30:00+09:00",
+        "USDKRW": 1375.27001953125,
+        "FX_hour_end": "2026-09-21T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-18"
+    },
+    {
+      "date": "2026-09-22",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 18693807.183853,
+        "vw": 193.4475,
+        "o": 187.05,
+        "c": 195.37,
+        "h": 196.4799,
+        "l": 186.37,
+        "t": 1790049600000,
+        "n": 296891
+      },
+      "stock_close": 195.37,
+      "change_percent": 3.446997776130467,
+      "nextweek_expiry": "2026-10-02",
+      "dte": 10,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261002P00195000",
+          "strike": 195,
+          "premium": 8.2,
+          "price_date": "2026-09-22"
+        },
+        "call": {
+          "ticker": "O:SKHY261002C00197500",
+          "strike": 197.5,
+          "premium": 7.56,
+          "price_date": "2026-09-22"
+        }
+      },
+      "pc_volume_ratio": 0.5289970507825114,
+      "option_volume_totals": {
+        "put": 49147.0,
+        "call": 92906.0,
+        "contracts": 1008
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.2954836620349008,
+      "rv20": 0.5925373175424609,
+      "put_iv7": 0.6454845064024642,
+      "call_iv7": 0.6696556798947124,
+      "atm_iv7": 0.6672559060884323,
+      "skew7_pp": -2.4171173492248177,
+      "iv7_minus_rv5_pp": 37.17722440535315,
+      "atm_iv30": 0.6145821003517205,
+      "iv7_minus_iv30_pp": 5.267380573671188,
+      "adr_premium": 0.4399618797700302,
+      "adr_inputs": {
+        "ADR_price": 195.37,
+        "ADR_reference_time": "2026-09-22T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1840000.0,
+        "KRX_date": "2026-09-22",
+        "KRX_close_time": "2026-09-22T15:30:00+09:00",
+        "USDKRW": 1356.1600341796875,
+        "FX_hour_end": "2026-09-22T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-21"
+    },
+    {
+      "date": "2026-09-23",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 13960651.761788,
+        "vw": 189.639,
+        "o": 191.6,
+        "c": 189.28,
+        "h": 193.078,
+        "l": 186.11,
+        "t": 1790136000000,
+        "n": 232258
+      },
+      "stock_close": 189.28,
+      "change_percent": -3.1171623074166988,
+      "nextweek_expiry": "2026-10-02",
+      "dte": 9,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261002P00187500",
+          "strike": 187.5,
+          "premium": 6.35,
+          "price_date": "2026-09-23"
+        },
+        "call": {
+          "ticker": "O:SKHY261002C00190000",
+          "strike": 190,
+          "premium": 6.5,
+          "price_date": "2026-09-23"
+        }
+      },
+      "pc_volume_ratio": 0.7529105601972332,
+      "option_volume_totals": {
+        "put": 38479.0,
+        "call": 51107.0,
+        "contracts": 899
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.47639684727616965,
+      "rv20": 0.6087315163567187,
+      "put_iv7": 0.6020218893438865,
+      "call_iv7": 0.6124137708845975,
+      "atm_iv7": 0.6052804852804956,
+      "skew7_pp": -1.0391881540711023,
+      "iv7_minus_rv5_pp": 12.888363800432595,
+      "atm_iv30": 0.570128546655178,
+      "iv7_minus_iv30_pp": 3.5151938625317625,
+      "adr_premium": 0.3888597994008458,
+      "adr_inputs": {
+        "ADR_price": 189.28,
+        "ADR_reference_time": "2026-09-23T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1862000.0,
+        "KRX_date": "2026-09-23",
+        "KRX_close_time": "2026-09-23T15:30:00+09:00",
+        "USDKRW": 1366.260009765625,
+        "FX_hour_end": "2026-09-23T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-22"
+    },
+    {
+      "date": "2026-09-24",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 9582410.268529,
+        "vw": 186.257,
+        "o": 185.57,
+        "c": 186.37,
+        "h": 188.9,
+        "l": 184.74,
+        "t": 1790222400000,
+        "n": 178495
+      },
+      "stock_close": 186.37,
+      "change_percent": -1.5374049027895187,
+      "nextweek_expiry": "2026-10-02",
+      "dte": 8,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261002P00185000",
+          "strike": 185,
+          "premium": 5.4,
+          "price_date": "2026-09-24"
+        },
+        "call": {
+          "ticker": "O:SKHY261002C00187500",
+          "strike": 187.5,
+          "premium": 5.9,
+          "price_date": "2026-09-24"
+        }
+      },
+      "pc_volume_ratio": 0.8036662486324946,
+      "option_volume_totals": {
+        "put": 30119.0,
+        "call": 37477.0,
+        "contracts": 810
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.43251865424333746,
+      "rv20": 0.6114502502625471,
+      "put_iv7": 0.5565591136049609,
+      "call_iv7": 0.5921325920822035,
+      "atm_iv7": 0.5768566166867773,
+      "skew7_pp": -3.557347847724257,
+      "iv7_minus_rv5_pp": 14.433796244343988,
+      "atm_iv30": 0.5546233278068687,
+      "iv7_minus_iv30_pp": 2.223328887990861,
+      "adr_premium": 0.36793772491881205,
+      "adr_inputs": {
+        "ADR_price": 186.37,
+        "ADR_reference_time": "2026-09-24T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1862000.0,
+        "KRX_date": "2026-09-23",
+        "KRX_close_time": "2026-09-23T15:30:00+09:00",
+        "USDKRW": 1366.68994140625,
+        "FX_hour_end": "2026-09-24T20:00:00+00:00",
+        "KR_age_hours": 37.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-23"
+    },
+    {
+      "date": "2026-09-25",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 13710497.564235,
+        "vw": 190.8747,
+        "o": 189.36,
+        "c": 191.56,
+        "h": 192.83,
+        "l": 187.8,
+        "t": 1790308800000,
+        "n": 196043
+      },
+      "stock_close": 191.56,
+      "change_percent": 2.7847829586306716,
+      "nextweek_expiry": "2026-10-02",
+      "dte": 7,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261002P00190000",
+          "strike": 190,
+          "premium": 5.07,
+          "price_date": "2026-09-25"
+        },
+        "call": {
+          "ticker": "O:SKHY261002C00192500",
+          "strike": 192.5,
+          "premium": 5.5,
+          "price_date": "2026-09-25"
+        }
+      },
+      "pc_volume_ratio": 0.7014849814377321,
+      "option_volume_totals": {
+        "put": 45727.0,
+        "call": 65186.0,
+        "contracts": 898
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.4423740566015734,
+      "rv20": 0.6132478878352746,
+      "put_iv7": 0.5516688555253279,
+      "call_iv7": 0.5765245343456056,
+      "atm_iv7": 0.5637722158432007,
+      "skew7_pp": -2.4855678820277727,
+      "iv7_minus_rv5_pp": 12.139815924162727,
+      "atm_iv30": 0.5711889946343949,
+      "iv7_minus_iv30_pp": -0.7416778791194178,
+      "adr_premium": 0.3948181518948042,
+      "adr_inputs": {
+        "ADR_price": 191.56,
+        "ADR_reference_time": "2026-09-25T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1862000.0,
+        "KRX_date": "2026-09-23",
+        "KRX_close_time": "2026-09-23T15:30:00+09:00",
+        "USDKRW": 1355.7900390625,
+        "FX_hour_end": "2026-09-25T20:00:00+00:00",
+        "KR_age_hours": 61.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-24"
+    },
+    {
+      "date": "2026-09-28",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 16342141.357594,
+        "vw": 182.4594,
+        "o": 185.8,
+        "c": 181.92,
+        "h": 186.7,
+        "l": 179.31,
+        "t": 1790568000000,
+        "n": 247399
+      },
+      "stock_close": 181.92,
+      "change_percent": -5.032365838379627,
+      "nextweek_expiry": "2026-10-09",
+      "dte": 11,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261009P00180000",
+          "strike": 180,
+          "premium": 5.74,
+          "price_date": "2026-09-28"
+        },
+        "call": {
+          "ticker": "O:SKHY261009C00182500",
+          "strike": 182.5,
+          "premium": 7.2,
+          "price_date": "2026-09-28"
+        }
+      },
+      "pc_volume_ratio": 0.6790349150227007,
+      "option_volume_totals": {
+        "put": 33801.0,
+        "call": 49778.0,
+        "contracts": 985
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.5903287855965523,
+      "rv20": 0.6485214348128168,
+      "put_iv7": 0.5714679812914221,
+      "call_iv7": 0.6085679115713424,
+      "atm_iv7": 0.5848774666222716,
+      "skew7_pp": -3.7099930279920312,
+      "iv7_minus_rv5_pp": -0.545131897428075,
+      "atm_iv30": 0.5889923024235476,
+      "iv7_minus_iv30_pp": -0.4114835801276029,
+      "adr_premium": 0.400084362958675,
+      "adr_inputs": {
+        "ADR_price": 181.92,
+        "ADR_reference_time": "2026-09-28T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1768000.0,
+        "KRX_date": "2026-09-28",
+        "KRX_close_time": "2026-09-28T15:30:00+09:00",
+        "USDKRW": 1360.6800537109375,
+        "FX_hour_end": "2026-09-28T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-25"
+    },
+    {
+      "date": "2026-09-29",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 13140642.307484,
+        "vw": 186.543,
+        "o": 185.1,
+        "c": 186.68,
+        "h": 188.41,
+        "l": 183.05,
+        "t": 1790654400000,
+        "n": 163552
+      },
+      "stock_close": 186.68,
+      "change_percent": 2.6165347405453065,
+      "nextweek_expiry": "2026-10-09",
+      "dte": 10,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261009P00185000",
+          "strike": 185,
+          "premium": 5.9,
+          "price_date": "2026-09-29"
+        },
+        "call": {
+          "ticker": "O:SKHY261009C00187500",
+          "strike": 187.5,
+          "premium": 7.35,
+          "price_date": "2026-09-29"
+        }
+      },
+      "pc_volume_ratio": 0.6651698498323371,
+      "option_volume_totals": {
+        "put": 22812.0,
+        "call": 34295.0,
+        "contracts": 749
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.556542970922417,
+      "rv20": 0.6499891579048078,
+      "put_iv7": 0.5727072148398055,
+      "call_iv7": 0.6164832960322059,
+      "atm_iv7": 0.5964338980388381,
+      "skew7_pp": -4.37760811924004,
+      "iv7_minus_rv5_pp": 3.989092711642106,
+      "atm_iv30": null,
+      "iv7_minus_iv30_pp": null,
+      "adr_premium": 0.4311427957075513,
+      "adr_inputs": {
+        "ADR_price": 186.68,
+        "ADR_reference_time": "2026-09-29T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1765000.0,
+        "KRX_date": "2026-09-29",
+        "KRX_close_time": "2026-09-29T15:30:00+09:00",
+        "USDKRW": 1353.0999755859375,
+        "FX_hour_end": "2026-09-29T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-28"
+    },
+    {
+      "date": "2026-09-30",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 11066887.280985,
+        "vw": 185.3538,
+        "o": 186.175,
+        "c": 184.15,
+        "h": 187.7,
+        "l": 183.9,
+        "t": 1790740800000,
+        "n": 160837
+      },
+      "stock_close": 184.15,
+      "change_percent": -1.3552603385472484,
+      "nextweek_expiry": "2026-10-09",
+      "dte": 9,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261009P00182500",
+          "strike": 182.5,
+          "premium": 5.6,
+          "price_date": "2026-09-30"
+        },
+        "call": {
+          "ticker": "O:SKHY261009C00185000",
+          "strike": 185,
+          "premium": 6.5,
+          "price_date": "2026-09-30"
+        }
+      },
+      "pc_volume_ratio": 0.6281111012930399,
+      "option_volume_totals": {
+        "put": 21325.0,
+        "call": 33951.0,
+        "contracts": 760
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.524273247853139,
+      "rv20": 0.6450053893060705,
+      "put_iv7": 0.5800755931648823,
+      "call_iv7": 0.6445851935379451,
+      "atm_iv7": 0.6029684067073302,
+      "skew7_pp": -6.450960037306275,
+      "iv7_minus_rv5_pp": 7.869515885419121,
+      "atm_iv30": 0.6033081290125848,
+      "iv7_minus_iv30_pp": -0.03397223052545861,
+      "adr_premium": 0.4064041548376687,
+      "adr_inputs": {
+        "ADR_price": 184.15,
+        "ADR_reference_time": "2026-09-30T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1776000.0,
+        "KRX_date": "2026-09-30",
+        "KRX_close_time": "2026-09-30T15:30:00+09:00",
+        "USDKRW": 1356.3800048828125,
+        "FX_hour_end": "2026-09-30T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-29"
+    },
+    {
+      "date": "2026-10-01",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 17483664.065737,
+        "vw": 188.9042,
+        "o": 185.5,
+        "c": 193.5,
+        "h": 193.83,
+        "l": 182.68,
+        "t": 1790827200000,
+        "n": 243328
+      },
+      "stock_close": 193.5,
+      "change_percent": 5.077382568558231,
+      "nextweek_expiry": "2026-10-09",
+      "dte": 8,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261009P00192500",
+          "strike": 192.5,
+          "premium": 5.4,
+          "price_date": "2026-10-01"
+        },
+        "call": {
+          "ticker": "O:SKHY261009C00195000",
+          "strike": 195,
+          "premium": 5.32,
+          "price_date": "2026-10-01"
+        }
+      },
+      "pc_volume_ratio": 0.5479425815756265,
+      "option_volume_totals": {
+        "put": 48631.0,
+        "call": 88752.0,
+        "contracts": 927
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.6372013445013843,
+      "rv20": 0.659620093108151,
+      "put_iv7": 0.5196051339785009,
+      "call_iv7": 0.5367879122490579,
+      "atm_iv7": 0.5235990231829041,
+      "skew7_pp": -1.718277827055692,
+      "iv7_minus_rv5_pp": -11.360232131848026,
+      "atm_iv30": null,
+      "iv7_minus_iv30_pp": null,
+      "adr_premium": 0.4350458522865308,
+      "adr_inputs": {
+        "ADR_price": 193.5,
+        "ADR_reference_time": "2026-10-01T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1833000.0,
+        "KRX_date": "2026-10-01",
+        "KRX_close_time": "2026-10-01T15:30:00+09:00",
+        "USDKRW": 1359.4000244140625,
+        "FX_hour_end": "2026-10-01T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-09-30"
+    },
+    {
+      "date": "2026-10-02",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 15606595.271903,
+        "vw": 194.1498,
+        "o": 194.2,
+        "c": 195.13,
+        "h": 195.525,
+        "l": 191.39,
+        "t": 1790913600000,
+        "n": 209808
+      },
+      "stock_close": 195.13,
+      "change_percent": 0.842377260981908,
+      "nextweek_expiry": "2026-10-09",
+      "dte": 7,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261009P00195000",
+          "strike": 195,
+          "premium": 4.74,
+          "price_date": "2026-10-02"
+        },
+        "call": {
+          "ticker": "O:SKHY261009C00197500",
+          "strike": 197.5,
+          "premium": 4,
+          "price_date": "2026-10-02"
+        }
+      },
+      "pc_volume_ratio": 0.6051830686424348,
+      "option_volume_totals": {
+        "put": 45537.0,
+        "call": 75245.0,
+        "contracts": 1078
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.6135084887412589,
+      "rv20": 0.6569464409950995,
+      "put_iv7": 0.45078707291022824,
+      "call_iv7": 0.4666901109254441,
+      "atm_iv7": 0.4559067344665528,
+      "skew7_pp": -1.5903038015215865,
+      "iv7_minus_rv5_pp": -15.760175427470607,
+      "atm_iv30": 0.5768391363452801,
+      "iv7_minus_iv30_pp": -12.093240187872729,
+      "adr_premium": 0.4242051682355674,
+      "adr_inputs": {
+        "ADR_price": 195.13,
+        "ADR_reference_time": "2026-10-02T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1841000.0,
+        "KRX_date": "2026-10-02",
+        "KRX_close_time": "2026-10-02T15:30:00+09:00",
+        "USDKRW": 1343.699951171875,
+        "FX_hour_end": "2026-10-02T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-10-01"
+    },
+    {
+      "date": "2026-10-05",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 12266222.277565,
+        "vw": 194.2006,
+        "o": 193.64,
+        "c": 195.02,
+        "h": 195.97,
+        "l": 190.4178,
+        "t": 1791172800000,
+        "n": 174451
+      },
+      "stock_close": 195.02,
+      "change_percent": -0.05637267462715867,
+      "nextweek_expiry": "2026-10-16",
+      "dte": 11,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261016P00195000",
+          "strike": 195,
+          "premium": 6.5,
+          "price_date": "2026-10-05"
+        },
+        "call": {
+          "ticker": "O:SKHY261016C00197500",
+          "strike": 197.5,
+          "premium": 5.67,
+          "price_date": "2026-10-05"
+        }
+      },
+      "pc_volume_ratio": 0.9796069418203774,
+      "option_volume_totals": {
+        "put": 50294.0,
+        "call": 51341.0,
+        "contracts": 855
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.38964521270922015,
+      "rv20": 0.6038630858375578,
+      "put_iv7": 0.5160080886730694,
+      "call_iv7": 0.515811862265713,
+      "atm_iv7": 0.4998603180181368,
+      "skew7_pp": 0.01962264073563924,
+      "iv7_minus_rv5_pp": 11.021510530891664,
+      "atm_iv30": 0.5508655861228062,
+      "iv7_minus_iv30_pp": -5.100526810466944,
+      "adr_premium": 0.42109307011941555,
+      "adr_inputs": {
+        "ADR_price": 195.02,
+        "ADR_reference_time": "2026-10-05T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1841000.0,
+        "KRX_date": "2026-10-02",
+        "KRX_close_time": "2026-10-02T15:30:00+09:00",
+        "USDKRW": 1341.52001953125,
+        "FX_hour_end": "2026-10-05T20:00:00+00:00",
+        "KR_age_hours": 85.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-10-02"
+    },
+    {
+      "date": "2026-10-06",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 21911645.346012,
+        "vw": 186.2941,
+        "o": 191.8,
+        "c": 182.56,
+        "h": 191.84,
+        "l": 180.9063,
+        "t": 1791259200000,
+        "n": 348683
+      },
+      "stock_close": 182.56,
+      "change_percent": -6.389088298636036,
+      "nextweek_expiry": "2026-10-16",
+      "dte": 10,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261016P00182500",
+          "strike": 182.5,
+          "premium": 5.9,
+          "price_date": "2026-10-06"
+        },
+        "call": {
+          "ticker": "O:SKHY261016C00185000",
+          "strike": 185,
+          "premium": 5.14,
+          "price_date": "2026-10-06"
+        }
+      },
+      "pc_volume_ratio": 0.5805913113435237,
+      "option_volume_totals": {
+        "put": 86601.0,
+        "call": 149160.0,
+        "contracts": 1067
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.6626179234532433,
+      "rv20": 0.6316705330180408,
+      "put_iv7": 0.5256122340471538,
+      "call_iv7": 0.5435913802808076,
+      "atm_iv7": 0.5200185710925692,
+      "skew7_pp": -1.797914623365371,
+      "iv7_minus_rv5_pp": -14.259935236067411,
+      "atm_iv30": 0.5504867159883511,
+      "iv7_minus_iv30_pp": -3.046814489578187,
+      "adr_premium": 0.37703575254247745,
+      "adr_inputs": {
+        "ADR_price": 182.56,
+        "ADR_reference_time": "2026-10-06T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1773000.0,
+        "KRX_date": "2026-10-06",
+        "KRX_close_time": "2026-10-06T15:30:00+09:00",
+        "USDKRW": 1337.3599853515625,
+        "FX_hour_end": "2026-10-06T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-10-05"
+    },
+    {
+      "date": "2026-10-07",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 20918200.042695,
+        "vw": 178.7736,
+        "o": 178.27,
+        "c": 178.25,
+        "h": 181.14,
+        "l": 176.7,
+        "t": 1791345600000,
+        "n": 306815
+      },
+      "stock_close": 178.25,
+      "change_percent": -2.3608676599474188,
+      "nextweek_expiry": "2026-10-16",
+      "dte": 9,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261016P00177500",
+          "strike": 177.5,
+          "premium": 5.35,
+          "price_date": "2026-10-07"
+        },
+        "call": {
+          "ticker": "O:SKHY261016C00180000",
+          "strike": 180,
+          "premium": 5.15,
+          "price_date": "2026-10-07"
+        }
+      },
+      "pc_volume_ratio": 0.6843602485576368,
+      "option_volume_totals": {
+        "put": 76983.0,
+        "call": 112489.0,
+        "contracts": 932
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.6754320771404669,
+      "rv20": 0.5808934782919354,
+      "put_iv7": 0.5210688476523032,
+      "call_iv7": 0.55021415274378,
+      "atm_iv7": 0.5362671727399357,
+      "skew7_pp": -2.9145305091476836,
+      "iv7_minus_rv5_pp": -13.91649044005312,
+      "atm_iv30": 0.5802491727471352,
+      "iv7_minus_iv30_pp": -4.398200000719942,
+      "adr_premium": 0.3857566744051075,
+      "adr_inputs": {
+        "ADR_price": 178.25,
+        "ADR_reference_time": "2026-10-07T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1723000.0,
+        "KRX_date": "2026-10-07",
+        "KRX_close_time": "2026-10-07T15:30:00+09:00",
+        "USDKRW": 1339.5,
+        "FX_hour_end": "2026-10-07T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-10-06"
+    },
+    {
+      "date": "2026-10-08",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 22531095.667108,
+        "vw": 171.6246,
+        "o": 176.4,
+        "c": 170.5,
+        "h": 177.18,
+        "l": 167.21,
+        "t": 1791432000000,
+        "n": 353909
+      },
+      "stock_close": 170.5,
+      "change_percent": -4.347826086956519,
+      "nextweek_expiry": "2026-10-16",
+      "dte": 8,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261016P00170000",
+          "strike": 170,
+          "premium": 4.85,
+          "price_date": "2026-10-08"
+        },
+        "call": {
+          "ticker": "O:SKHY261016C00172500",
+          "strike": 172.5,
+          "premium": 4.55,
+          "price_date": "2026-10-08"
+        }
+      },
+      "pc_volume_ratio": 0.85137558171366,
+      "option_volume_totals": {
+        "put": 124403.0,
+        "call": 146120.0,
+        "contracts": 1069
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.48760482688747236,
+      "rv20": 0.5718795798006875,
+      "put_iv7": 0.5341369241325994,
+      "call_iv7": 0.5344720054189995,
+      "atm_iv7": 0.5234371844504947,
+      "skew7_pp": -0.03350812864001407,
+      "iv7_minus_rv5_pp": 3.5832357563022335,
+      "atm_iv30": 0.5736280889973528,
+      "iv7_minus_iv30_pp": -5.019090454685815,
+      "adr_premium": 0.3620119819890737,
+      "adr_inputs": {
+        "ADR_price": 170.5,
+        "ADR_reference_time": "2026-10-08T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1681000.0,
+        "KRX_date": "2026-10-08",
+        "KRX_close_time": "2026-10-08T15:30:00+09:00",
+        "USDKRW": 1342.8399658203125,
+        "FX_hour_end": "2026-10-08T20:00:00+00:00",
+        "KR_age_hours": 13.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-10-07"
+    },
+    {
+      "date": "2026-10-09",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 12087355.773079,
+        "vw": 170.2023,
+        "o": 172.785,
+        "c": 169.03,
+        "h": 173.3,
+        "l": 168.7743,
+        "t": 1791518400000,
+        "n": 189342
+      },
+      "stock_close": 169.03,
+      "change_percent": -0.8621700879765437,
+      "nextweek_expiry": "2026-10-16",
+      "dte": 7,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261016P00167500",
+          "strike": 167.5,
+          "premium": 3.37,
+          "price_date": "2026-10-09"
+        },
+        "call": {
+          "ticker": "O:SKHY261016C00170000",
+          "strike": 170,
+          "premium": 3.8,
+          "price_date": "2026-10-09"
+        }
+      },
+      "pc_volume_ratio": 0.8612371403498945,
+      "option_volume_totals": {
+        "put": 46127.0,
+        "call": 53559.0,
+        "contracts": 930
+      },
+      "pc_oi_ratio": null,
+      "oi_known_at": null,
+      "oi_reference_date": null,
+      "rv5": 0.42429339270229416,
+      "rv20": 0.5694662806732022,
+      "put_iv7": 0.4464033263704839,
+      "call_iv7": 0.4685058106704967,
+      "atm_iv7": 0.44591879189014433,
+      "skew7_pp": -2.2102484300012772,
+      "iv7_minus_rv5_pp": 2.1625399187850167,
+      "atm_iv30": 0.5409961058058235,
+      "iv7_minus_iv30_pp": -9.507731391567914,
+      "adr_premium": 0.34851950549251054,
+      "adr_inputs": {
+        "ADR_price": 169.03,
+        "ADR_reference_time": "2026-10-09T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1681000.0,
+        "KRX_date": "2026-10-08",
+        "KRX_close_time": "2026-10-08T15:30:00+09:00",
+        "USDKRW": 1341.0999755859375,
+        "FX_hour_end": "2026-10-09T20:00:00+00:00",
+        "KR_age_hours": 37.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-10-08"
+    },
+    {
+      "date": "2026-10-12",
+      "row_type": "completed_US_session",
+      "OHLCV": {
+        "v": 14724473.161175,
+        "vw": 162.7262,
+        "o": 164.32,
+        "c": 162.23,
+        "h": 164.49,
+        "l": 161.31,
+        "t": 1791777600000,
+        "n": 258731
+      },
+      "stock_close": 162.23,
+      "change_percent": -4.022954505117438,
+      "nextweek_expiry": "2026-10-23",
+      "dte": 11,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261023P00160000",
+          "strike": 160,
+          "premium": 4.17,
+          "price_date": "2026-10-12"
+        },
+        "call": {
+          "ticker": "O:SKHY261023C00162500",
+          "strike": 162.5,
+          "premium": 5.2,
+          "price_date": "2026-10-12"
+        }
+      },
+      "pc_volume_ratio": 1.1493988360264813,
+      "option_volume_totals": {
+        "put": 68926.0,
+        "call": 59967.0,
+        "contracts": 1067
+      },
+      "pc_oi_ratio": 1.0354477611940298,
+      "oi_known_at": "2026-10-13T08:06:53.902478+00:00",
+      "oi_reference_date": "2026-10-12",
+      "rv5": 0.34499533401737614,
+      "rv20": 0.5184605823951649,
+      "put_iv7": 0.5025577465639346,
+      "call_iv7": 0.5060850704631403,
+      "atm_iv7": 0.4874593226059263,
+      "skew7_pp": -0.35273238992057365,
+      "iv7_minus_rv5_pp": 14.246398858855013,
+      "atm_iv30": 0.5428260660412826,
+      "iv7_minus_iv30_pp": -5.53667434353563,
+      "adr_premium": 0.2879768368277926,
+      "adr_inputs": {
+        "ADR_price": 162.23,
+        "ADR_reference_time": "2026-10-12T16:00:00-04:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1681000.0,
+        "KRX_date": "2026-10-08",
+        "KRX_close_time": "2026-10-08T15:30:00+09:00",
+        "USDKRW": 1334.5799560546875,
+        "FX_hour_end": "2026-10-12T20:00:00+00:00",
+        "KR_age_hours": 109.5,
+        "FX_age_hours": 0.0,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "iv_source": "American CRR120 model estimate from daily last trades, not provider historical IV",
+      "iv_rate_date": "2026-10-08"
+    },
+    {
+      "date": "2026-10-13",
+      "row_type": "pre_market_snapshot",
+      "observed_at": "2026-10-13T08:06:53.902478+00:00",
+      "stock_close": null,
+      "reference_previous_close": 162.23,
+      "reference_price_date": "2026-10-12",
+      "OHLCV": null,
+      "change_percent": null,
+      "nextweek_expiry": "2026-10-23",
+      "dte": 10,
+      "selected_options": {
+        "put": {
+          "ticker": "O:SKHY261023P00160000",
+          "strike": 160,
+          "premium": 4.17,
+          "price_date": "2026-10-12"
+        },
+        "call": {
+          "ticker": "O:SKHY261023C00162500",
+          "strike": 162.5,
+          "premium": 5.2,
+          "price_date": "2026-10-12"
+        }
+      },
+      "pc_volume_ratio": null,
+      "pc_oi_ratio": 1.0354477611940298,
+      "oi_reference_date": "2026-10-12",
+      "rv5": 0.34499533401737614,
+      "rv20": 0.5184605823951649,
+      "rv_reference_date": "2026-10-12",
+      "put_iv7": 0.44273738692872844,
+      "call_iv7": 0.5691466291956899,
+      "atm_iv7": 0.4990450764842372,
+      "skew7_pp": -12.640924226696148,
+      "iv7_minus_rv5_pp": 15.404974246686104,
+      "atm_iv30": 0.5390352284309917,
+      "iv7_minus_iv30_pp": -3.9990151946754535,
+      "adr_premium": 0.5096271944063202,
+      "adr_inputs": {
+        "ADR_price": 162.23,
+        "ADR_reference_time": "2026-10-13T08:06:53.902478+00:00",
+        "ordinary_shares_per_ADS": 0.1,
+        "KRX_close": 1443000.0,
+        "KRX_date": "2026-10-13",
+        "KRX_close_time": "2026-10-13T15:30:00+09:00",
+        "USDKRW": 1342.780029296875,
+        "FX_hour_end": "2026-10-13T08:00:00+00:00",
+        "KR_age_hours": 1.6149729105555555,
+        "FX_age_hours": 0.11497291056315104,
+        "comparison": "asynchronous close conversion; not executable arbitrage premium"
+      },
+      "adr_qualification": "ADR previous US close vs newly available KR close; indicative mismatch, not current synchronized premium"
+    }
+  ],
+  "coverage": {
+    "historical_daily_contracts": 4168,
+    "all_current_snapshot_contracts": 2684,
+    "all_current_OI_fields": 2684,
+    "historical_pc_volume_days": 39,
+    "stock_history_days": 65
+  },
+  "live_iv_method": {
+    "quality": "calculated from provider current IV/Delta, not vendor constant-maturity endpoint",
+    "reference_spot": 162.23,
+    "spot_reference_date": "2026-10-12",
+    "asof": "2026-10-13T08:06:53.902478+00:00",
+    "option_daily_trade_filter": "2026-10-12",
+    "25delta": "linear interpolation of IV versus absolute delta within expiration; no extrapolation",
+    "tenor": "linear interpolation of total variance IV^2*T to fixed 7/30 calendar days; no extrapolation",
+    "ATM": "mean of Put/Call IV at same nearest common strike to previous stock close, per expiration",
+    "expiry_points": [
+      {
+        "expiry": "2026-10-16",
+        "T_years": 0.009575916334411468,
+        "DTE_exact": 3.4952094620601857,
+        "delta_selection": {
+          "put": {
+            "points": [
+              [
+                0.2314366280141453,
+                0.4959076197420433
+              ],
+              [
+                0.3356553380395457,
+                0.47486683748400493
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.1781193797287492
+          },
+          "call": {
+            "points": [
+              [
+                0.1995215800221411,
+                0.6541848733477127
+              ],
+              [
+                0.27062765697602387,
+                0.6632491632875772
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.7099030369879309
+          }
+        },
+        "put_25delta": 0.49215984865723383,
+        "call_25delta": 0.6606196403041616,
+        "atm_strike": 162.5,
+        "atm_mean": 0.5538378433727238,
+        "atm_components": {
+          "put": 0.4158817111599892,
+          "call": 0.6917939755854583
+        }
+      },
+      {
+        "expiry": "2026-10-23",
+        "T_years": 0.028753998526192287,
+        "DTE_exact": 10.495209462060185,
+        "delta_selection": {
+          "put": {
+            "points": [
+              [
+                0.22669546885724015,
+                0.4287691928826442
+              ],
+              [
+                0.29705726202313015,
+                0.4175520745854359
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.33121002314161346
+          },
+          "call": {
+            "points": [
+              [
+                0.2246827673317353,
+                0.5228791359403143
+              ],
+              [
+                0.2911640734145209,
+                0.5555485208445566
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.38081731782974465
+          }
+        },
+        "put_25delta": 0.42505397087184366,
+        "call_25delta": 0.5353202034746954,
+        "atm_strike": 162.5,
+        "atm_mean": 0.47946422421803525,
+        "atm_components": {
+          "put": 0.37960620520045113,
+          "call": 0.5793222432356193
+        }
+      },
+      {
+        "expiry": "2026-10-30",
+        "T_years": 0.047932080717973106,
+        "DTE_exact": 17.495209462060185,
+        "delta_selection": {
+          "put": {
+            "points": [
+              [
+                0.24820359887999,
+                0.5019305677722679
+              ],
+              [
+                0.28656728041548774,
+                0.4643118365509205
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.04682556647614237
+          },
+          "call": {
+            "points": [
+              [
+                0.2296982419518116,
+                0.6369658105389228
+              ],
+              [
+                0.25861398416179354,
+                0.6373510551392145
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.7021005340537333
+          }
+        },
+        "put_25delta": 0.5001690493727146,
+        "call_25delta": 0.637236290978529,
+        "atm_strike": 162.5,
+        "atm_mean": 0.5871974055321452,
+        "atm_components": {
+          "put": 0.5124697173315031,
+          "call": 0.6619250937327872
+        }
+      },
+      {
+        "expiry": "2026-11-06",
+        "T_years": 0.06722431816089548,
+        "DTE_exact": 24.536876128726853,
+        "delta_selection": {
+          "put": {
+            "points": [
+              [
+                0.19777601332788897,
+                0.5135910440685629
+              ],
+              [
+                0.2743481428878593,
+                0.49915627093836185
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.6820234329673417
+          },
+          "call": {
+            "points": [
+              [
+                0.23832352588793615,
+                0.6155891177396383
+              ],
+              [
+                0.27319438186419215,
+                0.6365014228514771
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.3348490819959942
+          }
+        },
+        "put_25delta": 0.5037461905441984,
+        "call_25delta": 0.6225915839087577,
+        "atm_strike": 162.5,
+        "atm_mean": 0.5395637831839464,
+        "atm_components": {
+          "put": 0.46080862122202937,
+          "call": 0.6183189451458635
+        }
+      },
+      {
+        "expiry": "2026-11-13",
+        "T_years": 0.0864024003526763,
+        "DTE_exact": 31.53687612872685,
+        "delta_selection": {
+          "put": {
+            "points": [
+              [
+                0.21610045252526616,
+                0.5002582276670771
+              ],
+              [
+                0.289035975087858,
+                0.49240342441985774
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.464787887762673
+          },
+          "call": {
+            "points": [
+              [
+                0.24999480574291627,
+                0.621166712322286
+              ],
+              [
+                0.26613683960668927,
+                0.6056108460811572
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.00032178454880996295
+          }
+        },
+        "put_25delta": 0.4966074102570106,
+        "call_25delta": 0.6211617066848862,
+        "atm_strike": 162.5,
+        "atm_mean": 0.5389194712597088,
+        "atm_components": {
+          "put": 0.485555414639433,
+          "call": 0.5922835278799847
+        }
+      },
+      {
+        "expiry": "2026-11-20",
+        "T_years": 0.10558048254445714,
+        "DTE_exact": 38.53687612872685,
+        "delta_selection": {
+          "put": {
+            "points": [
+              [
+                0.2325142768438632,
+                0.4958796370279024
+              ],
+              [
+                0.3022377810459446,
+                0.49988149808454535
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.2507866372501515
+          },
+          "call": {
+            "points": [
+              [
+                0.2315776211310494,
+                0.6088115880211077
+              ],
+              [
+                0.26426168184172916,
+                0.5937437158599961
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.5636502462783319
+          }
+        },
+        "put_25delta": 0.4968832503050402,
+        "call_25delta": 0.6003185781666067,
+        "atm_strike": 160,
+        "atm_mean": 0.5432158611561837,
+        "atm_components": {
+          "put": 0.49407132273467386,
+          "call": 0.5923603995776935
+        }
+      },
+      {
+        "expiry": "2026-11-27",
+        "T_years": 0.12475856473623795,
+        "DTE_exact": 45.53687612872685,
+        "delta_selection": {
+          "put": {
+            "points": [
+              [
+                0.23928646492826602,
+                0.4770018457039114
+              ],
+              [
+                0.3069473585559746,
+                0.4846035049841542
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.1583416135572078
+          },
+          "call": {
+            "points": [
+              [
+                0.24010188639982472,
+                0.5759709447452529
+              ],
+              [
+                0.25918009547657705,
+                0.5768728390183054
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.5188177548717916
+          }
+        },
+        "put_25delta": 0.4782055047000572,
+        "call_25delta": 0.5764388635071297,
+        "atm_strike": 162.5,
+        "atm_mean": 0.52113122173406,
+        "atm_components": {
+          "put": 0.4658701416202685,
+          "call": 0.5763923018478516
+        }
+      },
+      {
+        "expiry": "2026-12-18",
+        "T_years": 0.1822928113115804,
+        "DTE_exact": 66.53687612872685,
+        "delta_selection": {
+          "put": {
+            "points": [
+              [
+                0.2144253465343502,
+                0.4864672639231191
+              ],
+              [
+                0.2667907988335859,
+                0.48180196857435237
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.6793535031906718
+          },
+          "call": {
+            "points": [
+              [
+                0.2290817970906413,
+                0.5764202217002081
+              ],
+              [
+                0.2570960860046048,
+                0.5712931415606743
+              ]
+            ],
+            "target": 0.25,
+            "upper_weight": 0.7466976218315566
+          }
+        },
+        "put_25delta": 0.4832978791845153,
+        "call_25delta": 0.5725918431530784,
+        "atm_strike": 160,
+        "atm_mean": 0.5278845984591304,
+        "atm_components": {
+          "put": 0.48806356272912166,
+          "call": 0.5677056341891391
+        }
+      }
+    ],
+    "interpolation_proofs": {
+      "7d_put_25delta": {
+        "points": [
+          [
+            0.009575916334411468,
+            0.0023194910624628503
+          ],
+          [
+            0.028753998526192287,
+            0.005195010164163742
+          ]
+        ],
+        "target": 0.019178082191780823,
+        "upper_weight": 0.5006843625628308
+      },
+      "7d_call_25delta": {
+        "points": [
+          [
+            0.009575916334411468,
+            0.004179105215279343
+          ],
+          [
+            0.028753998526192287,
+            0.00823996780567072
+          ]
+        ],
+        "target": 0.019178082191780823,
+        "upper_weight": 0.5006843625628308
+      },
+      "7d_atm_mean": {
+        "points": [
+          [
+            0.009575916334411468,
+            0.002937281688976943
+          ],
+          [
+            0.028753998526192287,
+            0.006610140046230364
+          ]
+        ],
+        "target": 0.019178082191780823,
+        "upper_weight": 0.5006843625628308
+      },
+      "30d_put_25delta": {
+        "points": [
+          [
+            0.06722431816089548,
+            0.017058858067547582
+          ],
+          [
+            0.0864024003526763,
+            0.021308466653660367
+          ]
+        ],
+        "target": 0.0821917808219178,
+        "upper_weight": 0.7804462673247357
+      },
+      "30d_call_25delta": {
+        "points": [
+          [
+            0.06722431816089548,
+            0.026057509052133852
+          ],
+          [
+            0.0864024003526763,
+            0.03333766336614053
+          ]
+        ],
+        "target": 0.0821917808219178,
+        "upper_weight": 0.7804462673247357
+      },
+      "30d_atm_mean": {
+        "points": [
+          [
+            0.06722431816089548,
+            0.019570953639232058
+          ],
+          [
+            0.0864024003526763,
+            0.025094211722346597
+          ]
+        ],
+        "target": 0.0821917808219178,
+        "upper_weight": 0.7804462673247357
+      }
+    }
+  },
+  "OI_method": "snapshot OI refers to end of last completed session; observed on next calendar day, not available at prior close",
+  "volume_method": "sum daily aggregate v across all 4168 contracts in as_of 2026-10-12 reference including expired; no near-ATM expiry restriction; no failed histories counted as zero",
+  "ADR_method": {
+    "source_ratio": {
+      "ordinary_shares_per_ADS": 0.1,
+      "source": "https://www.sec.gov/Archives/edgar/data/2120882/000119312526299963/d32785d424b4.htm",
+      "evidence": "Each ADS represents one-tenth of a share of our common stock",
+      "source_type": "Final SEC 424B4 prospectus"
+    },
+    "KR_price_source": "Yahoo Finance 000660.KS history",
+    "FX_source": "https://query1.finance.yahoo.com/v8/finance/chart/KRW=X (60m)",
+    "timing": "most recent KR close and completed FX hour before reference time; missing KR daily prices are not interpolated; asynchronous comparison"
+  },
+  "historical_IV": {
+    "model": "American Cox-Ross-Rubinstein binomial,120 steps; volatility inversion by 25 bisections, root [2%,300%] annualized",
+    "price": "same-day option aggregate c, not synchronized NBBO; same-day stock close; stock-option timing basis may dominate error",
+    "filters": "standard100 shares,American,volume>=10,positive price above intrinsic,0.70<=K/S<=1.35;25delta uses strictly OTM valid deltas;ATM common strike within3%spot",
+    "rates": "FRED DGS1MO latest observation strictly BEFORE trade date; continuous log(1+yield);latest feed observation2026-10-08 carried forward, no same-day hindsight",
+    "dividends": "q=0 modeling assumption. Massive dividend reference returned200 but no SKHY records; absence is not proof of zero dividends. Unknown future dividends and ADR fees not modeled. Do not equate estimates to official IV.",
+    "delta": "CRR first-layer hedge ratio; IV interpolated versus abs(delta) to25delta",
+    "tenor": "interpolate total variance to7/30 calendar days; expiration16:00ET,valuation16:00ET,no extrapolation",
+    "convergence_checks": [
+      {
+        "date": "2026-08-18",
+        "expiry": "2026-08-21",
+        "contracts": 64,
+        "max_120_240_difference_pp": 0.35041236877444426
+      },
+      {
+        "date": "2026-08-18",
+        "expiry": "2026-08-28",
+        "contracts": 71,
+        "max_120_240_difference_pp": 0.27029603719708195
+      },
+      {
+        "date": "2026-08-18",
+        "expiry": "2026-09-04",
+        "contracts": 42,
+        "max_120_240_difference_pp": 0.2260504364967164
+      },
+      {
+        "date": "2026-08-18",
+        "expiry": "2026-09-11",
+        "contracts": 37,
+        "max_120_240_difference_pp": 0.23195636272428377
+      },
+      {
+        "date": "2026-08-18",
+        "expiry": "2026-09-18",
+        "contracts": 31,
+        "max_120_240_difference_pp": 0.2607133388519367
+      },
+      {
+        "date": "2026-08-18",
+        "expiry": "2026-09-25",
+        "contracts": 25,
+        "max_120_240_difference_pp": 0.2853139638900659
+      },
+      {
+        "date": "2026-10-12",
+        "expiry": "2026-10-16",
+        "contracts": 44,
+        "max_120_240_difference_pp": 0.4203509688377238
+      },
+      {
+        "date": "2026-10-12",
+        "expiry": "2026-10-23",
+        "contracts": 41,
+        "max_120_240_difference_pp": 0.1986966729164208
+      },
+      {
+        "date": "2026-10-12",
+        "expiry": "2026-10-30",
+        "contracts": 42,
+        "max_120_240_difference_pp": 0.23651236295697542
+      },
+      {
+        "date": "2026-10-12",
+        "expiry": "2026-11-06",
+        "contracts": 33,
+        "max_120_240_difference_pp": 0.1795756816863947
+      },
+      {
+        "date": "2026-10-12",
+        "expiry": "2026-11-13",
+        "contracts": 28,
+        "max_120_240_difference_pp": 0.1291932463646006
+      },
+      {
+        "date": "2026-10-12",
+        "expiry": "2026-11-20",
+        "contracts": 28,
+        "max_120_240_difference_pp": 0.2035191059112762
+      }
+    ],
+    "max_fit_error_USD": 1.0934972483056526e-06,
+    "rejected_root_contracts": 44,
+    "coverage": {
+      "put_iv7": 39,
+      "call_iv7": 39,
+      "atm_iv7": 39,
+      "atm_iv30": 34
+    }
+  }
+}

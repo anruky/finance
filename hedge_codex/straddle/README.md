@@ -8,7 +8,7 @@
 | 报告2 | 每周1张Call＋1张Put | [报告2](skhy_report2_straddle.html) |
 | 报告3 | 不同平仓策略比较、时间衰减目标、最优策略逐周期成交明细 | [报告3](skhy_report3_all6_time_decay.html) |
 | 报告4 | 平仓后轮动开仓：本周五、下周五与期限费用性价比 | [报告4](rotation/skhy_report4_rotation.html) |
-| 报告5 | 固定平方根时间选约，比较44组止盈、止损与提前强平规则 | [报告5](rotation/exit_optimization/skhy_report5_exit_optimization.html) |
+| 报告5 | 原44组策略选优＋最优策略最新逐笔操作 | [报告5](rotation/exit_optimization/skhy_report5_exit_optimization.html) |
 
 ## 更新与复现
 
@@ -36,4 +36,4 @@ python3 -B verify_all6.py
 
 报告4行情截至美东2026-10-08，独立数据、缓存、程序和说明集中在 `rotation/`，不改动报告1/2/3。
 
-报告5使用相同的2026-07-31至2026-10-08区间，仅保留平方根时间选约，比较44组退出规则；详细文件在 `rotation/exit_optimization/`。
+报告5的第一部分保留2026-07-31至2026-10-08的44组选优结果；第二部分仅更新已选最优策略的最新交易明细，截至美东2026-10-12收盘；10月12日使用公开分钟行情补齐并核对收盘期权链。日常刷新见 `rotation/exit_optimization/README.md`。

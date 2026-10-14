@@ -1,0 +1,222 @@
+{
+  "price": 425.8,
+  "fx": 0.8528784648187633,
+  "valuation_shares": 92.0,
+  "forecast": [
+    {
+      "year": 2026,
+      "segments": [
+        4025.1629000000003,
+        1739.676,
+        2489.36975,
+        87.2316
+      ],
+      "revenue": 8341.44025,
+      "margin": 0.36,
+      "operating": 3002.9184899999996,
+      "finance": -10,
+      "tax": 598.5836979999999,
+      "nci": 40,
+      "core": 2354.3347919999997,
+      "investment": 250,
+      "profit": 2604.3347919999997,
+      "shares": 92,
+      "sbc": 240,
+      "eps": 28.307986869565212,
+      "economic_eps": 25.699291217391302
+    },
+    {
+      "year": 2027,
+      "segments": [
+        4387.427561,
+        2035.4209199999998,
+        2738.306725,
+        91.59318
+      ],
+      "revenue": 9252.748386,
+      "margin": 0.36,
+      "operating": 3330.9894189599995,
+      "finance": -30,
+      "tax": 660.197883792,
+      "nci": 45,
+      "core": 2595.7915351679994,
+      "investment": 260,
+      "profit": 2855.7915351679994,
+      "shares": 91,
+      "sbc": 250,
+      "eps": 31.382324562285707,
+      "economic_eps": 28.635071815032962
+    },
+    {
+      "year": 2028,
+      "segments": [
+        4738.421765880001,
+        2340.7340579999995,
+        3012.1373975,
+        96.17283900000001
+      ],
+      "revenue": 10187.46606038,
+      "margin": 0.37,
+      "operating": 3769.3624423406,
+      "finance": -40,
+      "tax": 745.8724884681201,
+      "nci": 50,
+      "core": 2933.48995387248,
+      "investment": 280,
+      "profit": 3213.48995387248,
+      "shares": 90,
+      "sbc": 260,
+      "eps": 35.70544393191644,
+      "economic_eps": 32.816555043027556
+    }
+  ],
+  "cash_assumptions": {
+    "core_profit": [
+      2600,
+      2930,
+      3200,
+      3450,
+      3700
+    ],
+    "depreciation_amortisation": [
+      1000,
+      1100,
+      1200,
+      1300,
+      1400
+    ],
+    "reinvestment_including_compute_prepayments": [
+      1950,
+      1900,
+      1700,
+      1650,
+      1650
+    ],
+    "other_working_capital": [
+      100,
+      150,
+      150,
+      150,
+      150
+    ],
+    "media_and_lease_payments": [
+      300,
+      320,
+      330,
+      350,
+      360
+    ],
+    "economic_sbc_reserve": [
+      250,
+      260,
+      270,
+      280,
+      290
+    ]
+  },
+  "cash_flows": [
+    1000,
+    1400,
+    1950,
+    2320,
+    2650
+  ],
+  "assets": {
+    "listed": 4141.2,
+    "unlisted": 2327.4,
+    "excess_cash": 200,
+    "total": 6668.6
+  },
+  "investment_asset_sensitivity": [
+    {
+      "label": "wider_discount",
+      "listed_ratio": 0.7,
+      "unlisted_ratio": 0.4,
+      "investment_nav": 4962.0,
+      "investment_per_share": 63.23853260869565,
+      "dcf_price": 451.1152632293877,
+      "sotp_price": 514.2288437474695,
+      "weighted_price": 484.7396042600059
+    },
+    {
+      "label": "base",
+      "listed_ratio": 0.85,
+      "unlisted_ratio": 0.6,
+      "investment_nav": 6468.6,
+      "investment_per_share": 82.4394945652174,
+      "dcf_price": 470.31622518590945,
+      "sotp_price": 533.4298057039912,
+      "weighted_price": 496.2601814339189
+    },
+    {
+      "label": "narrower_discount",
+      "listed_ratio": 0.95,
+      "unlisted_ratio": 0.8,
+      "investment_nav": 7731.6,
+      "investment_per_share": 98.53588043478261,
+      "dcf_price": 486.4126110554747,
+      "sotp_price": 549.5261915735565,
+      "weighted_price": 505.91801295565807
+    }
+  ],
+  "holding_value_illustrations_usd_100m": {
+    "pdd": 160.5326169684,
+    "sea": 100.0211679599,
+    "spotify_affiliated_gross": 87.72532049050001,
+    "spotify_wholly_owned_entities": 65.1705035905
+  },
+  "investment_asset_stress_per_share": {
+    "listed_value_down_20pct": 10.555558695652175,
+    "unlisted_book_down_30pct": 8.898510326086958,
+    "net_asset_plus_1000": 12.744565217391305,
+    "weighted_net_asset_plus_1000": 7.646739130434782
+  },
+  "dcf": {
+    "core": 30234.677370664107,
+    "explicit": 6523.710512854269,
+    "terminal": 23710.96685780984,
+    "assets": 6668.6,
+    "value": 36903.27737066411,
+    "price": 470.31622518590945,
+    "terminal_share": 0.7842308540992057
+  },
+  "pe_price": 503.61932554689224,
+  "sotp_price": 533.4298057039912,
+  "weighted_price": 496.2601814339189,
+  "reverse_dcf_scale": 0.8848449048584939,
+  "reverse_terminal_cf": 2344.8389978750088,
+  "dcf_sensitivity": [
+    [
+      484.7363799661105,
+      540.636475200739,
+      618.8966085292188
+    ],
+    [
+      429.9758659825797,
+      470.31622518590945,
+      524.1033707903491
+    ],
+    [
+      387.5216510763073,
+      417.7220502186792,
+      456.5511348303002
+    ]
+  ],
+  "pe_sensitivity": [
+    [
+      351.75,
+      439.6875,
+      527.625
+    ],
+    [
+      402.89445,
+      503.61806250000006,
+      604.3416750000001
+    ],
+    [
+      464.31,
+      580.3875,
+      696.465
+    ]
+  ]
+}
