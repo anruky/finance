@@ -1,0 +1,173 @@
+[
+  {
+    "event": "三星 Q3 初步业绩",
+    "start": "2026-10-08",
+    "end": "2026-10-08",
+    "base_close": 178.25,
+    "ending_close": 170.5,
+    "return_percent": -4.347826086956519,
+    "range_percent": 5.593267882187938
+  },
+  {
+    "event": "9 月 FOMC 会议纪要",
+    "start": "2026-10-07",
+    "end": "2026-10-07",
+    "base_close": 182.56,
+    "ending_close": 178.25,
+    "return_percent": -2.3608676599474188,
+    "range_percent": 2.4320771253286577
+  },
+  {
+    "event": "美国 9 月非农就业报告",
+    "start": "2026-10-02",
+    "end": "2026-10-02",
+    "base_close": 193.5,
+    "ending_close": 195.13,
+    "return_percent": 0.842377260981908,
+    "range_percent": 2.136950904392775
+  },
+  {
+    "event": "美国 ISM 制造业 PMI",
+    "start": "2026-10-01",
+    "end": "2026-10-01",
+    "base_close": 184.15,
+    "ending_close": 193.5,
+    "return_percent": 5.077382568558231,
+    "range_percent": 6.054846592451808
+  },
+  {
+    "event": "韩国 9 月出口与半导体出口发布",
+    "start": "2026-10-01",
+    "end": "2026-10-01",
+    "base_close": 184.15,
+    "ending_close": 193.5,
+    "return_percent": 5.077382568558231,
+    "range_percent": 6.054846592451808
+  },
+  {
+    "event": "**Micron FY2026 Q4 财报**",
+    "start": "2026-10-01",
+    "end": "2026-10-01",
+    "base_close": 184.15,
+    "ending_close": 193.5,
+    "return_percent": 5.077382568558231,
+    "range_percent": 6.054846592451808
+  },
+  {
+    "event": "NVIDIA × CoreWeave keynote / Vera Rubin AI 基建",
+    "start": "2026-09-30",
+    "end": "2026-09-30",
+    "base_close": 186.68,
+    "ending_close": 184.15,
+    "return_percent": -1.3552603385472484,
+    "range_percent": 2.0355688879365665
+  },
+  {
+    "event": "美国 PCE + Q2 GDP 第三次估值",
+    "start": "2026-09-30",
+    "end": "2026-09-30",
+    "base_close": 186.68,
+    "ending_close": 184.15,
+    "return_percent": -1.3552603385472484,
+    "range_percent": 2.0355688879365665
+  },
+  {
+    "event": "美国 8 月 JOLTS 职位空缺",
+    "start": "2026-09-29",
+    "end": "2026-09-29",
+    "base_close": 181.92,
+    "ending_close": 186.68,
+    "return_percent": 2.6165347405453065,
+    "range_percent": 2.946350043975366
+  },
+  {
+    "event": "CoreWeave Fully Connected AI 基础设施大会；9/29 开幕",
+    "start": "2026-09-29",
+    "end": "2026-10-01",
+    "base_close": 181.92,
+    "ending_close": 193.5,
+    "return_percent": 6.365435356200533,
+    "range_percent": 6.129067722075641
+  },
+  {
+    "event": "美联储理事 Lisa Cook：“AI and Emerging Tech”讲话",
+    "start": "2026-09-28",
+    "end": "2026-09-28",
+    "base_close": 191.56,
+    "ending_close": 181.92,
+    "return_percent": -5.032365838379627,
+    "range_percent": 3.8577991229901785
+  },
+  {
+    "event": "Solidigm 潜在 IPO",
+    "start": "2026-09-28",
+    "end": "2026-10-02",
+    "base_close": 191.56,
+    "ending_close": 195.13,
+    "return_percent": 1.8636458550845614,
+    "range_percent": 8.46471079557319
+  },
+  {
+    "event": "Meta Muse 爆发 + 全球 AI / 半导体重新升温",
+    "start": "2026-09-21",
+    "end": "2026-09-22",
+    "base_close": 187.5,
+    "ending_close": 195.37,
+    "return_percent": 4.197333333333342,
+    "range_percent": 5.6391466666666625
+  },
+  {
+    "event": "Trump–Xi 中美峰会及先进芯片 / HBM 限制未进一步升级",
+    "start": "2026-09-28",
+    "end": "2026-10-02",
+    "base_close": 191.56,
+    "ending_close": 195.13,
+    "return_percent": 1.8636458550845614,
+    "range_percent": 8.46471079557319
+  },
+  {
+    "event": "印第安纳 HBM 工厂奠基公告（时点待核）",
+    "start": "2026-08-28",
+    "end": "2026-08-28",
+    "base_close": 161.61,
+    "ending_close": 161.04,
+    "return_percent": -0.3527009467236053,
+    "range_percent": 3.458944372254194
+  },
+  {
+    "event": "NVIDIA 盘后财报（原讨论线索待核）",
+    "start": "2026-08-27",
+    "end": "2026-08-27",
+    "base_close": 158.02,
+    "ending_close": 161.61,
+    "return_percent": 2.271864320972039,
+    "range_percent": 3.872927477534474
+  },
+  {
+    "event": "三星股东回报预期差（催化待核）",
+    "start": "2026-08-24",
+    "end": "2026-08-24",
+    "base_close": 163.41,
+    "ending_close": 155.37,
+    "return_percent": -4.920139526344769,
+    "range_percent": 3.703567713114248
+  },
+  {
+    "event": "光互连技术路线图（公告日待核）",
+    "start": "2026-08-20",
+    "end": "2026-08-20",
+    "base_close": 156.16,
+    "ending_close": 163.08,
+    "return_percent": 4.431352459016402,
+    "range_percent": 4.008709016393437
+  },
+  {
+    "event": "海力士回购 / 注销消息（待核实）",
+    "start": "2026-08-19",
+    "end": "2026-08-19",
+    "base_close": 155.62,
+    "ending_close": 156.16,
+    "return_percent": 0.34699910037270243,
+    "range_percent": 5.256329520627171
+  }
+]

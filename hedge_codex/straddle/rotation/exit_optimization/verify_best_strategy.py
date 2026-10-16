@@ -15,7 +15,10 @@ for tr in r['trades']:
  assert abs(tr['gross']-x['value']+e['value'])<1e-7 and abs(tr['gross']-tr['call_pnl']-tr['put_pnl'])<1e-7
  assert e['value']/(100*e['stock'])<=.12+1e-12
  for leg in ['call','put']:
-  b=source_bars(q[leg+'_ticker']);assert b[et]['o']==e[leg]
+  b=source_bars(q[leg+'_ticker'])
+  if e.get('price_basis')=='latest_same_day_trade_proxy':
+   k=max(k for k in b if k.date()==et.date() and k<=et-timedelta(minutes=1));assert b[k]['c']==e[leg] and k.isoformat()==e['quote_times'][leg] and (et-k).total_seconds()/60==e['ages'][leg]
+  else:assert b[et]['o']==e[leg]
   if tr['status']=='模拟平仓':assert b[xt]['o']==x[leg]
   if tr['status']=='仍持仓估值':
    assert xt.date().isoformat()==latest['data_end']

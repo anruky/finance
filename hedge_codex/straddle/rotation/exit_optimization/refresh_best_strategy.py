@@ -30,6 +30,26 @@ class IncrementalMarket(core.Market):
 if __name__=='__main__':
  ap=argparse.ArgumentParser();ap.add_argument('--offline',action='store_true');ap.add_argument('--end');args=ap.parse_args()
  original=json.loads((ROOT/'exit_optimization_results.json').read_text());best=next(r for r in original['results'] if r['rule']['id']==original['best'])
- m=IncrementalMarket(args.offline,args.end);result=opt.Engine(m).run(best['rule'])
- data=dict(selection_end=original['end'],data_end=m.end,selected_rule_id=original['best'],requested_end=args.end or __import__('refresh_data').last_completed_date(),checked_at_utc=datetime.now(timezone.utc).isoformat(),result=result)
+ from entry_execution import EntryEngine,summarize
+ import copy
+ m=IncrementalMarket(args.offline,args.end);engine=EntryEngine(m)
+ latest_path=BASE/'best_strategy_latest.json'
+ data=json.loads(latest_path.read_text()) if latest_path.exists() else dict(selection_end=original['end'],selected_rule_id=original['best'],result=best)
+ assert data['selected_rule_id']==original['best'] and data['result']['rule']==best['rule']
+ if m.end<data.get('data_end',original['end']):raise RuntimeError('Refusing to replace newer ledger with older market coverage')
+ result=copy.deepcopy(data['result']);last=result['trades'][-1] if result['trades'] else None
+ def finalize(tr,new):
+  tr.update(new);e,x=tr['entry'],tr['exit'];tr.update(gross=x['value']-e['value'],roi=100*(x['value']-e['value'])/e['value'],call_pnl=100*(x['call']-e['call']),put_pnl=100*(x['put']-e['put']))
+ if last and last['status']=='仍持仓估值':finalize(last,engine.closing(last['contract'],last['entry'],best['rule']))
+ t=m.reentry(datetime.fromisoformat(last['exit']['time'])) if last and last['status']!='仍持仓估值' else None
+ if last and t:result['decisions']=[d for d in result['decisions'] if d['time']<=last['exit']['time']]
+ while t and t<=m.limit:
+  dec,q,e=engine.opening(t,best['rule']);result['decisions'].append(dec)
+  if e is None:
+   if dec['action']=='数据待验证':raise RuntimeError('Missing same-day candidate data; existing report preserved')
+   t=m.nextday(t);continue
+  tr=dict(id=len(result['trades'])+1,decision=dec,contract=q,entry=e);finalize(tr,engine.closing(q,e,best['rule']));result['trades'].append(tr)
+  t=m.reentry(datetime.fromisoformat(tr['exit']['time'])) if tr['status']!='仍持仓估值' else None
+ summarize(result,m.limit)
+ data.update(data_end=m.end,requested_end=args.end or __import__('refresh_data').last_completed_date(),checked_at_utc=datetime.now(timezone.utc).isoformat(),result=result,entry_execution_version='latest_same_day_trade_v1')
  core.save(BASE/'best_strategy_latest.json',data);print('UPDATED_FIXED_RULE',original['best'],m.end,result['stats'])

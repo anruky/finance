@@ -4,16 +4,117 @@ import json
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import run_local_backtest as m
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import qqq_biweekly_backtest as m
+from qqq_biweekly_valuation import build_valuation
+REPORT_DIR = Path(__file__).resolve().parent
+DATA_DIR = Path(os.environ.get("QQQ_DATA_DIR", REPORT_DIR.parents[1] / "Data"))
 
-# 买 call 对冲参数（已优化）
+# 买 call 对冲参数（沿用原配置）
 BUY_CALL_OTM = 0.0   # 买 call 的 OTM（0% = ATM，最及时）
 BUY_CALL_NUM = 3     # 买 call 手数
 
 r = m.run('QQQ', m.make_targets(20, 6, 10, 15), options_file='QQQ_options_2wk.json',
-          buy_call_otm=BUY_CALL_OTM, buy_call_num=BUY_CALL_NUM)
+          buy_call_otm=BUY_CALL_OTM, buy_call_num=BUY_CALL_NUM, data_dir=DATA_DIR)
+valuation = build_valuation(DATA_DIR, r)
+r['one_year_return_pct'] = valuation['one_year_return_pct']
+r['one_year_start'] = valuation['start']['date']
+r['one_year_end'] = valuation['end']['date']
+r['latest_marked_equity'] = valuation['end']['equity']
+latest_stock = json.load(open(DATA_DIR / "QQQ_stock.json"))
+pending_chains = {c["date"]: c for c in json.load(open(DATA_DIR / "QQQ_options_2wk.json"))}
+pending_expiry = pending_chains.get(r["end"], {}).get("expiry", "待补齐入场数据")
+pending = pending_chains.get(r['end'])
+pending_text = '尚缺下一周期入场数据。'
+if pending:
+    last_state = r['cycle_list'][-1]['state']
+    targets = m.make_targets(20, 6, 10, 15)[last_state]
+    ps = m.find_real_put(pending['puts'], targets['put'], pending['dte'], pending['spot'])
+    cs = m.find_real_call(pending['calls'], targets['call'], pending['dte'], pending['spot'])
+    if ps and cs:
+        hits = [d for d in latest_stock if r['end'] < d[0] <= r['latest_stock'] and d[2] >= cs['strike']]
+        trigger = ('已于 ' + hits[0][0] + ' 触价，按模型触发买入3手ATM Call') if hits else '截至最新可读日线尚未触发买Call'
+        pending_text = (f"入场参数状态 {last_state}；入场股价 ${pending['spot']:.2f}；"
+                        f"卖 Put 行权价 ${ps['strike']:g}，卖 Call 行权价 ${cs['strike']:g}；{trigger}。"
+                        '本段仅展示未到期周期的观察状态，不计入已结算业绩。')
+refreshed_at = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y-%m-%d %H:%M 上海时间")
 
-stock = json.load(open('/Users/gavinz/git/finance/data/QQQ_stock.json'))
+# Keep open-cycle estimates separate from the completed-cycle ledger.
+pending_module = ''
+current = valuation['end']
+if current.get('open_options') and pending and ps and cs:
+    entry_value = r['final']
+    entry_cash = entry_value - 100 * pending['spot']
+    put_income, call_income = ps['prem'] * 100, cs['prem'] * 100
+    premium_income = put_income + call_income
+    stock_pnl = 100 * (current['stock_close'] - pending['spot'])
+    put_pnl = put_income - 100 * current['put_close']
+    call_pnl = call_income - 100 * current['call_close']
+    hedge_pnl = current['hedge_market_value'] - current['hedge_cost']
+    cycle_pnl = current['equity'] - entry_value
+    cycle_ret = cycle_pnl / entry_value * 100
+    assert abs(cycle_pnl - (stock_pnl + put_pnl + call_pnl + hedge_pnl)) < 0.01
+    observed = [row for row in latest_stock if pending['date'] < row[0] <= valuation['as_of']]
+    observed_high = max(row[2] for row in observed) if observed else pending['spot']
+    days_left = (datetime.strptime(pending_expiry, '%Y-%m-%d') - datetime.strptime(valuation['as_of'], '%Y-%m-%d')).days
+    put_position = ('价内' if current['stock_close'] < ps['strike'] else '价外/平值')
+    call_position = ('价内/平值' if current['stock_close'] >= cs['strike'] else '价外')
+    if current['hedge_trigger_date']:
+        hedge_status = f"已于 {current['hedge_trigger_date']} 触发买入 {BUY_CALL_NUM} 手 ATM Call；估算成本 ${current['hedge_cost']:,.2f}，当前市值 ${current['hedge_market_value']:,.2f}。"
+    else:
+        hedge_status = f"尚未触发买 Call 对冲。开仓后的日线最高价为 ${observed_high:.2f}，低于触发价 ${cs['strike']:g}；当前没有额外买入 Call 持仓。"
+    if current['stock_close'] < ps['strike']:
+        estimated_state = 'C' if current['hedge_trigger_date'] else 'E'
+        expiry_scenario = f"若到期股价仍为 ${current['stock_close']:.2f}，卖 Put 预计被行权、卖 Call 预计作废，模型结果为 {estimated_state}；交割后持有 200 股，按策略卖出 100 股归一，下一周期使用 Put 10% / Call 15% 年化目标。"
+    elif current['stock_close'] >= cs['strike']:
+        expiry_scenario = f"若到期股价仍为 ${current['stock_close']:.2f}，卖 Call 预计被行权、卖 Put 预计作废；模型进入 B 后买回 100 股归一，下一周期使用 Put 20% / Call 6% 年化目标。"
+    else:
+        estimated_state = 'D' if current['hedge_trigger_date'] else 'A'
+        expiry_scenario = f"若到期股价仍为 ${current['stock_close']:.2f}，卖 Put / Call 预计均作废，模型结果为 {estimated_state}；下一周期使用 Put 20% / Call 6% 年化目标。"
+    put_ticker = f"QQQ{pending_expiry[2:4]}{pending_expiry[5:7]}{pending_expiry[8:10]}P{int(ps['strike']*1000):08d}"
+    call_ticker = f"QQQ{pending_expiry[2:4]}{pending_expiry[5:7]}{pending_expiry[8:10]}C{int(cs['strike']*1000):08d}"
+    pending_module = f"""
+<div class="card" id="latest-open-cycle">
+<h2>最新一期 · 未到期（估算）</h2>
+<p style="font-size:14px;line-height:1.9;"><strong>开仓 {pending['date']} → 到期 {pending_expiry}</strong> · 估值时点 {valuation['as_of']} 美股收盘 · 距到期 {days_left} 个自然日。<br>
+本模块为策略模型持仓及估算收益，不代表账户实际成交；该期单独展示，未加入下方 {r['cycles']} 个已结算周期明细。</p>
+<div class="kpis" style="margin-top:14px;">
+  <div class="kpi"><div class="label">本期估算盈亏</div><div class="value">${cycle_pnl:+,.2f}</div></div>
+  <div class="kpi"><div class="label">本期估算收益率</div><div class="value">{cycle_ret:+.2f}%</div></div>
+  <div class="kpi"><div class="label">当前组合净值（估算）</div><div class="value">${current['equity']:,.2f}</div></div>
+</div>
+<h3 style="font-size:15px;margin:16px 0 8px;">开仓细节</h3>
+<p style="font-size:13px;line-height:1.9;">上期结果状态 <strong>{last_state}</strong>，本期卖 Put / Call 年化权利金目标为 <strong>{targets['put']*100:.0f}% / {targets['call']*100:.0f}%</strong>。<br>
+开仓前组合净值 ${entry_value:,.2f}：100 股 QQQ（入场参考价 ${pending['spot']:.2f}，价值 ${100*pending['spot']:,.2f}）+ 现金 ${entry_cash:,.2f}。<br>
+本期卖出权利金合计 <strong>${premium_income:,.2f}</strong>；开仓成交价格沿用入场日 VWAP，最新估值采用同日期权收盘价。</p>
+<div class="tbl-scroll" style="max-height:none;">
+<table>
+<thead><tr><th>开仓操作 / 合约</th><th>数量 / 到期日</th><th>行权价</th><th>开仓价（美元/股）</th><th>收取权利金</th><th>当前价（美元/股）</th><th>当前负债市值</th><th>估算盈亏</th></tr></thead>
+<tbody>
+<tr><td>卖 Put<br><span class="c-muted">{put_ticker}</span></td><td>1 张 × 100 股<br>{pending_expiry}</td><td>${ps['strike']:g}</td><td>${ps['prem']:.4f}</td><td>${put_income:,.2f}</td><td>${current['put_close']:.2f}</td><td>${100*current['put_close']:,.2f}</td><td>${put_pnl:+,.2f}</td></tr>
+<tr><td>卖 Call<br><span class="c-muted">{call_ticker}</span></td><td>1 张 × 100 股<br>{pending_expiry}</td><td>${cs['strike']:g}</td><td>${cs['prem']:.4f}</td><td>${call_income:,.2f}</td><td>${current['call_close']:.2f}</td><td>${100*current['call_close']:,.2f}</td><td>${call_pnl:+,.2f}</td></tr>
+</tbody></table>
+</div>
+<h3 style="font-size:15px;margin:16px 0 8px;">当前情况与估算收益</h3>
+<p style="font-size:13px;line-height:1.9;">QQQ 从 ${pending['spot']:.2f} 变为 <strong>${current['stock_close']:.2f}</strong>，变动 {(current['stock_close']/pending['spot']-1)*100:+.2f}%。当前卖 Put 为<strong>{put_position}</strong>，卖 Call 为<strong>{call_position}</strong>。<br>
+{hedge_status}<br>
+{expiry_scenario}此为现价不变情景，最终结果以到期行情为准。</p>
+<div class="tbl-scroll" style="max-height:none;">
+<table><thead><tr><th>本期收益拆分（估算）</th><th>金额</th></tr></thead><tbody>
+<tr><td>持有 100 股浮动盈亏</td><td>${stock_pnl:+,.2f}</td></tr>
+<tr><td>卖 Put 浮动盈亏（开仓权利金 − 当前负债市值）</td><td>${put_pnl:+,.2f}</td></tr>
+<tr><td>卖 Call 浮动盈亏（开仓权利金 − 当前负债市值）</td><td>${call_pnl:+,.2f}</td></tr>
+<tr><td>买 Call 对冲浮动盈亏</td><td>${hedge_pnl:+,.2f}</td></tr>
+<tr><td class="bold">本期合计估算盈亏</td><td class="bold">${cycle_pnl:+,.2f}（{cycle_ret:+.2f}%）</td></tr>
+</tbody></table>
+</div>
+<p class="note">估算净值 = 现金 ${current['cash']:,.2f} + 100 股市值 ${100*current['stock_close']:,.2f} − 卖出期权负债 ${current['short_option_liability']:,.2f} + 买 Call 市值 ${current['hedge_market_value']:,.2f} = ${current['equity']:,.2f}。本期收益率以开仓前组合净值为分母，包含股票浮动盈亏和当前期权时间价值，最终以到期结算为准。</p>
+</div>
+"""
+
+stock = [s for s in latest_stock if r['start'] <= s[0] <= r['end']]
 dates = [s[0] for s in stock]
 closes = [s[4] for s in stock]
 S0 = closes[0]
@@ -35,7 +136,7 @@ yr_cycles = defaultdict(int)
 yr_states = defaultdict(lambda: defaultdict(int))
 yr_end_val = {}
 for c in r['cycle_list']:
-    y = c['entry'][:4]
+    y = c['expiry'][:4]
     yr_prem[y] += c['prem']
     yr_cycles[y] += 1
     yr_states[y][c['state']] += 1
@@ -57,14 +158,14 @@ def yearly_dd(values, start_val):
 yearly_rows = ''
 prev_val = initial
 prev_bh = S0_bt
-bt_start = r['cycle_list'][0]['entry']  # 回测起点日期（期权首日），B&H 从此起算
-for y in ['2024', '2025', '2026']:
+bt_start = r['start']  # 回测起点日期（期权首日），B&H 从此起算
+for y in sorted(yr_end_val):
     endv = yr_end_val.get(y)
     if endv is None:
         continue
     sret = (endv - prev_val) / prev_val * 100
     # 策略年内回撤（周期价值）
-    strat_vals = [c['value'] for c in r['cycle_list'] if c['entry'][:4] == y]
+    strat_vals = [c['value'] for c in r['cycle_list'] if c['expiry'][:4] == y]
     sdd = yearly_dd(strat_vals, prev_val)
     # B&H 年内回撤（日线，从回测起点起算）
     bh_vals = [c for d, c in zip(dates, closes) if d[:4] == y and d >= bt_start]
@@ -94,9 +195,13 @@ for c in r['cycle_list']:
     except Exception:
         bv.append(None)
 pairs = [(l, s, b) for l, s, b in zip(labels, sv, bv) if b is not None]
-labels = [p[0] for p in pairs]
-sv = [p[1] for p in pairs]
-bv = [p[2] for p in pairs]
+labels = [r['start']] + [p[0] for p in pairs]
+sv = [initial] + [p[1] for p in pairs]
+bv = [initial] + [p[2] for p in pairs]
+if valuation['as_of'] > r['end']:
+    labels.append(valuation['as_of'])
+    sv.append(round(valuation['end']['equity'], 2))
+    bv.append(round(initial * r['latest_close'] / S0_bt, 2))
 
 cycle_rows_data = []
 prev_bh_val = initial
@@ -142,8 +247,8 @@ state_meta = {
 }
 otm_stat = defaultdict(lambda: {'put': [], 'call': []})
 for c in r['cycle_list']:
-    otm_stat[c['state']]['put'].append((c['spot'] - c['put']) / c['spot'] * 100)
-    otm_stat[c['state']]['call'].append((c['call'] - c['spot']) / c['spot'] * 100)
+    otm_stat[c['prev_state']]['put'].append((c['spot'] - c['put']) / c['spot'] * 100)
+    otm_stat[c['prev_state']]['call'].append((c['call'] - c['spot']) / c['spot'] * 100)
 
 param_rows = ''
 for s in ['A', 'B', 'C', 'D', 'E']:
@@ -220,31 +325,46 @@ html = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QQQ Wheel 2周周期最优策略报告</title>
+<title>策略1</title>
 <style>{css}</style>
 </head>
 <body>
 <div class="wrap">
-<h1>QQQ Wheel 策略 · 2周周期最优配置 <span style="color:var(--muted);font-size:15px;">（真实期权数据）</span></h1>
-<p class="sub">区间 2024-08-19 ~ 2026-08-14（499 交易日）· 真实历史期权数据（VWAP）· 周期 14 天（周五到期）· 参数 A/B/D 20%/6%，C/E 10%/15%</p>
+<h1>策略1</h1>
+<p class="sub">QQQ Wheel · 行情与未到期估值更新至 {valuation['as_of']} · 已结算区间 {r['start']} ~ {r['end']}（{len(stock)} 交易日）· 历史期权日线 VWAP 回测· 周期 14 天（周五到期）· 参数 A/B/D 20%/6%，C/E 10%/15%</p>
 
+<div class="card">
+<h2>刷新状态与回测口径</h2>
+<p style="font-size:14px;line-height:1.9;">更新时间：{refreshed_at}<br>
+最新完整美股交易日：<strong>{r['latest_stock']}</strong>，QQQ 收盘 <strong>${r['latest_close']:.2f}</strong>；报告日期（上海）{refreshed_at[:10]}，行情日期按美东交易日记录。<br>
+数据源：历史股票与期权为 Polygon/Massive；最新股票日线由 <a style="color:inherit" href="https://finance.yahoo.com/quote/QQQ/history/">Yahoo Finance</a> 补齐，未到期期权采用 Polygon/Massive 同日收盘价。<br>
+<strong>策略最近一年收益：{valuation['one_year_return_pct']:+.2f}%</strong>，区间 {valuation['start']['date']} → {valuation['end']['date']}，组合净值 ${valuation['start']['equity']:,.2f} → ${valuation['end']['equity']:,.2f}，包含两端未到期期权的市值。<br>
+已完成周期结算至 <strong>{r['end']}</strong>。当前未到期周期 {r['end']} → {pending_expiry} 尚未取得到期日收盘数据，尚未结算，未纳入已结算收益、年度汇总及明细；其股票浮动盈亏和期权市值已纳入最近一年收益及最新估值。<br>
+当前周期的开仓细节、持仓与估算盈亏见下方独立模块。<br>
+<strong>对冲成本沿用原模型近似：</strong>以触价时选定的 Call 行权价，取该合约<strong>周期入场日 VWAP</strong>估算买入成本，并非触发时成交价；此近似可能显著影响收益，需用触发时行情另行校准。卖出期权也以入场日 VWAP 选约及计价，不代表可实现成交。<br>
+仅按日最高价判断触价；未计佣金、价差、股息、现金利息及提前行权；已结算收益按相同区间比较；最近一年收益以最新完整交易日向前一年为区间，按组合净值变动计算；周年日非交易日时取前一交易日。<br>
+<a style="color:inherit" href="https://www.massive.com/docs/rest/options/aggregates/custom-bars">期权数据口径</a> · <a style="color:inherit" href="refresh_data_provenance.json">历史增量数据记录</a> · <a style="color:inherit" href="../../Data/qqq_latest_market_sources.json">最新行情来源</a> · <a style="color:inherit" href="../../Data/qqq_biweekly_valuation.json">最近一年估值明细</a>
+</p>
+</div>
 <div class="kpis">
-  <div class="kpi"><div class="label">策略年化收益</div><div class="value c-pos">{r['ann']:.2f}%</div></div>
-  <div class="kpi"><div class="label">策略总收益</div><div class="value c-pos">{r['total_ret']:+.2f}%</div></div>
-  <div class="kpi"><div class="label">最大回撤</div><div class="value">{r['dd']:.2f}%</div></div>
-  <div class="kpi"><div class="label">买入持有年化</div><div class="value">{r['bh_ann']:.2f}%</div></div>
+  <div class="kpi"><div class="label">策略年化收益（已结算）</div><div class="value c-pos">{r['ann']:.2f}%</div></div>
+  <div class="kpi"><div class="label">策略最近一年收益</div><div class="value c-pos">{valuation['one_year_return_pct']:+.2f}%</div></div>
+  <div class="kpi"><div class="label">周期末最大回撤</div><div class="value">{r['dd']:.2f}%</div></div>
+  <div class="kpi"><div class="label">买入持有年化（已结算）</div><div class="value">{r['bh_ann']:.2f}%</div></div>
   <div class="kpi"><div class="label">买入持有回撤</div><div class="value">{bh_dd_pct}%</div></div>
   <div class="kpi"><div class="label">周期数</div><div class="value">{r['cycles']}</div></div>
   <div class="kpi"><div class="label">权利金收入</div><div class="value">${r['premium']:,.0f}</div></div>
 </div>
 
+{pending_module}
+
 <div class="card">
-<h2>按年度汇总</h2>
+<h2>按年度汇总（已结算周期）</h2>
 <table>
 <thead><tr><th>年份</th><th>周期数</th><th>权利金</th><th>策略收益</th><th>策略回撤</th><th>买入持有</th><th>B&H回撤</th><th>状态分布</th></tr></thead>
 <tbody>{yearly_rows}</tbody>
 </table>
-<p class="note">白色=当年跑赢买入持有，灰色=跑输。2024 为 8月19日起的区间，2026 为截至 8月14日的区间。</p>
+<p class="note">白色=当年跑赢买入持有，灰色=跑输。起止年份为部分年度，截至 {r['end']}；周期按到期年份计入。策略回撤以周期末价值计算，B&H回撤以日收盘价计算。</p>
 </div>
 
 <div class="card">
@@ -253,7 +373,7 @@ html = f"""<!DOCTYPE html>
 <strong>资金结构</strong>：2 手资金 = 1 手持股 + 1 手现金，整体看涨。<br>
 <strong>操作周期</strong>：每两周（周五到期）卖 1 手 put + 1 手 call，收权利金。<br>
 <strong>每日监控（触价对冲）</strong>：股价一旦触及卖出的 call 行权价，买 <strong>{BUY_CALL_NUM} 手 {BUY_CALL_OTM*100:.0f}% OTM（ATM）call</strong> 对冲踏空上行（不融资买股）。<br>
-<strong>遇假日</strong>：期权到期日顺延到前一个交易日（周四）。
+<strong>遇假日</strong>：期权到期日提前至前一个交易日（周四）。
 </p>
 <table>
 <thead><tr><th>状态</th><th>含义</th><th>触发买call</th><th>到期结果</th><th>周期末持仓</th></tr></thead>
@@ -275,13 +395,13 @@ html = f"""<!DOCTYPE html>
 <tbody>{param_rows}</tbody>
 </table>
 <div style="margin-top:12px;padding:12px 16px;background:#1e1e1e;border:1px solid var(--border);border-radius:8px;font-size:13px;">
-<strong>买 call 对冲参数（已优化）</strong>：股价触及卖出的 call 行权价时，买 <strong>{BUY_CALL_NUM} 手 {BUY_CALL_OTM*100:.0f}% OTM（ATM）call</strong> 对冲踏空上行。<span class="c-muted">（搜索结论：OTM 越小越好，0% 最优；手数越多牛市收益越高，选 3 手为平衡）</span>
+<strong>买 call 对冲参数（沿用原配置）</strong>：股价触及卖出的 call 行权价时，买 <strong>{BUY_CALL_NUM} 手 {BUY_CALL_OTM*100:.0f}% OTM（ATM）call</strong> 对冲踏空上行。<span class="c-muted">（本次沿用历史选定参数，未重新优化；样本内参数选择可能高估表现）</span>
 </div>
 <p class="note">OTM=行权价相对入场价的偏离（Put 为现价下方、Call 为现价上方），由真实回测数据统计。资金结构：2手资金 = 1手持股 + 1手现金 · 到期日=每两周后的周五</p>
 </div>
 
 <div class="card">
-<h2>收入与成本</h2>
+<h2>收入与成本（已结算至 {r['end']}）</h2>
 <table>
 <thead><tr><th>收入</th><th>金额</th><th>成本</th><th>金额</th></tr></thead>
 <tbody>
@@ -291,11 +411,12 @@ html = f"""<!DOCTYPE html>
 <tr><td class="bold">合计收入</td><td class="bold">${total_income:,.0f}</td><td class="bold">合计成本</td><td class="bold">${total_cost:,.0f}</td></tr>
 </tbody>
 </table>
-<p class="note">初始资金 ${initial:,.0f} → 终值 ${final_val:,.0f} · 净盈亏 +{net:,.0f}（{net/initial*100:.1f}%）</p>
+<p class="note">初始资金 ${initial:,.0f} → 终值 ${final_val:,.0f} · 净盈亏 {net:+,.0f}（{net/initial*100:.1f}%）</p>
 </div>
 
 <div class="card">
 <h2>组合价值走势（策略 vs 买入持有）</h2>
+<p class="note">最新点为 {valuation['as_of']} 收盘估值，包含当前未到期期权市值；此前为已结算周期末净值。</p>
 <canvas id="c" height="120"></canvas>
 </div>
 
@@ -319,6 +440,7 @@ html = f"""<!DOCTYPE html>
 
 html = html.replace('__CHART_JS__', chart_js)
 
-open('qqq_wheel_biweekly_report.html', 'w').write(html)
+(REPORT_DIR / 'qqq_wheel_biweekly_report.html').write_text(html)
+(DATA_DIR / 'qqq_biweekly_latest_result.json').write_text(json.dumps(r, ensure_ascii=False, indent=2))
 print('完整报告已生成: qqq_wheel_biweekly_report.html')
-print(f"年化 {r['ann']:.2f}% 总收益 {r['total_ret']:.2f}% 回撤 {r['dd']:.2f}% 周期 {r['cycles']}")
+print(f"最近一年 {valuation['one_year_return_pct']:.2f}%（{valuation['start']['date']} ~ {valuation['end']['date']}）；已结算年化 {r['ann']:.2f}% 周期 {r['cycles']}")

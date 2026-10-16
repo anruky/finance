@@ -1,0 +1,130 @@
+{
+  "end": "2026-10-14",
+  "checked_at_utc": "2026-10-15T03:08:13.001673+00:00",
+  "records": [
+    {
+      "ticker": "SKHY",
+      "provider": "Yahoo Finance public chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY",
+      "days": {
+        "2026-10-13": 389,
+        "2026-10-14": 390
+      },
+      "raw_file": "public_market_data/SKHY_2026-10-14.json",
+      "sha256": "61c20416e1db5e81aeb22f8178119e76d4ead0b8879b6d91d8de7df234a92d1f"
+    },
+    {
+      "ticker": "O:SKHY261016C00167500",
+      "provider": "Yahoo Finance public chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY261016C00167500",
+      "days": {
+        "2026-10-13": 91,
+        "2026-10-14": 41
+      },
+      "raw_file": "public_market_data/SKHY261016C00167500_2026-10-14.json",
+      "sha256": "10b088db417bd75d25329950878411e877b2b3427e6bbe1625a50ce6d4d33227"
+    },
+    {
+      "ticker": "O:SKHY261016P00167500",
+      "provider": "Yahoo Finance public chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY261016P00167500",
+      "days": {
+        "2026-10-13": 25,
+        "2026-10-14": 18
+      },
+      "raw_file": "public_market_data/SKHY261016P00167500_2026-10-14.json",
+      "sha256": "2d6b1ac60902a9fb6a4bbc95f0fb4e69e2f76961ec62609acd156e4d8424e9bc"
+    },
+    {
+      "ticker": "O:SKHY261016C00155000",
+      "provider": "Yahoo Finance public chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY261016C00155000",
+      "days": {
+        "2026-10-13": 166,
+        "2026-10-14": 197
+      },
+      "raw_file": "public_market_data/SKHY261016C00155000_2026-10-14.json",
+      "sha256": "1d34d446096673664bedf22bcece4206fda4396a5ceea0bd21c5ddec058fa4c8"
+    },
+    {
+      "ticker": "O:SKHY261016P00155000",
+      "provider": "Yahoo Finance public chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY261016P00155000",
+      "days": {
+        "2026-10-13": 134,
+        "2026-10-14": 108
+      },
+      "raw_file": "public_market_data/SKHY261016P00155000_2026-10-14.json",
+      "sha256": "b74ff4f919e4e83ad09cdad3e82e6fdfe395f42f45b89c8362ed139515c7f5c2"
+    },
+    {
+      "ticker": "O:SKHY261023C00155000",
+      "provider": "Yahoo Finance public chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY261023C00155000",
+      "days": {
+        "2026-10-13": 75,
+        "2026-10-14": 74
+      },
+      "raw_file": "public_market_data/SKHY261023C00155000_2026-10-14.json",
+      "sha256": "626da24859e97919ef25013718881974858160c03fa8f4b00edf4af50506833e"
+    },
+    {
+      "ticker": "O:SKHY261023P00155000",
+      "provider": "Yahoo Finance public chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY261023P00155000",
+      "days": {
+        "2026-10-13": 59,
+        "2026-10-14": 38
+      },
+      "raw_file": "public_market_data/SKHY261023P00155000_2026-10-14.json",
+      "sha256": "0995108598cce3b537dbe79de1bf7df92bd2e830efb175387728f871309c7287"
+    },
+    {
+      "ticker": "O:SKHY261023C00148000",
+      "provider": "Yahoo Finance public chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY261023C00148000",
+      "days": {
+        "2026-10-13": 0,
+        "2026-10-14": 12
+      },
+      "raw_file": "public_market_data/SKHY261023C00148000_2026-10-14.json",
+      "sha256": "1c27d88a65e89d050826ab3e1583f43b95d7d9e79517ab4c6885ac74afbda28d"
+    },
+    {
+      "ticker": "O:SKHY261023P00148000",
+      "provider": "Yahoo Finance public chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY261023P00148000",
+      "days": {
+        "2026-10-13": 8,
+        "2026-10-14": 20
+      },
+      "raw_file": "public_market_data/SKHY261023P00148000_2026-10-14.json",
+      "sha256": "0f133e4f69afa1f82e7d228c3c8cd8f8d99937db0f344457b5de651e74c119d4"
+    },
+    {
+      "ticker": "O:SKHY261016C00148000",
+      "provider": "Massive / Polygon",
+      "url": "https://api.polygon.io/v2/aggs/ticker/O:SKHY261016C00148000/range/1/minute/2026-10-13/2026-10-14",
+      "raw_file": "public_market_data/SKHY261016C00148000_massive_2026-10-14.json",
+      "sha256": "c0ff39e2bfc42bacad7ba4b6f2e2145fc683b0e8fceaa28ee284100e6649ee6b",
+      "points": 96
+    },
+    {
+      "ticker": "O:SKHY261016P00148000",
+      "provider": "Massive / Polygon",
+      "url": "https://api.polygon.io/v2/aggs/ticker/O:SKHY261016P00148000/range/1/minute/2026-10-13/2026-10-14",
+      "raw_file": "public_market_data/SKHY261016P00148000_massive_2026-10-14.json",
+      "sha256": "5bf8d6b22dd6533c68232148244998e5747347dfe52129cdf75aeb0ea30efa9d",
+      "points": 109
+    },
+    {
+      "ticker": "SKHY",
+      "provider": "Yahoo Finance public daily chart",
+      "raw_file": "public_market_data/SKHY_daily_2026-10-14.json",
+      "sha256": "1f3e0392698b73a59bdbdbccd66a2587a85f0f0c8edd92a6f3f612782dedf9a9",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/SKHY?range=5d&interval=1d"
+    }
+  ],
+  "previous": "oct12_market_provenance.json",
+  "note": "Regular-session minute OHLC trades only. Stock daily closes use timestamped 16:00 markers or same-day regularMarketPrice; option final marks use last positive-volume regular minute close."
+}

@@ -1,0 +1,43 @@
+{
+  "as_of": "2026-10-15",
+  "requested_year_start": "2025-10-15",
+  "start": {
+    "date": "2025-10-15",
+    "equity": 122682.01999999999,
+    "open_options": true,
+    "entry": "2025-10-03",
+    "expiry": "2025-10-17",
+    "cash": 62669.02,
+    "shares": 100,
+    "stock_close": 602.22,
+    "put_strike": 595.0,
+    "call_strike": 620.0,
+    "put_close": 1.99,
+    "call_close": 0.1,
+    "short_option_liability": 209.0,
+    "hedge_cost": 0,
+    "hedge_market_value": 0,
+    "hedge_trigger_date": null
+  },
+  "end": {
+    "date": "2026-10-15",
+    "equity": 160253.32999999996,
+    "open_options": true,
+    "entry": "2026-10-02",
+    "expiry": "2026-10-16",
+    "cash": 88707.32999999996,
+    "shares": 100,
+    "stock_close": 728.0,
+    "put_strike": 740,
+    "call_strike": 775,
+    "put_close": 12.53,
+    "call_close": 0.01,
+    "short_option_liability": 1254.0,
+    "hedge_cost": 0,
+    "hedge_market_value": 0,
+    "hedge_trigger_date": null
+  },
+  "one_year_return_pct": 30.624952213861476,
+  "method": "One-year change in existing strategy equity including open-option close marks; no restart; non-trading anniversary uses preceding trading close. Hedge entry costs retain original entry-day VWAP convention.",
+  "retrieved_at_utc": "2026-10-16T02:58:54.187308+00:00"
+}

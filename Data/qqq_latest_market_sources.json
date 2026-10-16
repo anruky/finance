@@ -1,0 +1,24 @@
+{
+  "retrieved_at_utc": "2026-10-16T02:41:52.723929+00:00",
+  "latest_session": "2026-10-15",
+  "stock": {
+    "provider": "Yahoo Finance chart",
+    "url": "https://query2.finance.yahoo.com/v8/finance/chart/QQQ?interval=1d&range=1mo",
+    "rows_added": [
+      [
+        "2026-10-15",
+        718.55,
+        729.43,
+        715.44,
+        728.0,
+        49610000
+      ]
+    ],
+    "regular_market_time": 1792094400
+  },
+  "options": {
+    "provider": "Polygon/Massive",
+    "quotes_file": "qqq_valuation_quotes.json"
+  },
+  "note": "Shanghai 2026-10-16 morning; US 2026-10-16 regular session has not opened. Massive stock daily access remained through 2026-10-14; latest stock day supplemented from Yahoo; latest options available from Massive."
+}

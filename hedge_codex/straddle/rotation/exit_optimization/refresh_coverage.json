@@ -1,10 +1,9 @@
 {
-  "requested_end": "2026-10-12",
-  "stock_end": "2026-10-12",
-  "checked_at_utc": "2026-10-13T05:58:06.210282+00:00",
-  "provider_coverage": {
-    "Massive": "2026-10-09",
-    "Yahoo Finance": "2026-10-12"
-  },
-  "note": "截至10/9为Massive历史成交；10/12补充Yahoo Finance公开分钟行情，并与Investing.com收盘期权链核对。策略与原选优结果不变。"
+  "requested_end": "2026-10-14",
+  "stock_end": "2026-10-14",
+  "checked_at_utc": "2026-10-15T03:08:13.001673+00:00",
+  "note": "原选优结果不变；10/9前沿用Massive历史，10/12至10/14以Yahoo Finance公开分钟行情续算。10/16到期148行权价两腿由Massive成交数据补齐，两个到期日均参与选约。期末两腿按各自最后成交价估值，价龄见各轮细节。",
+  "provenance_file": "oct14_market_provenance.json",
+  "entry_execution_version": "latest_same_day_trade_v1",
+  "entry_correction": "entry_execution_correction.json"
 }
